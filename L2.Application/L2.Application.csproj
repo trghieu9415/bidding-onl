@@ -7,65 +7,64 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluentValidation" Version="12.1.1" />
-      <PackageReference Include="MediatR" Version="14.0.0" />
-      <PackageReference Include="Sieve" Version="2.5.5" />
+        <PackageReference Include="AutoMapper" Version="16.0.0"/>
+        <PackageReference Include="FluentValidation" Version="12.1.1"/>
+        <PackageReference Include="MediatR" Version="14.0.0"/>
+        <PackageReference Include="Sieve" Version="2.5.5"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\L1.Core\L1.Core.csproj" />
+        <ProjectReference Include="..\L1.Core\L1.Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="UseCases\Auth\Admin\ChangePassword\" />
-      <Folder Include="UseCases\Auth\Admin\Login\" />
-      <Folder Include="UseCases\Auth\Bidder\ChangePassword\" />
-      <Folder Include="UseCases\Auth\Bidder\GetProfile\" />
-      <Folder Include="UseCases\Auth\Bidder\Login\" />
-      <Folder Include="UseCases\Auth\Bidder\Register\" />
-      <Folder Include="UseCases\Auth\Bidder\RequestPassword\" />
-      <Folder Include="UseCases\Auth\Bidder\ResetPassword\" />
-      <Folder Include="UseCases\Auth\Bidder\UpdateProfile\" />
-      <Folder Include="UseCases\Bidder\Admin\GetBidders\" />
-      <Folder Include="UseCases\Bidder\Admin\GetBidder\" />
-      <Folder Include="UseCases\Bidder\Admin\GetLockedBidders\" />
-      <Folder Include="UseCases\Bidder\Admin\LockBidder\" />
-      <Folder Include="UseCases\Bidder\Admin\UnlockBider\" />
-      <Folder Include="UseCases\Bidding\Admin\AddAuction\" />
-      <Folder Include="UseCases\Bidding\Admin\AddSession\" />
-      <Folder Include="UseCases\Bidding\Admin\GetAuctions\" />
-      <Folder Include="UseCases\Bidding\Admin\GetAuction\" />
-      <Folder Include="UseCases\Bidding\Admin\GetRemovedAuctions\" />
-      <Folder Include="UseCases\Bidding\Admin\GetRemovedSessions\" />
-      <Folder Include="UseCases\Bidding\Admin\GetSessions\" />
-      <Folder Include="UseCases\Bidding\Admin\GetSession\" />
-      <Folder Include="UseCases\Bidding\Admin\PublishSession\" />
-      <Folder Include="UseCases\Bidding\Admin\RemoveAuction\" />
-      <Folder Include="UseCases\Bidding\Admin\RemoveSession\" />
-      <Folder Include="UseCases\Bidding\Admin\RestoreAuction\" />
-      <Folder Include="UseCases\Bidding\Admin\RestoreSession\" />
-      <Folder Include="UseCases\Bidding\Admin\UpdateAuction\" />
-      <Folder Include="UseCases\Bidding\Admin\UpdateSession\" />
-      <Folder Include="UseCases\Bidding\Bidder\GetSessions\" />
-      <Folder Include="UseCases\Bidding\Bidder\PlaceBid\" />
-      <Folder Include="UseCases\Bidding\System\CancelSession\" />
-      <Folder Include="UseCases\Bidding\System\EndSession\" />
-      <Folder Include="UseCases\Bidding\System\StartSession\" />
-      <Folder Include="UseCases\Catalog\Admin\AddCategory\" />
-      <Folder Include="UseCases\Catalog\Admin\ApproveItem\" />
-      <Folder Include="UseCases\Catalog\Admin\GetCategories\" />
-      <Folder Include="UseCases\Catalog\Admin\GetCategory\" />
-      <Folder Include="UseCases\Catalog\Admin\GetItems\" />
-      <Folder Include="UseCases\Catalog\Admin\GetItem\" />
-      <Folder Include="UseCases\Catalog\Admin\GetRemovedCategories\" />
-      <Folder Include="UseCases\Catalog\Admin\RejectItem\" />
-      <Folder Include="UseCases\Catalog\Admin\RemoveCategory\" />
-      <Folder Include="UseCases\Catalog\Admin\SellItem\" />
-      <Folder Include="UseCases\Catalog\Admin\UpdateCategory\" />
-      <Folder Include="UseCases\Catalog\Bidder\GetCategories\" />
-      <Folder Include="UseCases\Catalog\Bidder\GetRegisteredItems\" />
-      <Folder Include="UseCases\Catalog\Bidder\RegisterItem\" />
-      <Folder Include="UseCases\Catalog\Bidder\UpdateRegisteredItem\" />
+        <Folder Include="UseCases\Auth\Admin\ChangePassword\"/>
+        <Folder Include="UseCases\Auth\Bidder\ChangePassword\"/>
+        <Folder Include="UseCases\Auth\Bidder\GetProfile\"/>
+        <Folder Include="UseCases\Auth\Bidder\Login\"/>
+        <Folder Include="UseCases\Auth\Bidder\Register\"/>
+        <Folder Include="UseCases\Auth\Bidder\RequestPassword\"/>
+        <Folder Include="UseCases\Auth\Bidder\ResetPassword\"/>
+        <Folder Include="UseCases\Auth\Bidder\UpdateProfile\"/>
+        <Folder Include="UseCases\Bidder\Admin\GetBidders\"/>
+        <Folder Include="UseCases\Bidder\Admin\GetBidder\"/>
+        <Folder Include="UseCases\Bidder\Admin\GetLockedBidders\"/>
+        <Folder Include="UseCases\Bidder\Admin\LockBidder\"/>
+        <Folder Include="UseCases\Bidder\Admin\UnlockBider\"/>
+        <Folder Include="UseCases\Bidding\Admin\AddAuction\"/>
+        <Folder Include="UseCases\Bidding\Admin\AddSession\"/>
+        <Folder Include="UseCases\Bidding\Admin\GetAuctions\"/>
+        <Folder Include="UseCases\Bidding\Admin\GetAuction\"/>
+        <Folder Include="UseCases\Bidding\Admin\GetRemovedAuctions\"/>
+        <Folder Include="UseCases\Bidding\Admin\GetRemovedSessions\"/>
+        <Folder Include="UseCases\Bidding\Admin\GetSessions\"/>
+        <Folder Include="UseCases\Bidding\Admin\GetSession\"/>
+        <Folder Include="UseCases\Bidding\Admin\PublishSession\"/>
+        <Folder Include="UseCases\Bidding\Admin\RemoveAuction\"/>
+        <Folder Include="UseCases\Bidding\Admin\RemoveSession\"/>
+        <Folder Include="UseCases\Bidding\Admin\RestoreAuction\"/>
+        <Folder Include="UseCases\Bidding\Admin\RestoreSession\"/>
+        <Folder Include="UseCases\Bidding\Admin\UpdateAuction\"/>
+        <Folder Include="UseCases\Bidding\Admin\UpdateSession\"/>
+        <Folder Include="UseCases\Bidding\Bidder\GetSessions\"/>
+        <Folder Include="UseCases\Bidding\Bidder\PlaceBid\"/>
+        <Folder Include="UseCases\Bidding\System\CancelSession\"/>
+        <Folder Include="UseCases\Bidding\System\EndSession\"/>
+        <Folder Include="UseCases\Bidding\System\StartSession\"/>
+        <Folder Include="UseCases\Catalog\Admin\ApproveItem\"/>
+        <Folder Include="UseCases\Catalog\Admin\GetCategories\"/>
+        <Folder Include="UseCases\Catalog\Admin\GetCategory\"/>
+        <Folder Include="UseCases\Catalog\Admin\GetItems\"/>
+        <Folder Include="UseCases\Catalog\Admin\GetItem\"/>
+        <Folder Include="UseCases\Catalog\Admin\GetRemovedCategories\"/>
+        <Folder Include="UseCases\Catalog\Admin\RejectItem\"/>
+        <Folder Include="UseCases\Catalog\Admin\RemoveCategory\"/>
+        <Folder Include="UseCases\Catalog\Admin\UpdateCategory\"/>
+        <Folder Include="UseCases\Catalog\Bidder\GetCategories\"/>
+        <Folder Include="UseCases\Catalog\Bidder\GetRegisteredItems\"/>
+        <Folder Include="UseCases\Catalog\Bidder\RegisterItem\"/>
+        <Folder Include="UseCases\Catalog\Bidder\UpdateRegisteredItem\"/>
+        <Folder Include="UseCases\Catalog\System\AssignWinner\"/>
     </ItemGroup>
 
 </Project>

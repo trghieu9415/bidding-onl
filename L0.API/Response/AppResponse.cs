@@ -54,6 +54,20 @@ public static class AppResponse {
     };
   }
 
+  public static ObjectResult Success(Guid id, string? message = null, int status = 200) {
+    var response = new SuccessIdResponse {
+      Status = status,
+      Message = message ?? "Thao tác thành công",
+      Data = new IdData {
+        Id = id
+      }
+    };
+
+    return new ObjectResult(response) {
+      StatusCode = status
+    };
+  }
+
 
   public static ObjectResult Fail(string? error = null, int status = 400) {
     var response = new ErrorResponse {
