@@ -11,7 +11,7 @@ public class AppUser : IdentityUser<Guid> {
   public DateTime? DeletedAt { get; private set; }
   public bool IsDeleted { get; private set; }
 
-  public UserRole Role { get; init; } = UserRole.Customer;
+  public UserRole Role { get; init; } = UserRole.Trader;
 
   public void Update(string fullName, string? url) {
     FullName = fullName;

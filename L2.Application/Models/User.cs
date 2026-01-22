@@ -11,5 +11,5 @@ public record User {
 
 public enum UserRole {
   Admin,
-  Customer
+  Trader
 }

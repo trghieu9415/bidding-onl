@@ -7,26 +7,24 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\L2.Application\L2.Application.csproj" />
+        <ProjectReference Include="..\L2.Application\L2.Application.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.12" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.12">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Sieve" Version="2.5.5" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.12"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.12">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Sieve" Version="2.5.5"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Adapters\Identity\" />
-      <Folder Include="Adapters\Audit\" />
-      <Folder Include="Adapters\Repository\" />
-      <Folder Include="Adapters\Security\" />
-      <Folder Include="Adapters\Storage\" />
-      <Folder Include="Persistence\Seeding\" />
-      <Folder Include="Persistence\Sieve\" />
+        <Folder Include="Adapters\Audit\"/>
+        <Folder Include="Adapters\Security\"/>
+        <Folder Include="Adapters\Storage\"/>
+        <Folder Include="Persistence\Seeding\"/>
+        <Folder Include="Persistence\Sieve\"/>
     </ItemGroup>
 
 </Project>

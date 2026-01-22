@@ -7,7 +7,6 @@ namespace L2.Application.Ports.Repository;
 public interface IReadRepository<T> where T : AggregateRoot {
   Task<T?> GetByIdAsync(
     Guid id,
-    List<Expression<Func<T, object>>>? includes = null,
     CancellationToken ct = default
   );
 
