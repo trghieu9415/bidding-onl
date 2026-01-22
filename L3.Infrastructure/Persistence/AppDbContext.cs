@@ -1,4 +1,6 @@
 ﻿using System.Data;
+using L1.Core.Domain.Bidding.Entities;
+using L1.Core.Domain.Catalog.Entities;
 using L2.Application.Ports.Repository;
 using L3.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -11,6 +13,11 @@ public class AppDbContext(
   DbContextOptions<AppDbContext> options
 ) : IdentityUserContext<AppUser, Guid>(options), IUnitOfWork {
   private IDbContextTransaction? _currentTransaction;
+  public DbSet<Auction> Auctions => Set<Auction>();
+  public DbSet<AuctionSession> AuctionSessions => Set<AuctionSession>();
+  public DbSet<Bid> Bids => Set<Bid>();
+  public DbSet<CatalogItem> CatalogItems => Set<CatalogItem>();
+  public DbSet<Category> Categories => Set<Category>();
 
 
   public async Task BeginTransactionAsync(CancellationToken ct = default) {
