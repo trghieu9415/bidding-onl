@@ -1,5 +1,17 @@
-﻿namespace L2.Application.DTOs;
+﻿using L1.Core.Domain.Catalog.Enums;
 
-public class CatalogItemDto {
-  
-}
+namespace L2.Application.DTOs;
+
+public record CatalogItemDto(
+  Guid Id,
+  Guid OwnerId,
+  string Name,
+  string Description,
+  ItemStatus Status,
+  ItemCondition? Condition,
+  decimal StartingPrice,
+  string? MainImageUrl,
+  List<string> SubImageUrls,
+  List<Guid> CategoryIds,
+  DateTime CreatedAt
+);

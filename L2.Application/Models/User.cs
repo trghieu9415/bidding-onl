@@ -7,6 +7,7 @@ public record User {
   public string? PhoneNumber { get; init; }
   public string? Url { get; init; }
   public bool IsActive { get; init; } = true;
+  public UserRole Role { get; init; }
 }
 
 public enum UserRole {

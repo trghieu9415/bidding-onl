@@ -14,10 +14,15 @@ public class AuctionSession : AggregateRoot {
   public SessionStatus Status { get; private set; } = SessionStatus.Draft;
   public IReadOnlyCollection<Guid> AuctionIds => _auctionIds.AsReadOnly();
 
-  public static AuctionSession? Create(string title) {
+  public static AuctionSession Create(string title) {
     return new AuctionSession {
       Title = title
     };
+  }
+
+  public AuctionSession Update(string title) {
+    Title = title;
+    return this;
   }
 
   public AuctionSession SetTimeFrame(DateTime startTime, DateTime endTime) {

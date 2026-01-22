@@ -1,6 +1,7 @@
 using AutoMapper;
 using L1.Core.Domain.Catalog.Entities;
 using L2.Application.DTOs;
+using L2.Application.Models;
 using L2.Application.Ports.Repository;
 using MediatR;
 
@@ -14,6 +15,8 @@ public class GetRemovedCategoriesHandler(
     var (total, entities) = await readRepository.GetDeletedAsync(request.SieveModel, ct: ct);
 
     var dtos = mapper.Map<List<CategoryDto>>(entities);
-    return new GetRemovedCategoriesResult(dtos, total);
+    var meta = Meta.Create(request.SieveModel.Page ?? 1, request.SieveModel.PageSize ?? 10, total);
+
+    return new GetRemovedCategoriesResult(dtos, meta);
   }
 }

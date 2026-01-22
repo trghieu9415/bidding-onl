@@ -11,19 +11,20 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.12"/>
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.12"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.12">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.12"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4"/>
         <PackageReference Include="Sieve" Version="2.5.5"/>
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Adapters\Audit\"/>
-        <Folder Include="Adapters\Security\"/>
         <Folder Include="Persistence\Seeding\"/>
-        <Folder Include="Persistence\Sieve\"/>
     </ItemGroup>
 
 </Project>

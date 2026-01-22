@@ -1,1 +1,11 @@
-public class RequestPasswordHandler {}
+using L2.Application.Ports.Security;
+using MediatR;
+
+namespace L2.Application.UseCases.Auth.Bidder.RequestPassword;
+
+public class RequestPasswordHandler(IAuthentication authService) : IRequestHandler<RequestPasswordCommand, Unit> {
+  public async Task<Unit> Handle(RequestPasswordCommand request, CancellationToken ct) {
+    await authService.RequestPasswordAsync(request.Email, ct);
+    return Unit.Value;
+  }
+}

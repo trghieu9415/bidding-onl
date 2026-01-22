@@ -1,5 +1,12 @@
-﻿namespace L2.Application.DTOs;
+﻿using L1.Core.Domain.Bidding.Enums;
 
-public class AuctionSessionDto {
-  
-}
+namespace L2.Application.DTOs;
+
+public record AuctionSessionDto(
+  Guid Id,
+  string Title,
+  SessionStatus Status,
+  DateTime? StartTime,
+  DateTime? EndTime,
+  List<Guid> AuctionIds
+);

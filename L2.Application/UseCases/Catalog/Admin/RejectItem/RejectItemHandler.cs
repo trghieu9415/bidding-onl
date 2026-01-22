@@ -1,1 +1,17 @@
-public class RejectItemHandler {}
+using L1.Core.Domain.Catalog.Entities;
+using L2.Application.Exceptions;
+using L2.Application.Ports.Repository;
+using MediatR;
+
+namespace L2.Application.UseCases.Catalog.Admin.RejectItem;
+
+public class RejectItemHandler(IRepository<CatalogItem> repository) : IRequestHandler<RejectItemCommand, Unit> {
+  public async Task<Unit> Handle(RejectItemCommand request, CancellationToken ct) {
+    var item = await repository.GetByIdAsync(request.Id, ct)
+               ?? throw new AppException("Sản phẩm không tồn tại", 404);
+
+    item.Reject();
+    await repository.UpdateAsync(item, ct);
+    return Unit.Value;
+  }
+}
