@@ -5,6 +5,7 @@ using L2.Application.Exceptions;
 using L2.Application.Models;
 using L2.Application.Ports.Notification;
 using L2.Application.Ports.Security;
+using L2.Application.Ports.Storage;
 using L3.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +17,8 @@ public class AuthenticationService(
   UserManager<AppUser> userManager,
   IJwtService jwtService,
   IConfiguration config,
-  IEmailService emailService
+  IEmailService emailService,
+  ICacheStorage cache
 ) : IAuthentication {
   public async Task<AuthTokens> LoginUserAsync(string email, string password, CancellationToken ct) {
     return await AuthenticateAsync(email, password, UserRole.Bidder);
@@ -118,6 +120,11 @@ public class AuthenticationService(
   }
 
   public async Task<AuthTokens> RefreshAsync(string refreshToken, CancellationToken ct) {
+    var isBlacklisted = await cache.GetAsync<bool>($"blacklist:{refreshToken}", ct);
+    if (isBlacklisted) {
+      throw new AppException("Phiên đăng nhập đã bị vô hiệu hóa", 401);
+    }
+
     var tokenHandler = new JwtSecurityTokenHandler();
     var key = Encoding.UTF8.GetBytes(config["Jwt:Secret"]!);
 
@@ -140,16 +147,34 @@ public class AuthenticationService(
         throw new AppException("Tài khoản không hợp lệ", 401);
       }
 
+      var remainingTime = jwtToken.ValidTo - DateTime.UtcNow;
+      if (remainingTime.TotalSeconds > 0) {
+        await cache.SetAsync($"blacklist:{refreshToken}", true, remainingTime, ct);
+      }
+
       var userModel = ToUserModel(user);
       return new AuthTokens(jwtService.GenerateAccessToken(userModel), jwtService.GenerateRefreshToken(userModel));
     } catch {
-      throw new AppException("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại", 401);
+      throw new AppException("Phiên đăng nhập không hợp lệ hoặc đã hết hạn", 401);
     }
   }
 
-  public Task LogoutAsync(string refreshToken, CancellationToken ct) {
-    // TODO: Thêm refreshToken vào blacklist
-    return Task.CompletedTask;
+  public async Task LogoutAsync(string refreshToken, CancellationToken ct) {
+    if (string.IsNullOrEmpty(refreshToken)) {
+      return;
+    }
+
+    var tokenHandler = new JwtSecurityTokenHandler();
+    try {
+      var jwtToken = tokenHandler.ReadJwtToken(refreshToken);
+      var remainingTime = jwtToken.ValidTo - DateTime.UtcNow;
+
+      if (remainingTime.TotalSeconds > 0) {
+        await cache.SetAsync($"blacklist:{refreshToken}", true, remainingTime, ct);
+      }
+    } catch {
+      // ignored
+    }
   }
 
   // NOTE: ========== [Helper methods] ==========
