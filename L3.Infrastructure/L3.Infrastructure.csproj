@@ -22,7 +22,6 @@
     <ItemGroup>
         <Folder Include="Adapters\Audit\"/>
         <Folder Include="Adapters\Security\"/>
-        <Folder Include="Adapters\Storage\"/>
         <Folder Include="Persistence\Seeding\"/>
         <Folder Include="Persistence\Sieve\"/>
     </ItemGroup>

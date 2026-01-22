@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using L1.Core.Base.Entity;
+using L1.Core.Base.Exception;
 using L1.Core.Domain.Catalog.Enums;
 using L1.Core.Domain.Catalog.ValueObjects;
 
@@ -18,8 +19,9 @@ public class CatalogItem : AggregateRoot {
   public decimal StartingPrice { get; private set; }
   public ImageGallery Images { get; private set; } = new(null, []);
 
-  public static CatalogItem Create(string name, string description) {
+  public static CatalogItem Create(Guid ownerId, string name, string description) {
     return new CatalogItem {
+      OwnerId = ownerId,
       Name = name,
       Description = description
     };
@@ -55,11 +57,28 @@ public class CatalogItem : AggregateRoot {
     return this;
   }
 
+  public void Reject() {
+    if (Status != ItemStatus.Pending) {
+      throw new DomainException("Chỉ có thể từ chối sản phẩm đang chờ duyệt.");
+    }
+
+    Status = ItemStatus.Rejected;
+  }
+
+
   public void Approve() {
+    if (Status != ItemStatus.Pending) {
+      throw new DomainException("Chỉ có thể duyệt sản phẩm đang chờ duyệt.");
+    }
+
     Status = ItemStatus.Approval;
   }
 
   public void Sell(bool isSold) {
+    if (Status != ItemStatus.Approval) {
+      throw new DomainException("Chỉ có thể chuyển trạng thái sản phẩm khi sản phẩm được duyệt.");
+    }
+
     Status = isSold ? ItemStatus.Sold : ItemStatus.Unsold;
   }
 }

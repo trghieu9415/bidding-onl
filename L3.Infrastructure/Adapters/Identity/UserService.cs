@@ -14,7 +14,7 @@ public class UserService(
   UserManager<AppUser> userManager,
   ISieveProcessor sieveProcessor
 ) : IUserService {
-  public async Task<User?> GetByIdAsync(Guid id, UserRole role = UserRole.Trader, CancellationToken ct = default) {
+  public async Task<User?> GetByIdAsync(Guid id, UserRole role = UserRole.Bidder, CancellationToken ct = default) {
     var user = await userManager.Users
       .FirstOrDefaultAsync(u => u.Id == id && u.Role == role, ct);
 
@@ -23,7 +23,7 @@ public class UserService(
 
   public async Task<(int total, List<User> users)> GetAsync(
     SieveModel? sieveModel = null,
-    UserRole role = UserRole.Trader,
+    UserRole role = UserRole.Bidder,
     CancellationToken ct = default
   ) {
     var query = userManager.Users.AsNoTracking()
@@ -44,7 +44,7 @@ public class UserService(
 
   public async Task<(int total, List<User> users)> GetDeletedAsync(
     SieveModel? sieveModel = null,
-    UserRole role = UserRole.Trader,
+    UserRole role = UserRole.Bidder,
     CancellationToken ct = default
   ) {
     var query = userManager.Users.AsNoTracking()

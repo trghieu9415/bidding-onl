@@ -5,19 +5,19 @@ namespace L2.Application.Ports.Identity;
 
 public interface IUserService {
   Task<User?> GetByIdAsync(Guid id,
-    UserRole role = UserRole.Trader,
+    UserRole role = UserRole.Bidder,
     CancellationToken ct = default
   );
 
   Task<(int total, List<User> users)> GetAsync(
     SieveModel? sieveModel = null,
-    UserRole role = UserRole.Trader,
+    UserRole role = UserRole.Bidder,
     CancellationToken ct = default
   );
 
   Task<(int total, List<User> users)> GetDeletedAsync(
     SieveModel? sieveModel = null,
-    UserRole role = UserRole.Trader,
+    UserRole role = UserRole.Bidder,
     CancellationToken ct = default
   );
 

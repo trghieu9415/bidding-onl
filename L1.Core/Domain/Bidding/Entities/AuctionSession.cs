@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using L1.Core.Base.Entity;
+using L1.Core.Base.Exception;
 using L1.Core.Domain.Bidding.Enums;
 using L1.Core.Domain.Bidding.ValueObjects;
 
@@ -20,11 +21,24 @@ public class AuctionSession : AggregateRoot {
   }
 
   public AuctionSession SetTimeFrame(DateTime startTime, DateTime endTime) {
+    if (startTime >= endTime) {
+      throw new DomainException("Thời gian bắt đầu phải trước thời gian kết thúc.");
+    }
+
+    if (Status != SessionStatus.Draft && Status != SessionStatus.Published) {
+      throw new DomainException("Không thể thay đổi thời gian khi phiên đã diễn ra.");
+    }
+
     TimeFrame = new AuctionTimeFrame(startTime, endTime);
     return this;
   }
 
+
   public AuctionSession SyncAuctions(ICollection<Guid> auctionIds) {
+    if (Status == SessionStatus.Closed) {
+      throw new DomainException("Phiên đấu giá đã đóng.");
+    }
+
     _auctionIds.Clear();
     _auctionIds.AddRange(auctionIds);
     return this;

@@ -22,35 +22,54 @@ public class Auction : AggregateRoot {
     };
   }
 
+  public void UpdateRules(decimal stepPrice, decimal reservePrice) {
+    if (Status != AuctionStatus.Scheduled) {
+      throw new DomainException("Chỉ được sửa quy tắc khi đấu giá chưa bắt đầu.");
+    }
+
+    Rules = new AuctionRules(stepPrice, reservePrice);
+  }
+
   public void PlaceBid(Guid bidderId, decimal amount) {
-    if (WinningBidId.HasValue) {
-      throw new DomainException("Đã có người ____");
+    if (Status != AuctionStatus.Active) {
+      throw new DomainException("Chỉ có thể đặt giá khi đấu giá đang diễn ra.");
     }
 
-    if (amount <= CurrentPrice) {
-      throw new DomainException("Giá đặt ___");
+    var minimumNextBid = _bids.Count == 0 ? Rules.ReservePrice : CurrentPrice + Rules.StepPrice;
+
+    if (amount < minimumNextBid) {
+      throw new DomainException($"Giá đặt phải tối thiểu là {minimumNextBid}");
     }
 
-    _bids.Add(Bid.Create(this, bidderId, amount));
+    var bid = Bid.Create(this, bidderId, amount);
+    _bids.Add(bid);
     CurrentPrice = amount;
   }
 
   public void End() {
-    if (_bids.Count == 0) {
+    if (Status != AuctionStatus.Active) {
+      throw new DomainException("Không thể kết thúc phiên đấu giá đang diễn ra.");
+    }
+
+    if (_bids.Count == 0 || CurrentPrice < Rules.ReservePrice) {
       Status = AuctionStatus.EndedUnsold;
     } else {
-      WinningBidId = _bids.Last().Id;
+      WinningBidId = _bids.OrderByDescending(x => x.Amount).First().Id;
       Status = AuctionStatus.EndedSold;
     }
   }
 
   public void Start() {
+    if (Status != AuctionStatus.Scheduled) {
+      throw new DomainException("Phiên đấu giá không ở trạng thái được lên lịch");
+    }
+
     Status = AuctionStatus.Active;
   }
 
   public void Cancel() {
     if (Status != AuctionStatus.Scheduled) {
-      throw new DomainException("Không thể hủy __ trạng thái hiện tại");
+      throw new DomainException("Không thể hủy phiên đấu giá đang diễn ra");
     }
 
     Status = AuctionStatus.Canceled;

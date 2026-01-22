@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using L1.Core.Base.Entity;
+using L1.Core.Base.Exception;
 
 namespace L1.Core.Domain.Catalog.Entities;
 
@@ -15,8 +16,13 @@ public class Category : AggregateRoot {
     };
   }
 
-  public Category Update(string? name) {
-    Name = name ?? Name;
+  public Category Update(string name, Guid? parentId) {
+    if (parentId == Id) {
+      throw new DomainException("Danh mục cha không thể là chính nó.");
+    }
+
+    Name = name;
+    ParentId = parentId;
     return this;
   }
 }
