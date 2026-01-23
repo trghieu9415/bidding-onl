@@ -1,41 +1,86 @@
-using L0.API;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using L0.API.Extensions;
+using L0.API.Middlewares;
+using L2.Application;
+using L2.Application.Behaviors;
+using L3.Infrastructure;
+using L3.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// --- Web API & JSON Configuration ---
+builder.Services
+  .AddControllers()
+  .ConfigureApiBehaviorOptions(options => {
+    options.SuppressModelStateInvalidFilter = true;
+  })
+  .AddJsonOptions(options => {
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+  });
+
+// --- Routing Configuration ---
+builder.Services.AddRouting(options => {
+  options.LowercaseUrls = true;
+  options.LowercaseQueryStrings = true;
+});
+
+// --- Swagger Documentation ---
+builder.Services.AddSwaggerDocument();
+
+// --- Application Layer (MediatR, AutoMapper, Validation) ---
+var applicationAssembly = typeof(IApplication).Assembly;
+
+builder.Services.AddMediatR(cfg => {
+  cfg.RegisterServicesFromAssembly(applicationAssembly);
+  cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+  cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
+});
+
+builder.Services.AddAutoMapper(config => {}, applicationAssembly);
+
+// --- Infrastructure & Third-Party Layers ---
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) {
-  app.MapOpenApi();
+// --- CLI Flag: Seeding Data ---
+if (args.Contains("--seeding")) {
+  using var scope = app.Services.CreateScope();
+  try {
+    var initializer = scope.ServiceProvider.GetRequiredService<DbInitializer>();
+    await initializer.SeedAsync();
+  } catch (Exception ex) {
+    Console.WriteLine($"[-] Lỗi trong quá trình Seeding: {ex.Message}");
+  }
+
+  return;
 }
 
+// --- Error Handling & Security ---
+app.UseMiddleware<GlobalExceptionHandler>();
 app.UseHttpsRedirection();
 
-var summaries = new[] {
-  "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+// --- Swagger UI ---
+if (app.Environment.IsDevelopment()) {
+  app.UseSwagger();
+  app.UseSwaggerUI(c => {
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "User API v1");
+    c.SwaggerEndpoint("/swagger/v2/swagger.json", "Dashboard API v2");
+  });
+}
 
-app.MapGet("/weatherforecast", () => {
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-          DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-          Random.Shared.Next(-20, 55),
-          summaries[Random.Shared.Next(summaries.Length)]
-        ))
-      .ToArray();
-    return forecast;
-  })
-  .WithName("GetWeatherForecast");
+// --- Authentication & Authorization ---
+// app.UseAuthentication();
+// app.UseAuthorization();
+
+// --- Endpoints ---
+app.MapControllers();
+
+// --- Allow Static Files ---
+app.UseStaticFiles();
 
 app.Run();
-
-namespace L0.API {
-  record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary) {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-  }
-}
