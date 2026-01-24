@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 using Sieve.Services;
 
 namespace L3.Infrastructure;
@@ -37,8 +38,14 @@ public static class InfrastructureConfig {
 
   // NOTE: ========== [Cơ sở dữ liệu] ==========
   private static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration config) {
+    var connectionString = config.GetConnectionString("DefaultConnection");
+
+    var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+    dataSourceBuilder.EnableDynamicJson();
+    var dataSource = dataSourceBuilder.Build();
+
     services.AddDbContext<AppDbContext>(options =>
-      options.UseNpgsql(config.GetConnectionString("DefaultConnection"),
+      options.UseNpgsql(dataSource,
         b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
     services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
@@ -95,7 +102,7 @@ public static class InfrastructureConfig {
 
   // NOTE: ========== [Dịch vụ ngoài] ==========
   private static IServiceCollection AddThirdPartyServices(this IServiceCollection services, IConfiguration config) {
-    services.AddScoped<ISieveProcessor, SieveProcessor>();
+    services.AddScoped<ISieveProcessor, AppSieveProcessor>();
     services.AddScoped<IEmailService, EmailService>();
     services.AddScoped<IBinaryStorage, LocalBinaryStorage>();
 

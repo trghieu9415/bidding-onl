@@ -2,7 +2,7 @@ bin/
 obj/
 out/
 
-[Mm]igrates/
+[Mm]igrations/
 
 appsettings.json
 

@@ -15,7 +15,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Sieve" Version="3.0.0-beta0015"/>
+    <PackageReference Include="Sieve" Version="2.5.5"/>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6"/>
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0"/>
   </ItemGroup>

@@ -6,6 +6,10 @@ using L2.Application;
 using L2.Application.Behaviors;
 using L3.Infrastructure;
 using L3.Infrastructure.Persistence;
+using Swashbuckle.AspNetCore.SwaggerUI;
+
+// Allow Local Timestamp
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +74,7 @@ if (app.Environment.IsDevelopment()) {
   app.UseSwaggerUI(c => {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "User API v1");
     c.SwaggerEndpoint("/swagger/v2/swagger.json", "Dashboard API v2");
+    c.DocExpansion(DocExpansion.None);
   });
 }
 

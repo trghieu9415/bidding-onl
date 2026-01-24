@@ -4,5 +4,5 @@ namespace L0.API.Controllers;
 
 [ApiController]
 [Route("api/dashboard/[controller]")]
-[ApiExplorerSettings(GroupName = "v1")]
+[ApiExplorerSettings(GroupName = "v2")]
 public abstract class DashboardController : ControllerBase;

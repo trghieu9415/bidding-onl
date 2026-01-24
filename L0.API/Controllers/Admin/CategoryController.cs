@@ -13,8 +13,9 @@ using Sieve.Models;
 namespace L0.API.Controllers.Admin;
 
 public class CategoryController(IMediator mediator) : DashboardController {
-  [HttpGet]
-  public async Task<IActionResult> GetById(GetCategoryQuery query) {
+  [HttpGet("{id:guid}")]
+  public async Task<IActionResult> GetById(Guid id) {
+    var query = new GetCategoryQuery(id);
     var result = await mediator.Send(query);
     return AppResponse.Success(result.Category);
   }
