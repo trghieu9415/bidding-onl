@@ -26,9 +26,7 @@ public class AuctionSession : AggregateRoot {
   }
 
   public AuctionSession SetTimeFrame(DateTime startTime, DateTime endTime) {
-    if (startTime >= endTime) {
-      throw new DomainException("Thời gian bắt đầu phải trước thời gian kết thúc.");
-    }
+    AuctionTimeFrame.Validate(startTime, endTime);
 
     if (Status != SessionStatus.Draft && Status != SessionStatus.Published) {
       throw new DomainException("Không thể thay đổi thời gian khi phiên đã diễn ra.");

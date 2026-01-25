@@ -16,7 +16,7 @@ public class CancelSessionHandler(
     session.Close();
     await sessionRepo.UpdateAsync(session, ct);
 
-    var auctions = await auctionRepo.GetByKeysAsync(session.AuctionIds.ToList(), ct);
+    var auctions = await auctionRepo.GetByKeysAsync(session.AuctionIds.ToList(), ct: ct);
     foreach (var auction in auctions) {
       auction.Cancel();
       await auctionRepo.UpdateAsync(auction, ct);

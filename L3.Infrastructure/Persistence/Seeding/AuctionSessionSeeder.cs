@@ -21,7 +21,7 @@ public class AuctionSessionSeeder(AppDbContext context) : ISeeder {
     }
 
     var auctions = items.Select(item =>
-      Auction.Create(item.Id, 500000, item.StartingPrice + 2000000)
+      Auction.Create(item.Id, item.StartingPrice, 500000, item.StartingPrice + 2000000)
     ).ToList();
 
     context.Auctions.AddRange(auctions);

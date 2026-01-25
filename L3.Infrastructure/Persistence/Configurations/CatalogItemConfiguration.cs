@@ -18,6 +18,10 @@ public class CatalogItemConfiguration : BaseConfiguration<CatalogItem> {
         .HasColumnType("jsonb");
     });
 
-    builder.Property(x => x.CategoryIds);
+    builder.Property(x => x.CategoryIds)
+      .HasColumnType("jsonb");
+
+    builder.HasIndex(x => x.CategoryIds)
+      .HasMethod("gin");
   }
 }

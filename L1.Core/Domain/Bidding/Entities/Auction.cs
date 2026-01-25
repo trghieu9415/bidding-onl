@@ -15,9 +15,10 @@ public class Auction : AggregateRoot {
   public AuctionRules Rules { get; private set; } = null!;
   public IReadOnlyCollection<Bid> Bids => _bids.AsReadOnly();
 
-  public static Auction Create(Guid catalogItemId, decimal stepPrice, decimal reversePrice) {
+  public static Auction Create(Guid catalogItemId, decimal startingPrice, decimal stepPrice, decimal reversePrice) {
     return new Auction {
       CatalogItemId = catalogItemId,
+      CurrentPrice = startingPrice,
       Rules = new AuctionRules(stepPrice, reversePrice)
     };
   }
@@ -35,7 +36,9 @@ public class Auction : AggregateRoot {
       throw new DomainException("Chỉ có thể đặt giá khi đấu giá đang diễn ra.");
     }
 
-    var minimumNextBid = _bids.Count == 0 ? Rules.ReservePrice : CurrentPrice + Rules.StepPrice;
+    var minimumNextBid = _bids.Count == 0
+      ? Math.Max(CurrentPrice, Rules.ReservePrice)
+      : CurrentPrice + Rules.StepPrice;
 
     if (amount < minimumNextBid) {
       throw new DomainException($"Giá đặt phải tối thiểu là {minimumNextBid}");

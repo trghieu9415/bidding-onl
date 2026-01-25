@@ -15,6 +15,10 @@ public class AuctionSessionConfiguration : BaseConfiguration<AuctionSession> {
       nav.Property(t => t.EndTime).HasColumnName("EndTime");
     });
 
-    builder.Property(x => x.AuctionIds);
+    builder.Property(x => x.AuctionIds)
+      .HasColumnType("jsonb");
+
+    builder.HasIndex(x => x.AuctionIds)
+      .HasMethod("gin");
   }
 }

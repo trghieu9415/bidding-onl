@@ -16,7 +16,11 @@ public class EndSessionHandler(
     session.Close();
     await sessionRepo.UpdateAsync(session, ct);
 
-    var auctions = await auctionRepo.GetByKeysAsync(session.AuctionIds.ToList(), ct);
+    var auctions = await auctionRepo.GetByKeysAsync(
+      session.AuctionIds.ToList(),
+      [b => b.Bids],
+      ct
+    );
     foreach (var auction in auctions) {
       auction.End();
       await auctionRepo.UpdateAsync(auction, ct);

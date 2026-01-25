@@ -6,13 +6,12 @@ namespace L1.Core.Base.Entity;
 
 public class AggregateRoot : BaseEntity, IHasDomainEvent {
   private readonly List<DomainEvent> _domainEvents = [];
-  
-  [NotMapped] 
-  [JsonIgnore]
-  public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly(); 
+  [NotMapped] [JsonIgnore] public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+
   public void AddDomainEvent(DomainEvent domainEvent) {
     _domainEvents.Add(domainEvent);
   }
+
   public void ClearEvents() {
     _domainEvents.Clear();
   }

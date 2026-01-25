@@ -16,7 +16,7 @@ public class StartSessionHandler(
     session.Start();
     await sessionRepo.UpdateAsync(session, ct);
 
-    var auctions = await auctionRepo.GetByKeysAsync(session.AuctionIds.ToList(), ct);
+    var auctions = await auctionRepo.GetByKeysAsync(session.AuctionIds.ToList(), ct: ct);
     foreach (var auction in auctions) {
       auction.Start();
       await auctionRepo.UpdateAsync(auction, ct);

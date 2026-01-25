@@ -8,11 +8,16 @@ public interface IRepository<T> where T : AggregateRoot {
 
   Task<List<T>> GetAsync(
     Expression<Func<T, bool>>? criteria = null,
-    ICollection<Expression<Func<T, BaseEntity>>>? includes = null,
+    ICollection<Expression<Func<T, object>>>? includes = null,
     CancellationToken ct = default
   );
 
-  Task<List<T>> GetByKeysAsync(ICollection<Guid> ids, CancellationToken ct = default);
+  Task<List<T>> GetByKeysAsync(
+    ICollection<Guid> ids,
+    ICollection<Expression<Func<T, object>>>? includes = null,
+    CancellationToken ct = default
+  );
+
   Task<IReadOnlyCollection<Guid>> GetMissingIds(ICollection<Guid> ids, CancellationToken ct = default);
 
   Task<Guid> CreateAsync(T entity, CancellationToken ct = default);

@@ -10,13 +10,22 @@ namespace L3.Infrastructure.Adapters.Repository;
 public class EfRepository<T>(AppDbContext context) : IRepository<T> where T : AggregateRoot {
   private readonly DbSet<T> _dbSet = context.Set<T>();
 
-  public Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default) {
-    return _dbSet.FirstOrDefaultAsync(x => x.Id == id, ct);
+  public async Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default) {
+    var query = _dbSet.Where(x => !x.IsDeleted);
+    var entityType = context.Model.FindEntityType(typeof(T));
+    if (entityType == null) {
+      return await query.FirstOrDefaultAsync(x => x.Id == id, ct);
+    }
+
+    var navigations = entityType.GetNavigations();
+    query = navigations.Aggregate(query, (current, nav) => current.Include(nav.Name));
+    return await query.FirstOrDefaultAsync(x => x.Id == id, ct);
   }
+
 
   public async Task<List<T>> GetAsync(
     Expression<Func<T, bool>>? criteria = null,
-    ICollection<Expression<Func<T, BaseEntity>>>? includes = null,
+    ICollection<Expression<Func<T, object>>>? includes = null,
     CancellationToken ct = default
   ) {
     IQueryable<T> query = _dbSet;
@@ -31,12 +40,21 @@ public class EfRepository<T>(AppDbContext context) : IRepository<T> where T : Ag
     return await query.ToListAsync(ct);
   }
 
-  public async Task<List<T>> GetByKeysAsync(ICollection<Guid>? ids, CancellationToken ct = default) {
+  public async Task<List<T>> GetByKeysAsync(
+    ICollection<Guid>? ids,
+    ICollection<Expression<Func<T, object>>>? includes,
+    CancellationToken ct = default
+  ) {
     if (ids == null || ids.Count == 0) {
       return [];
     }
 
-    return await _dbSet
+    IQueryable<T> query = _dbSet;
+    if (includes != null) {
+      query = includes.Aggregate(query, (current, include) => current.Include(include));
+    }
+
+    return await query
       .Where(x => ids.Contains(x.Id))
       .ToListAsync(ct);
   }

@@ -7,5 +7,7 @@ namespace L3.Infrastructure.Persistence.Configurations;
 public abstract class BaseConfiguration<T> : IEntityTypeConfiguration<T> where T : BaseEntity {
   public virtual void Configure(EntityTypeBuilder<T> builder) {
     builder.HasKey(e => e.Id);
+
+    builder.Property(x => x.RowVersion).IsRowVersion();
   }
 }
