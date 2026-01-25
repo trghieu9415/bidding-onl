@@ -1,11 +1,9 @@
 ﻿using System.Data;
-using System.Text.Json;
-using L1.Core.Base.Event;
 using L1.Core.Domain.Bidding.Entities;
 using L1.Core.Domain.Catalog.Entities;
 using L2.Application.Ports.Repository;
 using L3.Infrastructure.Identity;
-using L3.Infrastructure.Persistence.Outbox;
+using MassTransit;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -62,32 +60,15 @@ public class AppDbContext(
     }
   }
 
-  public override async Task<int> SaveChangesAsync(CancellationToken ct = default) {
-    var domainEvents = ChangeTracker.Entries<IHasDomainEvent>()
-      .Select(x => x.Entity)
-      .SelectMany(x => {
-        var events = x.DomainEvents.ToList();
-        x.ClearEvents();
-        return events;
-      })
-      .Select(domainEvent => new OutboxMessage {
-        Id = Guid.NewGuid(),
-        OccurredOnUtc = DateTime.UtcNow,
-        Type = domainEvent.GetType().Name,
-        Content = JsonSerializer.Serialize(domainEvent, domainEvent.GetType())
-      })
-      .ToList();
-
-    if (domainEvents.Count != 0) {
-      Set<OutboxMessage>().AddRange(domainEvents);
-    }
-
-    return await base.SaveChangesAsync(ct);
-  }
-
   protected override void OnModelCreating(ModelBuilder modelBuilder) {
     modelBuilder.HasPostgresExtension("pg_trgm");
     base.OnModelCreating(modelBuilder);
+
+    // NOTE: ========== [MassTransit Outbox Entities] ==========
+    modelBuilder.AddInboxStateEntity();
+    modelBuilder.AddOutboxMessageEntity();
+    modelBuilder.AddOutboxStateEntity();
+
     modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
   }
 }

@@ -35,7 +35,7 @@ builder.Services.AddRouting(options => {
 builder.Services.AddSwaggerDocument();
 
 // --- Application Layer (MediatR, AutoMapper, Validation) ---
-var applicationAssembly = typeof(IApplication).Assembly;
+var applicationAssembly = typeof(IApplicationMarker).Assembly;
 
 builder.Services.AddMediatR(cfg => {
   cfg.RegisterServicesFromAssembly(applicationAssembly);

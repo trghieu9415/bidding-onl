@@ -1,6 +1,6 @@
-﻿namespace L2.Application;
+﻿namespace L3.Worker;
 
 /// <summary>
 ///   Marker interface for assembly scanning
 /// </summary>
-public interface IApplication;
+public interface IWorkerMarker;

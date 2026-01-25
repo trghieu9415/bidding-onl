@@ -8,9 +8,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\L2.Application\L2.Application.csproj"/>
+    <ProjectReference Include="..\L3.Worker\L3.Worker.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.0.0"/>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.12"/>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.12"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.12">
