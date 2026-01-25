@@ -2,6 +2,7 @@
 using L1.Core.Base.Entity;
 using L1.Core.Base.Exception;
 using L1.Core.Domain.Bidding.Enums;
+using L1.Core.Domain.Bidding.Events;
 using L1.Core.Domain.Bidding.ValueObjects;
 
 namespace L1.Core.Domain.Bidding.Entities;
@@ -49,6 +50,7 @@ public class AuctionSession : AggregateRoot {
 
   public void Publish() {
     Status = SessionStatus.Published;
+    AddDomainEvent(new SessionPublishedEvent(Id, Title));
   }
 
   public void Start() {

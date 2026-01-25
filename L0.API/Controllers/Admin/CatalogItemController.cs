@@ -29,8 +29,9 @@ public class CatalogItemController(IMediator mediator) : DashboardController {
   }
 
   [HttpPatch("{id:guid}/reject")]
-  public async Task<IActionResult> Reject(Guid id) {
-    await mediator.Send(new RejectItemCommand(id));
+  public async Task<IActionResult> Reject(Guid id, [FromBody] RejectItemCommand command) {
+    command = command with { Id = id };
+    await mediator.Send(command);
     return AppResponse.Success("Sản phẩm đã bị từ chối");
   }
 }

@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using L0.API.Extensions;
+using L0.API.Hubs;
 using L0.API.Middlewares;
 using L2.Application;
 using L2.Application.Behaviors;
@@ -30,6 +31,9 @@ builder.Services.AddRouting(options => {
   options.LowercaseUrls = true;
   options.LowercaseQueryStrings = true;
 });
+
+// --- SignalR Configuration ---
+builder.Services.AddSignalR();
 
 // --- Swagger Documentation ---
 builder.Services.AddSwaggerDocument();
@@ -84,6 +88,7 @@ if (app.Environment.IsDevelopment()) {
 
 // --- Endpoints ---
 app.MapControllers();
+app.MapHub<BiddingHub>("/hubs/bidding");
 
 // --- Allow Static Files ---
 app.UseStaticFiles();

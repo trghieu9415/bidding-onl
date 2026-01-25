@@ -1,3 +1,7 @@
-﻿namespace L1.Core.Domain.Bidding.Events;
+﻿using L1.Core.Base.Event;
 
-public class SessionPublishedEvent {}
+namespace L1.Core.Domain.Bidding.Events;
+
+public record SessionPublishedEvent(Guid SessionId, string Title) : DomainEvent {
+  public override Guid AggregateId => SessionId;
+}

@@ -2,6 +2,7 @@
 using L1.Core.Base.Entity;
 using L1.Core.Base.Exception;
 using L1.Core.Domain.Catalog.Enums;
+using L1.Core.Domain.Catalog.Events;
 using L1.Core.Domain.Catalog.ValueObjects;
 
 namespace L1.Core.Domain.Catalog.Entities;
@@ -20,11 +21,13 @@ public class CatalogItem : AggregateRoot {
   public ImageGallery Images { get; private set; } = new(null, []);
 
   public static CatalogItem Create(Guid ownerId, string name, string description) {
-    return new CatalogItem {
+    var item = new CatalogItem {
       OwnerId = ownerId,
       Name = name,
       Description = description
     };
+    item.AddDomainEvent(new ItemRegisteredEvent(item.Id, ownerId, name));
+    return item;
   }
 
   public CatalogItem Update(string? name, string? description) {
@@ -57,12 +60,13 @@ public class CatalogItem : AggregateRoot {
     return this;
   }
 
-  public void Reject() {
+  public void Reject(string reason = "") {
     if (Status != ItemStatus.Pending) {
       throw new DomainException("Chỉ có thể từ chối sản phẩm đang chờ duyệt.");
     }
 
     Status = ItemStatus.Rejected;
+    AddDomainEvent(new ItemRejectedEvent(Id, OwnerId, reason));
   }
 
 
@@ -72,6 +76,7 @@ public class CatalogItem : AggregateRoot {
     }
 
     Status = ItemStatus.Approval;
+    AddDomainEvent(new ItemApprovedEvent(Id, OwnerId));
   }
 
   public void Sell(bool isSold) {

@@ -10,7 +10,7 @@ public class RejectItemHandler(IRepository<CatalogItem> repository) : IRequestHa
     var item = await repository.GetByIdAsync(request.Id, ct)
                ?? throw new AppException("Sản phẩm không tồn tại", 404);
 
-    item.Reject();
+    item.Reject(request.Reason);
     await repository.UpdateAsync(item, ct);
     return Unit.Value;
   }

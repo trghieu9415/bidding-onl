@@ -1,3 +1,7 @@
-﻿namespace L1.Core.Domain.Catalog.Events;
+﻿using L1.Core.Base.Event;
 
-public class ItemApprovedEvent {}
+namespace L1.Core.Domain.Catalog.Events;
+
+public record ItemApprovedEvent(Guid ItemId, Guid OwnerId) : DomainEvent {
+  public override Guid AggregateId => ItemId;
+}

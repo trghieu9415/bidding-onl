@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Consumers\"/>
     <Folder Include="Schedules\"/>
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\L0.API\L0.API.csproj"/>
     <ProjectReference Include="..\L2.Application\L2.Application.csproj"/>
   </ItemGroup>
 

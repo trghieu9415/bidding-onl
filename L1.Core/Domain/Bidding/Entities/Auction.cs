@@ -1,6 +1,7 @@
 ﻿using L1.Core.Base.Entity;
 using L1.Core.Base.Exception;
 using L1.Core.Domain.Bidding.Enums;
+using L1.Core.Domain.Bidding.Events;
 using L1.Core.Domain.Bidding.ValueObjects;
 
 namespace L1.Core.Domain.Bidding.Entities;
@@ -44,9 +45,16 @@ public class Auction : AggregateRoot {
       throw new DomainException($"Giá đặt phải tối thiểu là {minimumNextBid}");
     }
 
+    var previousBidderId = _bids.OrderByDescending(x => x.Amount).FirstOrDefault()?.BidderId;
+
     var bid = Bid.Create(this, bidderId, amount);
     _bids.Add(bid);
     CurrentPrice = amount;
+
+    AddDomainEvent(new BidPlacedEvent(Id, bidderId, amount));
+    if (previousBidderId.HasValue && previousBidderId != bidderId) {
+      AddDomainEvent(new OutbidEvent(Id, previousBidderId.Value, amount));
+    }
   }
 
   public void End() {
@@ -54,12 +62,15 @@ public class Auction : AggregateRoot {
       throw new DomainException("Không thể kết thúc phiên đấu giá đang diễn ra.");
     }
 
-    if (_bids.Count == 0 || CurrentPrice < Rules.ReservePrice) {
-      Status = AuctionStatus.EndedUnsold;
-    } else {
+    var isSold = _bids.Count > 0 || CurrentPrice <= Rules.ReservePrice;
+    if (isSold) {
       WinningBidId = _bids.OrderByDescending(x => x.Amount).First().Id;
       Status = AuctionStatus.EndedSold;
+    } else {
+      Status = AuctionStatus.EndedUnsold;
     }
+
+    AddDomainEvent(new AuctionEndedEvent(Id, WinningBidId, CurrentPrice, isSold));
   }
 
   public void Start() {
@@ -68,6 +79,7 @@ public class Auction : AggregateRoot {
     }
 
     Status = AuctionStatus.Active;
+    AddDomainEvent(new AuctionStartedEvent(Id));
   }
 
   public void Cancel() {
