@@ -1,4 +1,4 @@
-﻿namespace L2.Application.Ports.Repository;
+﻿namespace L2.Application.Ports.Repositories;
 
 public interface IUnitOfWork {
   Task<int> SaveChangesAsync(CancellationToken ct = default);

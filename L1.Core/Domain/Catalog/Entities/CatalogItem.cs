@@ -80,10 +80,6 @@ public class CatalogItem : AggregateRoot {
   }
 
   public void Sell(bool isSold) {
-    if (Status != ItemStatus.Approval) {
-      throw new DomainException("Chỉ có thể chuyển trạng thái sản phẩm khi sản phẩm được duyệt.");
-    }
-
     Status = isSold ? ItemStatus.Sold : ItemStatus.Unsold;
   }
 }

@@ -2,7 +2,7 @@
 using L1.Core.Base.Entity;
 using Sieve.Models;
 
-namespace L2.Application.Ports.Repository;
+namespace L2.Application.Ports.Repositories;
 
 public interface IReadRepository<T> where T : AggregateRoot {
   Task<T?> GetByIdAsync(

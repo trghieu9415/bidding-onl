@@ -1,11 +1,11 @@
 ﻿using System.Linq.Expressions;
 using L1.Core.Base.Entity;
-using L2.Application.Ports.Repository;
+using L2.Application.Ports.Repositories;
 using L3.Infrastructure.Exceptions;
 using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace L3.Infrastructure.Adapters.Repository;
+namespace L3.Infrastructure.Adapters.Repositories;
 
 public class EfRepository<T>(AppDbContext context) : IRepository<T> where T : AggregateRoot {
   private readonly DbSet<T> _dbSet = context.Set<T>();

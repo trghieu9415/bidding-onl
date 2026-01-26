@@ -1,7 +1,7 @@
 using L1.Core.Domain.Catalog.Entities;
 using L1.Core.Domain.Catalog.Enums;
 using L2.Application.Exceptions;
-using L2.Application.Ports.Repository;
+using L2.Application.Ports.Repositories;
 using L2.Application.Ports.Security;
 using MediatR;
 

@@ -2,7 +2,7 @@
 using L1.Core.Base.Event;
 using L1.Core.Domain.Bidding.Entities;
 using L1.Core.Domain.Catalog.Entities;
-using L2.Application.Ports.Repository;
+using L2.Application.Ports.Repositories;
 using L3.Infrastructure.Identity;
 using MassTransit;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;

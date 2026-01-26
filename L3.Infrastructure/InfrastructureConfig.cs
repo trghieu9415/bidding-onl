@@ -1,19 +1,17 @@
 ﻿using System.Text;
 using L2.Application.Ports.Identity;
 using L2.Application.Ports.Notification;
-using L2.Application.Ports.Repository;
+using L2.Application.Ports.Repositories;
 using L2.Application.Ports.Security;
 using L2.Application.Ports.Storage;
 using L3.Infrastructure.Adapters.Identity;
 using L3.Infrastructure.Adapters.Notification;
-using L3.Infrastructure.Adapters.Repository;
+using L3.Infrastructure.Adapters.Repositories;
 using L3.Infrastructure.Adapters.Security;
 using L3.Infrastructure.Adapters.Storage;
 using L3.Infrastructure.Identity;
 using L3.Infrastructure.Persistence;
 using L3.Infrastructure.Persistence.Seeding;
-using L3.Worker;
-using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +31,6 @@ public static class InfrastructureConfig {
       .AddRepositories()
       .AddAuthStrategy(config)
       .AddThirdPartyServices(config)
-      .AddMessaging(config)
       .AddSeeders();
 
     return services;
@@ -117,25 +114,6 @@ public static class InfrastructureConfig {
 
     return services;
   }
-
-  // NOTE: ========== [Messaging] ==========
-  private static IServiceCollection AddMessaging(this IServiceCollection services, IConfiguration config) {
-    services.AddMassTransit(x => {
-      x.AddConsumers(typeof(IWorkerMarker).Assembly);
-
-      x.AddEntityFrameworkOutbox<AppDbContext>(o => {
-        o.UsePostgres();
-        o.UseBusOutbox();
-      });
-
-      x.UsingInMemory((context, cfg) => {
-        cfg.ConfigureEndpoints(context);
-      });
-    });
-
-    return services;
-  }
-
 
   // NOTE: ========== [Dữ liệu mẫu] ==========
   private static IServiceCollection AddSeeders(this IServiceCollection services) {

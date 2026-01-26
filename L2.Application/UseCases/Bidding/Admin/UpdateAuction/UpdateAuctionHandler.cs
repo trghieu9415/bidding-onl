@@ -1,6 +1,6 @@
 using L1.Core.Domain.Bidding.Entities;
 using L2.Application.Exceptions;
-using L2.Application.Ports.Repository;
+using L2.Application.Ports.Repositories;
 using MediatR;
 
 namespace L2.Application.UseCases.Bidding.Admin.UpdateAuction;

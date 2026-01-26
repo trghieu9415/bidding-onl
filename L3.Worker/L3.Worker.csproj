@@ -7,16 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Schedules\"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\L0.API\L0.API.csproj"/>
-    <ProjectReference Include="..\L2.Application\L2.Application.csproj"/>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.0.0"/>
+    <PackageReference Include="Quartz.AspNetCore" Version="3.15.1"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\L2.Application\L2.Application.csproj"/>
+    <ProjectReference Include="..\L3.Infrastructure\L3.Infrastructure.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Schedules\"/>
   </ItemGroup>
 
 </Project>

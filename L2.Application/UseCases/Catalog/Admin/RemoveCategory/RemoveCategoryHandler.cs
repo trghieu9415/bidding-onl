@@ -1,5 +1,5 @@
 using L1.Core.Domain.Catalog.Entities;
-using L2.Application.Ports.Repository;
+using L2.Application.Ports.Repositories;
 using MediatR;
 
 namespace L2.Application.UseCases.Catalog.Admin.RemoveCategory;

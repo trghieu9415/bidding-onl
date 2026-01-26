@@ -2,7 +2,7 @@
 using L1.Core.Domain.Bidding.Entities;
 using L2.Application.DTOs;
 using L2.Application.Models;
-using L2.Application.Ports.Repository;
+using L2.Application.Ports.Repositories;
 using L2.Application.Ports.Security;
 using MediatR;
 

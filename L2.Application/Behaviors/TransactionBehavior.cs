@@ -1,5 +1,5 @@
 ﻿using L2.Application.Abstractions;
-using L2.Application.Ports.Repository;
+using L2.Application.Ports.Repositories;
 using MediatR;
 
 namespace L2.Application.Behaviors;
@@ -19,7 +19,7 @@ public class TransactionBehavior<TRequest, TResponse>(IUnitOfWork unitOfWork)
       await unitOfWork.SaveChangesAsync(ct);
       await unitOfWork.CommitTransactionAsync(ct);
       return response;
-    } catch (System.Exception) {
+    } catch (Exception) {
       await unitOfWork.RollbackTransactionAsync(ct);
       throw;
     }

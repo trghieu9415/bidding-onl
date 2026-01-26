@@ -2,7 +2,7 @@
 using L1.Core.Domain.Catalog.Entities;
 using L2.Application.DTOs;
 
-namespace L2.Application.Mapper;
+namespace L2.Application.Mappers;
 
 public class CatalogProfile : Profile {
   public CatalogProfile() {

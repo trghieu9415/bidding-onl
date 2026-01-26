@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using L1.Core.Base.Entity;
 
-namespace L2.Application.Ports.Repository;
+namespace L2.Application.Ports.Repositories;
 
 public interface IRepository<T> where T : AggregateRoot {
   Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default);
