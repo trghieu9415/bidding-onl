@@ -9,16 +9,16 @@ public class AuctionSessionConfiguration : BaseConfiguration<AuctionSession> {
     base.Configure(builder);
 
     builder.Property(x => x.Title).IsRequired().HasMaxLength(255);
+    builder.Property(x => x.Status).HasConversion<string>().HasMaxLength(50);
 
+    //
     builder.OwnsOne(x => x.TimeFrame, nav => {
-      nav.Property(t => t.StartTime).HasColumnName("StartTime");
-      nav.Property(t => t.EndTime).HasColumnName("EndTime");
+      nav.Property(t => t.StartTime).HasColumnName("StartTime").IsRequired();
+      nav.Property(t => t.EndTime).HasColumnName("EndTime").IsRequired();
     });
 
-    builder.Property(x => x.AuctionIds)
-      .HasColumnType("jsonb");
+    builder.Property(x => x.AuctionIds).HasColumnType("jsonb");
 
-    builder.HasIndex(x => x.AuctionIds)
-      .HasMethod("gin");
+    builder.HasIndex(x => x.AuctionIds).HasMethod("gin");
   }
 }

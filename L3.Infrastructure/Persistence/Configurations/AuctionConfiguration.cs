@@ -8,7 +8,11 @@ public class AuctionConfiguration : BaseConfiguration<Auction> {
   public override void Configure(EntityTypeBuilder<Auction> builder) {
     base.Configure(builder);
 
+    builder.Property(x => x.CatalogItemId).IsRequired();
     builder.Property(x => x.CurrentPrice).HasPrecision(18, 2);
+    builder.Property(x => x.WinningBidId).IsRequired(false);
+    builder.Property(x => x.WinningAt).IsRequired(false);
+    builder.Property(x => x.Status).HasConversion<string>().HasMaxLength(50);
 
     builder.OwnsOne(x => x.Rules, nav => {
       nav.Property(r => r.StepPrice).HasPrecision(18, 2).HasColumnName("StepPrice");
@@ -19,7 +23,5 @@ public class AuctionConfiguration : BaseConfiguration<Auction> {
       .WithOne(b => b.Auction)
       .HasForeignKey(b => b.AuctionId)
       .OnDelete(DeleteBehavior.Cascade);
-
-    builder.Navigation(x => x.Bids).AutoInclude(false);
   }
 }

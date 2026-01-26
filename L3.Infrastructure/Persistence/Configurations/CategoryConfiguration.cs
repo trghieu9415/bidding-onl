@@ -12,6 +12,8 @@ public class CategoryConfiguration : BaseConfiguration<Category> {
       .IsRequired()
       .HasMaxLength(100);
 
+    builder.Property(x => x.ParentId).IsRequired(false);
+
     builder.HasOne<Category>()
       .WithMany()
       .HasForeignKey(x => x.ParentId)

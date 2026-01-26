@@ -8,10 +8,8 @@ public class BidConfiguration : BaseConfiguration<Bid> {
     base.Configure(builder);
 
     builder.Property(x => x.Amount).HasPrecision(18, 2);
+    builder.Property(x => x.BidderId).IsRequired();
     builder.Property(x => x.TimePoint).IsRequired();
-
-    builder.HasOne(x => x.Auction)
-      .WithMany(a => a.Bids)
-      .HasForeignKey(x => x.AuctionId);
+    builder.Property(x => x.AuctionId).IsRequired();
   }
 }

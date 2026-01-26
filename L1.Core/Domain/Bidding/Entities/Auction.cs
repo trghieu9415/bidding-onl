@@ -13,6 +13,7 @@ public class Auction : AggregateRoot {
   public AuctionStatus Status { get; private set; } = AuctionStatus.Scheduled;
   public decimal CurrentPrice { get; private set; }
   public Guid? WinningBidId { get; private set; }
+  public DateTime? WinningAt { get; private set; }
   public AuctionRules Rules { get; private set; } = null!;
   public IReadOnlyCollection<Bid> Bids => _bids.AsReadOnly();
 
@@ -65,6 +66,7 @@ public class Auction : AggregateRoot {
     var isSold = _bids.Count > 0 || CurrentPrice <= Rules.ReservePrice;
     if (isSold) {
       WinningBidId = _bids.OrderByDescending(x => x.Amount).First().Id;
+      WinningAt = DateTime.Now;
       Status = AuctionStatus.EndedSold;
     } else {
       Status = AuctionStatus.EndedUnsold;
@@ -88,5 +90,13 @@ public class Auction : AggregateRoot {
     }
 
     Status = AuctionStatus.Canceled;
+  }
+
+  public void Paid(bool isPaid) {
+    if (Status != AuctionStatus.EndedSold) {
+      throw new DomainException("Phiên đấu giá chưa kết thúc hợp lệ");
+    }
+
+    Status = isPaid ? AuctionStatus.Completed : AuctionStatus.Canceled;
   }
 }

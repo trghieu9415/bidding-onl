@@ -8,6 +8,10 @@ public abstract class BaseConfiguration<T> : IEntityTypeConfiguration<T> where T
   public virtual void Configure(EntityTypeBuilder<T> builder) {
     builder.HasKey(e => e.Id);
 
+    builder.Property(x => x.CreatedAt).IsRequired();
+    builder.Property(x => x.DeletedAt).IsRequired(false);
+    builder.Property(x => x.IsDeleted).HasDefaultValue(false);
+
     builder.Property(x => x.RowVersion).IsRowVersion();
   }
 }
