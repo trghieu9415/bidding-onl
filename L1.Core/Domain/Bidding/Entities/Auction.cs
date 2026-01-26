@@ -12,6 +12,7 @@ public class Auction : AggregateRoot {
   public Guid CatalogItemId { get; private set; }
   public AuctionStatus Status { get; private set; } = AuctionStatus.Scheduled;
   public decimal CurrentPrice { get; private set; }
+  public Guid OwnerId { get; private set; }
   public Guid? WinningBidId { get; private set; }
   public DateTime? WinningAt { get; private set; }
   public AuctionRules Rules { get; private set; } = null!;
@@ -23,6 +24,11 @@ public class Auction : AggregateRoot {
       CurrentPrice = startingPrice,
       Rules = new AuctionRules(stepPrice, reversePrice)
     };
+  }
+
+  public Auction SetOwnerId(Guid ơwnerId) {
+    OwnerId = ơwnerId;
+    return this;
   }
 
   public void UpdateRules(decimal stepPrice, decimal reservePrice) {
@@ -72,7 +78,7 @@ public class Auction : AggregateRoot {
       Status = AuctionStatus.EndedUnsold;
     }
 
-    AddDomainEvent(new AuctionEndedEvent(Id, WinningBidId, CurrentPrice, isSold));
+    AddDomainEvent(new AuctionEndedEvent(Id, WinningBidId, CurrentPrice, OwnerId, isSold));
   }
 
   public void Start() {
@@ -81,7 +87,7 @@ public class Auction : AggregateRoot {
     }
 
     Status = AuctionStatus.Active;
-    AddDomainEvent(new AuctionStartedEvent(Id));
+    AddDomainEvent(new AuctionStartedEvent(Id, OwnerId));
   }
 
   public void Cancel() {

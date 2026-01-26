@@ -24,7 +24,7 @@ public class AddAuctionHandler(
       item.StartingPrice,
       request.StepPrice,
       request.ReservePrice
-    );
+    ).SetOwnerId(item.OwnerId);
     return await auctionRepository.CreateAsync(auction, ct);
   }
 }

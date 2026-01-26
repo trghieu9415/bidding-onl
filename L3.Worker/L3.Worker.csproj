@@ -8,17 +8,13 @@
 
   <ItemGroup>
     <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.0.0"/>
-    <PackageReference Include="MassTransit.Quartz" Version="9.0.0" />
+    <PackageReference Include="MassTransit.Quartz" Version="9.0.0"/>
     <PackageReference Include="Quartz.AspNetCore" Version="3.15.1"/>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\L2.Application\L2.Application.csproj"/>
     <ProjectReference Include="..\L3.Infrastructure\L3.Infrastructure.csproj"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Schedules\"/>
   </ItemGroup>
 
 </Project>

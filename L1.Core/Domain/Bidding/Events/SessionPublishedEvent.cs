@@ -2,6 +2,11 @@
 
 namespace L1.Core.Domain.Bidding.Events;
 
-public record SessionPublishedEvent(Guid SessionId, string Title) : DomainEvent {
+public record SessionPublishedEvent(
+  Guid SessionId,
+  string Title,
+  DateTime StartTime,
+  DateTime EndTime
+) : DomainEvent {
   public override Guid AggregateId => SessionId;
 }

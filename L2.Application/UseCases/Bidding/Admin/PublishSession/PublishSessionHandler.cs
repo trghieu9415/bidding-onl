@@ -5,8 +5,9 @@ using MediatR;
 
 namespace L2.Application.UseCases.Bidding.Admin.PublishSession;
 
-public class PublishSessionHandler(IRepository<AuctionSession> repository)
-  : IRequestHandler<PublishSessionCommand, Unit> {
+public class PublishSessionHandler(
+  IRepository<AuctionSession> repository
+) : IRequestHandler<PublishSessionCommand, Unit> {
   public async Task<Unit> Handle(PublishSessionCommand request, CancellationToken ct) {
     var session = await repository.GetByIdAsync(request.Id, ct)
                   ?? throw new AppException("Không tìm thấy phiên", 404);

@@ -16,8 +16,7 @@ public class BidPlacedConsumer(IRealtimeService realtimeService)
       "NewBidReceived",
       new {
         msg.BidderId,
-        msg.Amount,
-        Timestamp = msg.OccurredOn
+        msg.Amount
       },
       context.CancellationToken
     );

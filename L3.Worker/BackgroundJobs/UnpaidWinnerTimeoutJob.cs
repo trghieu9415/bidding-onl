@@ -1,6 +1,4 @@
-﻿// FILE: L3.Infrastructure/BackgroundJobs/UnpaidWinnerTimeoutJob.cs
-
-using L1.Core.Domain.Bidding.Enums;
+﻿using L1.Core.Domain.Bidding.Enums;
 using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Quartz;

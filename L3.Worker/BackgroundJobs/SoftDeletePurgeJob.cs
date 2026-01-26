@@ -1,6 +1,4 @@
-﻿// FILE: L3.Infrastructure/BackgroundJobs/SoftDeletePurgeJob.cs
-
-using L3.Infrastructure.Persistence;
+﻿using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 

@@ -10,8 +10,7 @@ public class AddSessionHandler(
   IRepository<Auction> auctionRepo
 ) : IRequestHandler<AddSessionCommand, Guid> {
   public async Task<Guid> Handle(AddSessionCommand request, CancellationToken ct) {
-    var session = AuctionSession.Create(request.Title)
-      .SetTimeFrame(request.StartTime, request.EndTime);
+    var session = AuctionSession.Create(request.Title, request.StartTime, request.EndTime);
 
     var missingIds = await auctionRepo.GetMissingIds(request.AuctionIds, ct);
     if (missingIds.Count != 0) {

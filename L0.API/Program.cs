@@ -41,6 +41,7 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<IRealtimeService, SignalRRealtimeService>();
 builder.Services.AddHubRegistry(reg => {
   reg.Register<BiddingHub>(HubKeys.Bidding);
+  reg.Register<NotificationHub>(HubKeys.Notification);
 });
 
 // --- Swagger Documentation ---
@@ -99,6 +100,7 @@ if (app.Environment.IsDevelopment()) {
 // --- Endpoints ---
 app.MapControllers();
 app.MapHub<BiddingHub>("/hubs/bidding");
+app.MapHub<NotificationHub>("/hubs/notification");
 
 // --- Allow Static Files ---
 app.UseStaticFiles();

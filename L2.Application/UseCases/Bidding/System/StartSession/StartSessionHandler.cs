@@ -1,4 +1,5 @@
 using L1.Core.Domain.Bidding.Entities;
+using L1.Core.Domain.Catalog.Entities;
 using L2.Application.Exceptions;
 using L2.Application.Ports.Repositories;
 using MediatR;
@@ -7,7 +8,8 @@ namespace L2.Application.UseCases.Bidding.System.StartSession;
 
 public class StartSessionHandler(
   IRepository<AuctionSession> sessionRepo,
-  IRepository<Auction> auctionRepo
+  IRepository<Auction> auctionRepo,
+  IReadRepository<CatalogItem> itemRepo
 ) : IRequestHandler<StartSessionCommand, Unit> {
   public async Task<Unit> Handle(StartSessionCommand request, CancellationToken ct) {
     var session = await sessionRepo.GetByIdAsync(request.Id, ct)

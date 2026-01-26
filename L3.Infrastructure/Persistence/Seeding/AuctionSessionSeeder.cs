@@ -21,17 +21,17 @@ public class AuctionSessionSeeder(AppDbContext context) : ISeeder {
     }
 
     var auctions = items.Select(item =>
-      Auction.Create(item.Id, item.StartingPrice, 500000, item.StartingPrice + 2000000)
+      Auction.Create(item.Id, item.StartingPrice, 500000, item.StartingPrice + 2000000).SetOwnerId(item.OwnerId)
     ).ToList();
 
     context.Auctions.AddRange(auctions);
     await context.SaveChangesAsync();
 
-    var session = AuctionSession.Create("Phiên đấu giá đồ công nghệ tháng 1/2026")
-      .SetTimeFrame(
-        DateTime.Now.AddDays(1),
-        DateTime.Now.AddDays(2)
-      );
+    var session = AuctionSession.Create(
+      "Phiên đấu giá đồ công nghệ tháng 1/2026",
+      DateTime.Now.AddDays(1),
+      DateTime.Now.AddDays(2)
+    );
 
     session.SyncAuctions(auctions.Select(a => a.Id).ToList());
     session.Publish();

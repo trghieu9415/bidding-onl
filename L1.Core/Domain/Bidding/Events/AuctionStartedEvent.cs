@@ -2,6 +2,6 @@
 
 namespace L1.Core.Domain.Bidding.Events;
 
-public record AuctionStartedEvent(Guid AuctionId) : DomainEvent {
+public record AuctionStartedEvent(Guid AuctionId, Guid OwnerId) : DomainEvent {
   public override Guid AggregateId => AuctionId;
 }

@@ -1,5 +1,20 @@
-﻿namespace L3.Worker.Consumers.Bidding;
+﻿using L1.Core.Domain.Bidding.Events;
+using L2.Application.UseCases.Bidding.System.EndSession;
+using L2.Application.UseCases.Bidding.System.StartSession;
+using MassTransit;
 
-public class SessionPublishedConsumer {
-  
+namespace L3.Worker.Consumers.Bidding;
+
+public class SessionPublishedConsumer(IMessageScheduler scheduler) {
+  public async Task Consume(ConsumeContext<SessionPublishedEvent> context) {
+    var msg = context.Message;
+
+    await scheduler.SchedulePublish(
+      context.Message.StartTime,
+      new StartSessionCommand(msg.Id));
+
+    await scheduler.SchedulePublish(
+      msg.EndTime,
+      new EndSessionCommand(msg.Id));
+  }
 }

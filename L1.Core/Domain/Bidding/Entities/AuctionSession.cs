@@ -11,14 +11,14 @@ public class AuctionSession : AggregateRoot {
   private readonly List<Guid> _auctionIds = [];
   private AuctionSession() {}
   [Required] public string Title { get; private set; } = null!;
-  public AuctionTimeFrame? TimeFrame { get; private set; }
+  public AuctionTimeFrame TimeFrame { get; private set; } = null!;
   public SessionStatus Status { get; private set; } = SessionStatus.Draft;
   public IReadOnlyCollection<Guid> AuctionIds => _auctionIds.AsReadOnly();
 
-  public static AuctionSession Create(string title) {
+  public static AuctionSession Create(string title, DateTime startTime, DateTime endTime) {
     return new AuctionSession {
       Title = title
-    };
+    }.SetTimeFrame(startTime, endTime);
   }
 
   public AuctionSession Update(string title) {
@@ -49,8 +49,12 @@ public class AuctionSession : AggregateRoot {
   }
 
   public void Publish() {
+    if (Status != SessionStatus.Draft) {
+      throw new DomainException("Trạng thái không phù hợp để công khai phiên đấu giá");
+    }
+
     Status = SessionStatus.Published;
-    AddDomainEvent(new SessionPublishedEvent(Id, Title));
+    AddDomainEvent(new SessionPublishedEvent(Id, Title, TimeFrame.StartTime, TimeFrame.EndTime));
   }
 
   public void Start() {

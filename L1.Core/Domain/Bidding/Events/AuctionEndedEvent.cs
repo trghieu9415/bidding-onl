@@ -2,6 +2,12 @@
 
 namespace L1.Core.Domain.Bidding.Events;
 
-public record AuctionEndedEvent(Guid AuctionId, Guid? WinnerId, decimal FinalPrice, bool IsSold) : DomainEvent {
+public record AuctionEndedEvent(
+  Guid AuctionId,
+  Guid? WinnerId,
+  decimal FinalPrice,
+  Guid OwerId,
+  bool IsSold
+) : DomainEvent {
   public override Guid AggregateId => AuctionId;
 }

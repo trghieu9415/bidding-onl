@@ -3,8 +3,6 @@ using L2.Application.Ports.Realtime;
 using L2.Application.Ports.Realtime.Contracts;
 using MassTransit;
 
-// Chứa IRealtimeService
-
 namespace L3.Worker.Consumers.Bidding;
 
 public class AuctionEndedConsumer(IRealtimeService realtimeService)
@@ -15,11 +13,21 @@ public class AuctionEndedConsumer(IRealtimeService realtimeService)
     await realtimeService.PublishAsync(
       HubKeys.Bidding,
       msg.AuctionId.ToString(),
-      "AuctionFinished",
+      "AuctionEnded",
       new {
         msg.WinnerId,
-        msg.FinalPrice,
-        msg.IsSold
+        msg.FinalPrice
+      },
+      context.CancellationToken
+    );
+
+    await realtimeService.PublishAsync(
+      HubKeys.Notification,
+      msg.OwerId.ToString(),
+      "AuctionFinished",
+      new {
+        msg.IsSold,
+        msg.FinalPrice
       },
       context.CancellationToken
     );

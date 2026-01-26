@@ -1,5 +1,22 @@
-﻿namespace L3.Worker.Consumers.Bidding;
+﻿using L1.Core.Domain.Bidding.Events;
+using L2.Application.Ports.Realtime;
+using L2.Application.Ports.Realtime.Contracts;
+using MassTransit;
 
-public class OutbidConsumer {
+namespace L3.Worker.Consumers.Bidding;
 
+public class OutbidConsumer(IRealtimeService realtimeService) {
+  public async Task Consume(ConsumeContext<OutbidEvent> context) {
+    var msg = context.Message;
+    await realtimeService.PublishAsync(
+      HubKeys.Notification,
+      msg.PreviousBidderId.ToString(),
+      "ReceiveNotification",
+      new {
+        Message = "Bạn đã bị đặt giá cao hơn!",
+        msg.NewPrice,
+        Timestamp = msg.OccurredOn
+      }
+    );
+  }
 }
