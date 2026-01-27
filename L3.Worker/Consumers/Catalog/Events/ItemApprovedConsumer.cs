@@ -3,7 +3,7 @@ using L2.Application.Ports.Realtime;
 using L2.Application.Ports.Realtime.Contracts;
 using MassTransit;
 
-namespace L3.Worker.Consumers.Catalog;
+namespace L3.Worker.Consumers.Catalog.Events;
 
 public class ItemApprovedConsumer(IRealtimeService realtimeService) : IConsumer<ItemApprovedEvent> {
   public async Task Consume(ConsumeContext<ItemApprovedEvent> context) {

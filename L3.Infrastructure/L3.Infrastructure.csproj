@@ -22,6 +22,7 @@
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.12"/>
     <PackageReference Include="MongoDB.Driver" Version="3.6.0"/>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4"/>
+    <PackageReference Include="RedLock.net" Version="2.3.2"/>
     <PackageReference Include="Sieve" Version="2.5.5"/>
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0"/>
   </ItemGroup>

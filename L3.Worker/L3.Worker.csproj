@@ -10,6 +10,7 @@
     <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.0.0"/>
     <PackageReference Include="MassTransit.Quartz" Version="9.0.0"/>
     <PackageReference Include="Quartz.AspNetCore" Version="3.15.1"/>
+    <PackageReference Include="Quartz.Serialization.Json" Version="3.15.1"/>
   </ItemGroup>
 
   <ItemGroup>

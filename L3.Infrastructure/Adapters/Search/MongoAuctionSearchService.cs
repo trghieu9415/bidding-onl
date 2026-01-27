@@ -20,7 +20,7 @@ public class MongoAuctionSearchService(MongoDbContext mongoContext) : IAuctionSe
     int pageSize,
     CancellationToken ct
   ) {
-    var collection = mongoContext.GetCollection<AuctionSearchDocument>("AuctionSearch");
+    var collection = mongoContext.GetCollection<AuctionSearchDocument>(DocumentKeys.AuctionSearch);
     var builder = Builders<AuctionSearchDocument>.Filter;
     var filters = new List<FilterDefinition<AuctionSearchDocument>> {
       builder.Ne(x => x.SessionId, Guid.Empty)

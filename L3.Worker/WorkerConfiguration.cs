@@ -12,6 +12,14 @@ public static class WorkerConfiguration {
     services.AddQuartz(q => {
       q.UseInMemoryStore();
 
+      var startupSyncKey = new JobKey("StartupSyncJob");
+      q.AddJob<StartupSyncJob>(opts => opts.WithIdentity(startupSyncKey));
+      q.AddTrigger(opts => opts
+        .ForJob(startupSyncKey)
+        .WithIdentity("StartupSyncJob-Trigger")
+        .StartNow()
+      );
+
       var imageCleanupKey = new JobKey("ImageCleanupJob");
       q.AddJob<ImageCleanupJob>(opts => opts.WithIdentity(imageCleanupKey));
       q.AddTrigger(opts => opts

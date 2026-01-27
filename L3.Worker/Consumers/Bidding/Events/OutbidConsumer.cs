@@ -3,7 +3,7 @@ using L2.Application.Ports.Realtime;
 using L2.Application.Ports.Realtime.Contracts;
 using MassTransit;
 
-namespace L3.Worker.Consumers.Bidding;
+namespace L3.Worker.Consumers.Bidding.Events;
 
 public class OutbidConsumer(IRealtimeService realtimeService) : IConsumer<OutbidEvent> {
   public async Task Consume(ConsumeContext<OutbidEvent> context) {

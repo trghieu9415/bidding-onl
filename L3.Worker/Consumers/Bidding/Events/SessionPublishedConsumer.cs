@@ -10,7 +10,7 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 
-namespace L3.Worker.Consumers.Bidding;
+namespace L3.Worker.Consumers.Bidding.Events;
 
 public class SessionPublishedConsumer(
   IMessageScheduler scheduler,
@@ -43,7 +43,7 @@ public class SessionPublishedConsumer(
                   ?? throw new InvalidOperationException($"Không tìm thấy Session {msg.SessionId}");
 
     var auctions = await auctionRepo.GetByKeysAsync(session.AuctionIds.ToList());
-    var collection = mongoContext.GetCollection<AuctionSearchDocument>("AuctionSearch");
+    var collection = mongoContext.GetCollection<AuctionSearchDocument>(DocumentKeys.AuctionSearch);
 
     var categoryCache = new Dictionary<Guid, Category>();
 
