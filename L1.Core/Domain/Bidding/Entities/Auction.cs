@@ -69,13 +69,16 @@ public class Auction : AggregateRoot {
       throw new DomainException("Không thể kết thúc phiên đấu giá đang diễn ra.");
     }
 
-    var isSold = _bids.Count > 0 || CurrentPrice <= Rules.ReservePrice;
+    var isSold = _bids.Count > 0 && CurrentPrice >= Rules.ReservePrice;
     if (isSold) {
-      WinningBidId = _bids.OrderByDescending(x => x.Amount).First().Id;
+      var topBid = _bids.OrderByDescending(x => x.Amount).First();
+      WinningBidId = topBid.Id;
       WinningAt = DateTime.Now;
       Status = AuctionStatus.EndedSold;
     } else {
       Status = AuctionStatus.EndedUnsold;
+      WinningBidId = null;
+      WinningAt = null;
     }
 
     AddDomainEvent(new AuctionEndedEvent(Id, WinningBidId, CurrentPrice, OwnerId, isSold));
@@ -100,7 +103,7 @@ public class Auction : AggregateRoot {
 
   public void Paid(bool isPaid) {
     if (Status != AuctionStatus.EndedSold) {
-      throw new DomainException("Phiên đấu giá chưa kết thúc hợp lệ");
+      throw new DomainException("Cuộc đấu giá chưa ở trạng thái chờ thanh toán");
     }
 
     Status = isPaid ? AuctionStatus.Completed : AuctionStatus.Canceled;

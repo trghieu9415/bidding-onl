@@ -47,11 +47,13 @@ builder.Services.AddHubRegistry(reg => {
 // --- Swagger Documentation ---
 builder.Services.AddSwaggerDocument();
 
-// --- Application Layer (MediatR, AutoMapper, Validation) ---
+// --- Application Layer ---
 var applicationAssembly = typeof(IApplicationMarker).Assembly;
 
+// --- Behaviors Registration ---
 builder.Services.AddMediatR(cfg => {
   cfg.RegisterServicesFromAssembly(applicationAssembly);
+  cfg.AddOpenBehavior(typeof(LockBehavior<,>));
   cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
   cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
 });

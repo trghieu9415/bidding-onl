@@ -63,13 +63,13 @@ public class AppDbContext(
   }
 
   public override async Task<int> SaveChangesAsync(CancellationToken ct = default) {
-    var entitiesWithEvents = ChangeTracker.Entries<IHasDomainEvent>()
+    var domainEvents = ChangeTracker.Entries<IHasDomainEvent>()
       .Select(x => x.Entity)
-      .Where(x => x.DomainEvents.Count != 0)
-      .ToList();
-
-    var domainEvents = entitiesWithEvents.SelectMany(x => x.DomainEvents).ToList();
-    entitiesWithEvents.ForEach(x => x.ClearEvents());
+      .SelectMany(x => {
+        var events = x.DomainEvents.ToList();
+        x.ClearEvents();
+        return events;
+      }).ToList();
 
     foreach (var domainEvent in domainEvents) {
       await publishEndpoint.Publish(domainEvent, ct);

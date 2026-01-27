@@ -22,25 +22,27 @@ public class SessionPublishedConsumer(
   ILogger<SessionPublishedConsumer> logger
 ) : IConsumer<SessionPublishedEvent> {
   public async Task Consume(ConsumeContext<SessionPublishedEvent> context) {
-    var msg = context.Message;
-
     try {
-      await ScheduleSessionTransitions(msg);
-      await SyncSearchReadModel(msg);
+      await ScheduleSessionTransitions(context);
+      await SyncSearchReadModel(context);
     } catch (Exception ex) {
-      logger.LogError(ex, "Lỗi khi xử lý SessionPublishedEvent cho Session: {SessionId}", msg.SessionId);
+      logger.LogError(ex, "Lỗi khi xử lý SessionPublishedEvent cho Session: {SessionId}", context.Message.SessionId);
       throw;
     }
   }
 
-  private async Task ScheduleSessionTransitions(SessionPublishedEvent msg) {
+  private async Task ScheduleSessionTransitions(ConsumeContext<SessionPublishedEvent> context) {
+    var msg = context.Message;
     await scheduler.SchedulePublish(msg.StartTime, new StartSessionCommand(msg.Id));
     await scheduler.SchedulePublish(msg.EndTime, new EndSessionCommand(msg.Id));
   }
 
-  private async Task SyncSearchReadModel(SessionPublishedEvent msg) {
-    var session = await sessionRepo.GetByIdAsync(msg.SessionId)
-                  ?? throw new InvalidOperationException($"Không tìm thấy Session {msg.SessionId}");
+  private async Task SyncSearchReadModel(ConsumeContext<SessionPublishedEvent> context) {
+    var msg = context.Message;
+
+    var session =
+      await sessionRepo.GetByIdAsync(msg.SessionId)
+      ?? throw new InvalidOperationException($"Không tìm thấy Session {msg.SessionId}");
 
     var auctions = await auctionRepo.GetByKeysAsync(session.AuctionIds.ToList());
     var collection = mongoContext.GetCollection<AuctionSearchDocument>(DocumentKeys.AuctionSearch);
@@ -73,12 +75,16 @@ public class SessionPublishedConsumer(
       await collection.ReplaceOneAsync(
         x => x.AuctionId == auction.Id,
         doc,
-        new ReplaceOptions { IsUpsert = true }
+        new ReplaceOptions { IsUpsert = true },
+        context.CancellationToken
       );
     }
 
-    logger.LogInformation("Đã đồng bộ {Count} đấu giá vào Search DB cho Session {SessionId}", auctions.Count,
-      session.Id);
+    logger.LogInformation(
+      "Đã đồng bộ {Count} đấu giá vào Search DB cho Session {SessionId}",
+      auctions.Count,
+      session.Id
+    );
   }
 
   private async Task<List<Guid>> BuildCategoryHierarchy(List<Guid> leafIds, Dictionary<Guid, Category> cache) {

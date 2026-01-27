@@ -9,6 +9,7 @@ using Sieve.Models;
 
 namespace L0.API.Controllers.Admin;
 
+// [Authorize]
 public class CatalogItemController(IMediator mediator) : DashboardController {
   [HttpGet]
   public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel) {

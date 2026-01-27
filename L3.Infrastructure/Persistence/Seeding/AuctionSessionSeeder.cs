@@ -1,5 +1,7 @@
-﻿using L1.Core.Domain.Bidding.Entities;
+﻿using Bogus;
+using L1.Core.Domain.Bidding.Entities;
 using L1.Core.Domain.Catalog.Enums;
+using L2.Application.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace L3.Infrastructure.Persistence.Seeding;
@@ -7,36 +9,45 @@ namespace L3.Infrastructure.Persistence.Seeding;
 public class AuctionSessionSeeder(AppDbContext context) : ISeeder {
   public int Order => 4;
 
+  // FILE: L3.Infrastructure/Persistence/Seeding/AuctionSessionSeeder.cs
   public async Task SeedAsync() {
     if (await context.AuctionSessions.AnyAsync()) {
       return;
     }
 
-    var items = await context.CatalogItems
-      .Where(x => x.Status == ItemStatus.Approval)
-      .ToListAsync();
+    var faker = new Faker("vi");
+    var approvedItems = await context.CatalogItems.Where(x => x.Status == ItemStatus.Approval).ToListAsync();
+    var bidders = await context.Users.Where(u => u.Role == UserRole.Bidder).ToListAsync();
 
-    if (items.Count == 0) {
-      return;
-    }
-
-    var auctions = items.Select(item =>
-      Auction.Create(item.Id, item.StartingPrice, 500000, item.StartingPrice + 2000000).SetOwnerId(item.OwnerId)
-    ).ToList();
-
-    context.Auctions.AddRange(auctions);
+    var liveSession = AuctionSession.Create("🔥 Đại tiệc Đấu giá Cuối tuần", DateTime.Now.AddHours(-2),
+      DateTime.Now.AddDays(1));
+    context.AuctionSessions.Add(liveSession);
     await context.SaveChangesAsync();
 
-    var session = AuctionSession.Create(
-      "Phiên đấu giá đồ công nghệ tháng 1/2026",
-      DateTime.Now.AddDays(1),
-      DateTime.Now.AddDays(2)
-    );
+    var auctionIds = new List<Guid>();
+    foreach (var item in approvedItems.Take(15)) {
+      var auction = Auction.Create(item.Id, item.StartingPrice, 100000, item.StartingPrice + 500000)
+        .SetOwnerId(item.OwnerId);
 
-    session.SyncAuctions(auctions.Select(a => a.Id).ToList());
-    session.Publish();
+      auction.Start();
 
-    context.AuctionSessions.Add(session);
+      var bidCount = faker.Random.Int(3, 7);
+      var currentPrice = item.StartingPrice;
+      for (var j = 0; j < bidCount; j++) {
+        currentPrice += 200000;
+        var bidder = faker.PickRandom(bidders);
+        if (bidder.Id != item.OwnerId) {
+          auction.PlaceBid(bidder.Id, currentPrice);
+        }
+      }
+
+      context.Auctions.Add(auction);
+      auctionIds.Add(auction.Id);
+    }
+
+    liveSession.SyncAuctions(auctionIds);
+    liveSession.Start();
+
     await context.SaveChangesAsync();
   }
 }

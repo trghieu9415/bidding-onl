@@ -1,11 +1,10 @@
-﻿// FILE: L0.API/Controllers/External/ImageController.cs
-
-using L0.API.Response;
+﻿using L0.API.Response;
 using L2.Application.Ports.Storage;
 using Microsoft.AspNetCore.Mvc;
 
 namespace L0.API.Controllers.External;
 
+// TODO: Sử dụng SixLabors.ImageSharp để xử lý hình ảnh tránh mã độc
 public class ImageController(IBinaryStorage storage) : ExternalController {
   [HttpPost("upload")]
   public async Task<IActionResult> Upload(IFormFile? file, CancellationToken ct = default) {
