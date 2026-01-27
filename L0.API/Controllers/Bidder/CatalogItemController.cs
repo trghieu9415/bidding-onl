@@ -30,8 +30,8 @@ public class CatalogItemController(IMediator mediator) : UserController {
   }
 
   [HttpGet("search")]
-  public async Task<IActionResult> Search([FromQuery] SieveModel sieveModel) {
-    var result = await mediator.Send(new SearchItemQuery(sieveModel));
+  public async Task<IActionResult> Search([FromQuery] SearchItemQuery query) {
+    var result = await mediator.Send(query);
     return AppResponse.Success(result.Items, result.Meta);
   }
 }

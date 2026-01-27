@@ -5,7 +5,7 @@ using MassTransit;
 
 namespace L3.Worker.Consumers.Bidding;
 
-public class AuctionStartedConsumer(IRealtimeService realtimeService) {
+public class AuctionStartedConsumer(IRealtimeService realtimeService) : IConsumer<AuctionStartedEvent> {
   public async Task Consume(ConsumeContext<AuctionStartedEvent> context) {
     var msg = context.Message;
 

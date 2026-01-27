@@ -3,7 +3,7 @@ using L2.Application.UseCases.Bidder.Admin.GetBidder;
 using L2.Application.UseCases.Bidder.Admin.GetBidders;
 using L2.Application.UseCases.Bidder.Admin.GetLockedBidders;
 using L2.Application.UseCases.Bidder.Admin.LockBidder;
-using L2.Application.UseCases.Bidder.Admin.UnlockBider;
+using L2.Application.UseCases.Bidder.Admin.UnlockBidder;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;

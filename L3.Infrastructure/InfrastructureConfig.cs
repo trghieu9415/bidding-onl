@@ -2,11 +2,13 @@
 using L2.Application.Ports.Identity;
 using L2.Application.Ports.Notification;
 using L2.Application.Ports.Repositories;
+using L2.Application.Ports.Search;
 using L2.Application.Ports.Security;
 using L2.Application.Ports.Storage;
 using L3.Infrastructure.Adapters.Identity;
 using L3.Infrastructure.Adapters.Notification;
 using L3.Infrastructure.Adapters.Repositories;
+using L3.Infrastructure.Adapters.Search;
 using L3.Infrastructure.Adapters.Security;
 using L3.Infrastructure.Adapters.Storage;
 using L3.Infrastructure.Identity;
@@ -27,6 +29,7 @@ public static class InfrastructureConfig {
   public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config) {
     services
       .AddPersistence(config)
+      .AddMongo()
       .AddIdentityConfig()
       .AddRepositories()
       .AddAuthStrategy(config)
@@ -51,6 +54,13 @@ public static class InfrastructureConfig {
     services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
     services.AddScoped<DbInitializer>();
 
+    return services;
+  }
+
+  // NOTE: ========== [Cơ sở dữ liệu tìm kiếm] ==========
+  private static IServiceCollection AddMongo(this IServiceCollection services) {
+    services.AddSingleton<MongoDbContext>();
+    services.AddScoped<IAuctionSearchService, MongoAuctionSearchService>();
     return services;
   }
 

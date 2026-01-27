@@ -5,7 +5,7 @@ using MassTransit;
 
 namespace L3.Worker.Consumers.Bidding;
 
-public class OutbidConsumer(IRealtimeService realtimeService) {
+public class OutbidConsumer(IRealtimeService realtimeService) : IConsumer<OutbidEvent> {
   public async Task Consume(ConsumeContext<OutbidEvent> context) {
     var msg = context.Message;
     await realtimeService.PublishAsync(
