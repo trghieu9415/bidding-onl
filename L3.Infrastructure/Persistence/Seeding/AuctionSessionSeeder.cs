@@ -9,7 +9,6 @@ namespace L3.Infrastructure.Persistence.Seeding;
 public class AuctionSessionSeeder(AppDbContext context) : ISeeder {
   public int Order => 4;
 
-  // FILE: L3.Infrastructure/Persistence/Seeding/AuctionSessionSeeder.cs
   public async Task SeedAsync() {
     if (await context.AuctionSessions.AnyAsync()) {
       return;
@@ -19,14 +18,14 @@ public class AuctionSessionSeeder(AppDbContext context) : ISeeder {
     var approvedItems = await context.CatalogItems.Where(x => x.Status == ItemStatus.Approval).ToListAsync();
     var bidders = await context.Users.Where(u => u.Role == UserRole.Bidder).ToListAsync();
 
-    var liveSession = AuctionSession.Create("🔥 Đại tiệc Đấu giá Cuối tuần", DateTime.Now.AddHours(-2),
+    var liveSession = AuctionSession.Create("Đại tiệc Đấu giá Cuối tuần", DateTime.Now.AddHours(-2),
       DateTime.Now.AddDays(1));
     context.AuctionSessions.Add(liveSession);
     await context.SaveChangesAsync();
 
     var auctionIds = new List<Guid>();
     foreach (var item in approvedItems.Take(15)) {
-      var auction = Auction.Create(item.Id, item.StartingPrice, 100000, item.StartingPrice + 500000)
+      var auction = Auction.Create(item.Id, item.StartingPrice, 10, item.StartingPrice + 50)
         .SetOwnerId(item.OwnerId);
 
       auction.Start();
@@ -34,7 +33,7 @@ public class AuctionSessionSeeder(AppDbContext context) : ISeeder {
       var bidCount = faker.Random.Int(3, 7);
       var currentPrice = item.StartingPrice;
       for (var j = 0; j < bidCount; j++) {
-        currentPrice += 200000;
+        currentPrice += 20;
         var bidder = faker.PickRandom(bidders);
         if (bidder.Id != item.OwnerId) {
           auction.PlaceBid(bidder.Id, currentPrice);

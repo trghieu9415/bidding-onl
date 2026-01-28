@@ -9,7 +9,6 @@ namespace L3.Infrastructure.Persistence.Seeding;
 public class CatalogItemSeeder(AppDbContext context) : ISeeder {
   public int Order => 3;
 
-  // FILE: L3.Infrastructure/Persistence/Seeding/CatalogItemSeeder.cs
   public async Task SeedAsync() {
     if (await context.CatalogItems.AnyAsync()) {
       return;
@@ -26,7 +25,7 @@ public class CatalogItemSeeder(AppDbContext context) : ISeeder {
         var productName = faker.Commerce.ProductName();
         var item = CatalogItem.Create(user.Id, productName, faker.Commerce.ProductDescription());
 
-        item.SetStartingPrice(faker.Random.Decimal(500000, 50000000))
+        item.SetStartingPrice(faker.Random.Int(50, 1000))
           .SetCondition(faker.PickRandom<ItemCondition>())
           .SyncCategories(new List<Guid> { faker.PickRandom(subCategories).Id });
 

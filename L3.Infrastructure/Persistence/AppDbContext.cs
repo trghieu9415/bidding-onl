@@ -13,7 +13,7 @@ namespace L3.Infrastructure.Persistence;
 
 public class AppDbContext(
   DbContextOptions<AppDbContext> options,
-  IPublishEndpoint publishEndpoint
+  IPublishEndpoint? publishEndpoint = null
 ) : IdentityUserContext<AppUser, Guid>(options), IUnitOfWork {
   private IDbContextTransaction? _currentTransaction;
   public DbSet<Auction> Auctions => Set<Auction>();
@@ -70,6 +70,10 @@ public class AppDbContext(
         x.ClearEvents();
         return events;
       }).ToList();
+
+    if (publishEndpoint == null) {
+      return await base.SaveChangesAsync(ct);
+    }
 
     foreach (var domainEvent in domainEvents) {
       await publishEndpoint.Publish(domainEvent, ct);

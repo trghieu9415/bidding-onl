@@ -8,5 +8,6 @@ public record SessionPublishedEvent(
   DateTime StartTime,
   DateTime EndTime
 ) : DomainEvent {
+  public SessionPublishedEvent() : this(Guid.Empty, "", DateTime.MinValue, DateTime.MinValue) {}
   public override Guid AggregateId => SessionId;
 }

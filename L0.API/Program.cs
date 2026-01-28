@@ -11,6 +11,7 @@ using L2.Application.Ports.Realtime.Contracts;
 using L3.Infrastructure;
 using L3.Infrastructure.Persistence;
 using L3.Worker;
+using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
 // Allow Local Timestamp
@@ -62,8 +63,13 @@ builder.Services.AddAutoMapper(config => {}, applicationAssembly);
 
 // --- Infrastructure & Third-Party Layers ---
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddWorker(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
+
+if (!args.Contains("--seeding") && !builder.Environment.EnvironmentName.Contains("Development")) {
+  if (!EF.IsDesignTime) {
+    builder.Services.AddWorker(builder.Configuration);
+  }
+}
 
 var app = builder.Build();
 

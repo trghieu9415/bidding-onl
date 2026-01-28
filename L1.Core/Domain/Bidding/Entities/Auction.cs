@@ -26,8 +26,8 @@ public class Auction : AggregateRoot {
     };
   }
 
-  public Auction SetOwnerId(Guid ơwnerId) {
-    OwnerId = ơwnerId;
+  public Auction SetOwnerId(Guid ownerId) {
+    OwnerId = ownerId;
     return this;
   }
 
@@ -44,10 +44,7 @@ public class Auction : AggregateRoot {
       throw new DomainException("Chỉ có thể đặt giá khi đấu giá đang diễn ra.");
     }
 
-    var minimumNextBid = _bids.Count == 0
-      ? Math.Max(CurrentPrice, Rules.ReservePrice)
-      : CurrentPrice + Rules.StepPrice;
-
+    var minimumNextBid = _bids.Count == 0 ? CurrentPrice : CurrentPrice + Rules.StepPrice;
     if (amount < minimumNextBid) {
       throw new DomainException($"Giá đặt phải tối thiểu là {minimumNextBid}");
     }

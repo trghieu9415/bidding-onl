@@ -17,6 +17,7 @@ using L3.Infrastructure.Persistence.Seeding;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -47,9 +48,11 @@ public static class InfrastructureConfig {
     dataSourceBuilder.EnableDynamicJson();
     var dataSource = dataSourceBuilder.Build();
 
-    services.AddDbContext<AppDbContext>(options =>
-      options.UseNpgsql(dataSource,
-        b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
+    services.AddDbContext<AppDbContext>(options => {
+        options.UseNpgsql(dataSource, b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName));
+        options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+      }
+    );
 
     services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
     services.AddScoped<DbInitializer>();

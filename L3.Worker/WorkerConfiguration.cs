@@ -46,6 +46,7 @@ public static class WorkerConfiguration {
     services.AddMassTransit(x => {
       x.AddConsumers(typeof(WorkerConfiguration).Assembly);
       x.AddQuartzConsumers();
+      x.AddPublishMessageScheduler();
 
       x.AddEntityFrameworkOutbox<AppDbContext>(o => {
         o.UsePostgres();

@@ -9,5 +9,6 @@ public record AuctionEndedEvent(
   Guid OwerId,
   bool IsSold
 ) : DomainEvent {
+  public AuctionEndedEvent() : this(Guid.Empty, null, 0, Guid.Empty, false) {}
   public override Guid AggregateId => AuctionId;
 }
