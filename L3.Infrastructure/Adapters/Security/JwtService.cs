@@ -38,7 +38,7 @@ public class JwtService(IConfiguration config) : IJwtService {
   private TokenModel GenerateToken(IEnumerable<Claim> claims, int expirationMinutes) {
     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Secret"]!));
     var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-    var expiry = DateTime.Now.AddMinutes(expirationMinutes);
+    var expiry = DateTime.UtcNow.AddMinutes(expirationMinutes);
 
     var token = new JwtSecurityToken(
       config["Jwt:Issuer"],

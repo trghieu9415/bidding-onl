@@ -33,8 +33,6 @@ public class AppDbContext(
 
   public async Task CommitTransactionAsync(CancellationToken ct = default) {
     try {
-      await base.SaveChangesAsync(ct);
-
       if (_currentTransaction != null) {
         await _currentTransaction.CommitAsync(ct);
       }

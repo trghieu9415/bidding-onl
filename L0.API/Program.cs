@@ -11,9 +11,6 @@ using L3.Worker;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
-// Allow Local Timestamp
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
 var builder = WebApplication.CreateBuilder(args);
 
 // --- Web API & JSON Configuration ---
@@ -57,10 +54,8 @@ builder.Services.AddAutoMapper(config => {}, applicationAssembly);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 
-if (!args.Contains("--seeding") && !builder.Environment.EnvironmentName.Contains("Development")) {
-  if (!EF.IsDesignTime) {
-    builder.Services.AddWorker(builder.Configuration);
-  }
+if (!args.Contains("--seeding") && !EF.IsDesignTime) {
+  builder.Services.AddWorker(builder.Configuration);
 }
 
 var app = builder.Build();

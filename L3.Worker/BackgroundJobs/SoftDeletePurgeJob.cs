@@ -6,7 +6,7 @@ namespace L3.Worker.BackgroundJobs;
 
 public class SoftDeletePurgeJob(AppDbContext dbContext) : IJob {
   public async Task Execute(IJobExecutionContext context) {
-    var threshold = DateTime.Now.AddDays(-30);
+    var threshold = DateTime.UtcNow.AddDays(-30);
 
     var oldCategories = await dbContext.Categories
       .Where(x => x.IsDeleted && x.DeletedAt < threshold)

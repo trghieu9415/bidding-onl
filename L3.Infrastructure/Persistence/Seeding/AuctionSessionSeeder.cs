@@ -18,8 +18,8 @@ public class AuctionSessionSeeder(AppDbContext context) : ISeeder {
     var approvedItems = await context.CatalogItems.Where(x => x.Status == ItemStatus.Approval).ToListAsync();
     var bidders = await context.Users.Where(u => u.Role == UserRole.Bidder).ToListAsync();
 
-    var liveSession = AuctionSession.Create("Đại tiệc Đấu giá Cuối tuần", DateTime.Now.AddHours(-2),
-      DateTime.Now.AddDays(1));
+    var liveSession = AuctionSession.Create("Đại tiệc Đấu giá Cuối tuần", DateTime.UtcNow.AddHours(-2),
+      DateTime.UtcNow.AddDays(1));
     context.AuctionSessions.Add(liveSession);
     await context.SaveChangesAsync();
 

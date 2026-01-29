@@ -5,9 +5,10 @@ using Quartz;
 
 namespace L3.Worker.BackgroundJobs;
 
+[DisallowConcurrentExecution]
 public class UnpaidWinnerTimeoutJob(AppDbContext dbContext) : IJob {
   public async Task Execute(IJobExecutionContext context) {
-    var deadline = DateTime.Now.AddDays(-1);
+    var deadline = DateTime.UtcNow.AddDays(-1);
 
     var expiredAuctions = await dbContext.Auctions
       .Where(a =>

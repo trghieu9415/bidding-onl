@@ -9,7 +9,7 @@ public class Bid : BaseEntity {
 
   public decimal Amount { get; private set; }
   public Guid BidderId { get; private set; }
-  public DateTime TimePoint { get; private set; } = DateTime.Now;
+  public DateTime TimePoint { get; private set; } = DateTime.UtcNow;
 
   public static Bid Create(Auction auction, Guid bidderId, decimal amount) {
     return new Bid {

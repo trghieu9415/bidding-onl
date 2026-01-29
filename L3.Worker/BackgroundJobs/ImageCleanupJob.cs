@@ -32,7 +32,7 @@ public class ImageCleanupJob(AppDbContext dbContext) : IJob {
       }
 
       var creationTime = File.GetCreationTime(filePath);
-      if (creationTime < DateTime.Now.AddDays(-1)) {
+      if (creationTime < DateTime.UtcNow.AddDays(-1)) {
         File.Delete(filePath);
       }
     }

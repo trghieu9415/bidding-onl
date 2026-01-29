@@ -7,7 +7,7 @@ namespace L3.Infrastructure.Identity;
 public class AppUser : IdentityUser<Guid> {
   [MaxLength(100)] public string FullName { get; set; } = null!;
   [MaxLength(255)] public string? Url { get; set; }
-  public DateTime CreatedAt { get; private init; } = DateTime.Now;
+  public DateTime CreatedAt { get; private init; } = DateTime.UtcNow;
   public DateTime? DeletedAt { get; private set; }
   public bool IsDeleted { get; private set; }
 
@@ -20,7 +20,7 @@ public class AppUser : IdentityUser<Guid> {
 
   public void Delete() {
     IsDeleted = true;
-    DeletedAt = DateTime.Now;
+    DeletedAt = DateTime.UtcNow;
   }
 
   public void Restore() {

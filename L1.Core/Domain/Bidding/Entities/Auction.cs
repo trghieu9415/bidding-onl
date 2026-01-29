@@ -70,7 +70,7 @@ public class Auction : AggregateRoot {
     if (isSold) {
       var topBid = _bids.OrderByDescending(x => x.Amount).First();
       WinningBidId = topBid.Id;
-      WinningAt = DateTime.Now;
+      WinningAt = DateTime.UtcNow;
       Status = AuctionStatus.EndedSold;
     } else {
       Status = AuctionStatus.EndedUnsold;

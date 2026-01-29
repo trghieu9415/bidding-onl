@@ -12,6 +12,7 @@ public static class WorkerConfiguration {
     var connectionString =
       config.GetConnectionString("DefaultConnection")
       ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
     services.AddQuartz(q => {
       q.UsePersistentStore(s => {
         s.UsePostgres(connectionString);
@@ -22,7 +23,10 @@ public static class WorkerConfiguration {
       // NOTE: ========== [Tự khởi động] ==========
       var startupSyncKey = new JobKey("StartupSyncJob");
       q.AddJob<StartupSyncJob>(opts => opts.WithIdentity(startupSyncKey));
-      q.AddTrigger(opts => opts.ForJob(startupSyncKey).StartNow());
+      q.AddTrigger(opts => opts
+        .ForJob(startupSyncKey)
+        .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.Now.AddSeconds(60)))
+      );
 
       // NOTE: ========== [02:00 Sáng] ==========
       var imageCleanupKey = new JobKey("ImageCleanupJob");
@@ -45,14 +49,17 @@ public static class WorkerConfiguration {
 
     services.AddMassTransit(x => {
       x.AddConsumers(typeof(WorkerConfiguration).Assembly);
+
       x.AddQuartzConsumers();
       x.AddPublishMessageScheduler();
 
       x.AddEntityFrameworkOutbox<AppDbContext>(o => {
         o.UsePostgres();
         o.UseBusOutbox();
+        o.DuplicateDetectionWindow = TimeSpan.FromMinutes(30);
       });
 
+      // TODO: Dùng RabbitMq khi tăng Worker Instance - Hiện tại chỉ cần 1 WorkerInstance
       x.UsingInMemory((context, cfg) => {
         cfg.UsePublishMessageScheduler();
         cfg.UseMessageRetry(r => {
