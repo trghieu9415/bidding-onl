@@ -1,13 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using L0.API.Adapters.Realtime;
 using L0.API.Extensions;
 using L0.API.Hubs;
 using L0.API.Middlewares;
 using L2.Application;
 using L2.Application.Behaviors;
-using L2.Application.Ports.Realtime;
-using L2.Application.Ports.Realtime.Contracts;
 using L3.Infrastructure;
 using L3.Infrastructure.Persistence;
 using L3.Worker;
@@ -38,12 +35,7 @@ builder.Services.AddRouting(options => {
 });
 
 // --- SignalR Configuration ---
-builder.Services.AddSignalR();
-builder.Services.AddScoped<IRealtimeService, SignalRRealtimeService>();
-builder.Services.AddHubRegistry(reg => {
-  reg.Register<BiddingHub>(HubKeys.Bidding);
-  reg.Register<NotificationHub>(HubKeys.Notification);
-});
+builder.Services.AddSignalRServices();
 
 // --- Swagger Documentation ---
 builder.Services.AddSwaggerDocument();

@@ -1,17 +1,17 @@
 ﻿using L1.Core.Domain.Bidding.Events;
 using L2.Application.Ports.Realtime;
-using L2.Application.Ports.Realtime.Contracts;
 using MassTransit;
 
 namespace L3.Worker.Consumers.Bidding.Events;
 
-public class AuctionStartedConsumer(IRealtimeService realtimeService) : IConsumer<AuctionStartedEvent> {
+public class AuctionStartedConsumer(
+  IUserNotifier userNotifier
+) : IConsumer<AuctionStartedEvent> {
   public async Task Consume(ConsumeContext<AuctionStartedEvent> context) {
     var msg = context.Message;
 
-    await realtimeService.PublishAsync(
-      HubKeys.Notification,
-      msg.OwnerId.ToString(),
+    await userNotifier.SendToUser(
+      msg.OwnerId,
       "AuctionStarted",
       new {
         Message = "Sản phẩm đã được mở đấu giá!",

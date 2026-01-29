@@ -62,8 +62,7 @@ public static class InfrastructureConfig {
 
   // NOTE: ========== [Cơ sở dữ liệu tìm kiếm] ==========
   private static IServiceCollection AddMongo(this IServiceCollection services) {
-    services.AddSingleton<MongoDbContext>();
-    services.AddScoped<IAuctionSearchService, MongoAuctionSearchService>();
+    services.AddScoped<IAuctionSearchService, PostgresAuctionSearchService>();
     return services;
   }
 

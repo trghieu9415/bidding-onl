@@ -1,29 +1,25 @@
 ﻿using L1.Core.Domain.Bidding.Events;
 using L2.Application.Ports.Realtime;
-using L2.Application.Ports.Realtime.Contracts;
 using MassTransit;
 
 namespace L3.Worker.Consumers.Bidding.Events;
 
-public class AuctionEndedConsumer(IRealtimeService realtimeService)
-  : IConsumer<AuctionEndedEvent> {
+public class AuctionEndedConsumer(
+  IBiddingNotifier biddingNotifier,
+  IUserNotifier userNotifier
+) : IConsumer<AuctionEndedEvent> {
   public async Task Consume(ConsumeContext<AuctionEndedEvent> context) {
     var msg = context.Message;
 
-    await realtimeService.PublishAsync(
-      HubKeys.Bidding,
-      msg.AuctionId.ToString(),
-      "AuctionEnded",
-      new {
-        msg.WinnerId,
-        msg.FinalPrice
-      },
+    await biddingNotifier.NotifyAuctionEnded(
+      msg.AuctionId,
+      msg.WinnerId,
+      msg.FinalPrice,
       context.CancellationToken
     );
 
-    await realtimeService.PublishAsync(
-      HubKeys.Notification,
-      msg.OwerId.ToString(),
+    await userNotifier.SendToUser(
+      msg.OwerId,
       "AuctionFinished",
       new {
         msg.IsSold,

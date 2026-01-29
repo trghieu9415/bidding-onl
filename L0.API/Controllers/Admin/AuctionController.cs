@@ -22,7 +22,7 @@ public class AuctionController(IMediator mediator) : DashboardController {
   [HttpGet("{id:guid}")]
   public async Task<IActionResult> GetById(Guid id) {
     var result = await mediator.Send(new GetAuctionQuery(id));
-    return AppResponse.Success(result);
+    return AppResponse.Success(result.Auction);
   }
 
   [HttpPost]

@@ -7,8 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.5.7"/>
-    <PackageReference Include="MassTransit.Quartz" Version="8.5.7"/>
     <PackageReference Include="Quartz.AspNetCore" Version="3.15.1"/>
     <PackageReference Include="Quartz.Serialization.Json" Version="3.15.1"/>
   </ItemGroup>
