@@ -1,5 +1,4 @@
 ﻿using L2.Application.Abstractions;
-using L2.Application.Ports.Repositories;
 using MediatR;
 
 namespace L2.Application.Behaviors;
