@@ -1,11 +1,13 @@
 ﻿using System.Text;
 using L2.Application.Abstractions;
+using L2.Application.Ports.Concurrency;
 using L2.Application.Ports.Identity;
 using L2.Application.Ports.Notification;
 using L2.Application.Ports.Repositories;
 using L2.Application.Ports.Search;
 using L2.Application.Ports.Security;
 using L2.Application.Ports.Storage;
+using L3.Infrastructure.Adapters.Concurrency;
 using L3.Infrastructure.Adapters.Identity;
 using L3.Infrastructure.Adapters.Notification;
 using L3.Infrastructure.Adapters.Repositories;
@@ -15,6 +17,8 @@ using L3.Infrastructure.Adapters.Storage;
 using L3.Infrastructure.Identity;
 using L3.Infrastructure.Persistence;
 using L3.Infrastructure.Persistence.Seeding;
+using Medallion.Threading;
+using Medallion.Threading.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +28,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using Sieve.Services;
+using StackExchange.Redis;
 
 namespace L3.Infrastructure;
 
@@ -132,8 +137,17 @@ public static class InfrastructureConfig {
     services.AddScoped<IEmailService, EmailService>();
     services.AddScoped<IBinaryStorage, LocalBinaryStorage>();
 
+    var redisConfiguration = config["Redis:Configuration"] ?? "localhost:6379";
+    var connectionMultiplexer = ConnectionMultiplexer.Connect(redisConfiguration);
+    services.AddSingleton<IConnectionMultiplexer>(connectionMultiplexer);
+
+    services.AddSingleton<IDistributedLockProvider>(_ =>
+      new RedisDistributedSynchronizationProvider(connectionMultiplexer.GetDatabase()));
+    services.AddScoped<IDistributedLockService, RedisLockService>();
+
+
     services.AddStackExchangeRedisCache(options => {
-      options.Configuration = config["Redis:Configuration"] ?? "localhost:6379";
+      options.Configuration = redisConfiguration;
       options.InstanceName = config["Redis:InstanceName"] ?? "Bidding_";
     });
     services.AddScoped<ICacheStorage, RedisCacheStorage>();

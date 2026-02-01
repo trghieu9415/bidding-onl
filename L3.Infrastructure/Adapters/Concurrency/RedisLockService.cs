@@ -1,11 +1,15 @@
 ﻿using L2.Application.Ports.Concurrency;
-using RedLockNet;
+using Medallion.Threading;
 
 namespace L3.Infrastructure.Adapters.Concurrency;
 
-public class RedisLockService(IDistributedLockFactory lockFactory) : IDistributedLockService {
+public class RedisLockService(IDistributedLockProvider lockProvider) : IDistributedLockService {
   public async Task<IDisposable?> AcquireLockAsync(string resourceKey, TimeSpan expiry, TimeSpan wait) {
-    var redLock = await lockFactory.CreateLockAsync(resourceKey, expiry, wait, TimeSpan.FromMilliseconds(200));
-    return redLock.IsAcquired ? redLock : null;
+    try {
+      var handle = await lockProvider.TryAcquireLockAsync(resourceKey, wait);
+      return handle;
+    } catch {
+      return null;
+    }
   }
 }

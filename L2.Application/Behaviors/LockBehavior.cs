@@ -1,6 +1,4 @@
-﻿// FILE: L2.Application/Behaviors/LockBehavior.cs
-
-using L2.Application.Abstractions;
+﻿using L2.Application.Abstractions;
 using L2.Application.Exceptions;
 using L2.Application.Ports.Concurrency;
 using MediatR;
