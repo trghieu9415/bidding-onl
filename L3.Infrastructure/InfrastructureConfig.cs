@@ -49,13 +49,15 @@ public static class InfrastructureConfig {
   // NOTE: ========== [Cơ sở dữ liệu] ==========
   private static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration config) {
     var connectionString = config.GetConnectionString("DefaultConnection");
-
     var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
     dataSourceBuilder.EnableDynamicJson();
     var dataSource = dataSourceBuilder.Build();
-
-    services.AddDbContext<AppDbContext>(options => {
-        options.UseNpgsql(dataSource, b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName));
+    services.AddSingleton(dataSource);
+    services.AddDbContext<AppDbContext>((
+        sp, options
+      ) => {
+        var ds = sp.GetRequiredService<NpgsqlDataSource>();
+        options.UseNpgsql(ds, b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName));
         options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
       }
     );

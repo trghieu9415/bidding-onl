@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using L1.Core.Base.Event;
 using L1.Core.Domain.Bidding.Entities;
 using L1.Core.Domain.Catalog.Entities;
 using L2.Application.Abstractions;
@@ -12,8 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 namespace L3.Infrastructure.Persistence;
 
 public class AppDbContext(
-  DbContextOptions<AppDbContext> options,
-  IPublishEndpoint? publishEndpoint = null
+  DbContextOptions<AppDbContext> options
 ) : IdentityUserContext<AppUser, Guid>(options), IUnitOfWork {
   private IDbContextTransaction? _currentTransaction;
   public DbSet<Auction> Auctions => Set<Auction>();
@@ -59,27 +57,6 @@ public class AppDbContext(
       }
     }
   }
-
-  public override async Task<int> SaveChangesAsync(CancellationToken ct = default) {
-    var domainEvents = ChangeTracker.Entries<IHasDomainEvent>()
-      .Select(x => x.Entity)
-      .SelectMany(x => {
-        var events = x.DomainEvents.ToList();
-        x.ClearEvents();
-        return events;
-      }).ToList();
-
-    if (publishEndpoint == null) {
-      return await base.SaveChangesAsync(ct);
-    }
-
-    foreach (var domainEvent in domainEvents) {
-      await publishEndpoint.Publish(domainEvent, ct);
-    }
-
-    return await base.SaveChangesAsync(ct);
-  }
-
 
   protected override void OnModelCreating(ModelBuilder modelBuilder) {
     modelBuilder.HasPostgresExtension("pg_trgm");

@@ -2,7 +2,7 @@
 using MediatR;
 using ValidationException = L2.Application.Exceptions.ValidationException;
 
-namespace L2.Application.Behaviors;
+namespace L3.Infrastructure.Behaviors;
 
 public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
   : IPipelineBehavior<TRequest, TResponse>

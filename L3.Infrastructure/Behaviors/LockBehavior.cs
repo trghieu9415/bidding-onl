@@ -3,7 +3,7 @@ using L2.Application.Exceptions;
 using L2.Application.Ports.Concurrency;
 using MediatR;
 
-namespace L2.Application.Behaviors;
+namespace L3.Infrastructure.Behaviors;
 
 public class LockBehavior<TRequest, TResponse>(IDistributedLockService lockService)
   : IPipelineBehavior<TRequest, TResponse>
