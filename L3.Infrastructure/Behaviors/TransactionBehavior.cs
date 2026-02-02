@@ -7,20 +7,19 @@ using MediatR;
 namespace L3.Infrastructure.Behaviors;
 
 public class TransactionBehavior<TRequest, TResponse>(
-  IUnitOfWork unitOfWork,
   AppDbContext dbContext,
   IPublishEndpoint publishEndpoint
 ) : IPipelineBehavior<TRequest, TResponse>
   where TRequest : ITransactional {
   public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct) {
-    await unitOfWork.BeginTransactionAsync(ct);
+    await dbContext.BeginTransactionAsync(ct);
 
     try {
       var response = await next();
 
       var domainEntities = dbContext.ChangeTracker
         .Entries<IHasDomainEvent>()
-        .Where(x => x.Entity.DomainEvents.Any())
+        .Where(x => x.Entity.DomainEvents.Count != 0)
         .Select(x => x.Entity)
         .ToList();
 
@@ -30,17 +29,13 @@ public class TransactionBehavior<TRequest, TResponse>(
 
       domainEntities.ForEach(x => x.ClearEvents());
 
-      foreach (var domainEvent in domainEvents) {
-        await publishEndpoint.Publish(domainEvent, ct);
-      }
+      await Task.WhenAll(domainEvents.Select(evt => publishEndpoint.Publish(evt, ct)));
 
-      await unitOfWork.SaveChangesAsync(ct);
-
-      await unitOfWork.CommitTransactionAsync(ct);
-
+      await dbContext.SaveChangesAsync(ct);
+      await dbContext.CommitTransactionAsync(ct);
       return response;
     } catch (Exception) {
-      await unitOfWork.RollbackTransactionAsync(ct);
+      await dbContext.RollbackTransactionAsync(ct);
       throw;
     }
   }
