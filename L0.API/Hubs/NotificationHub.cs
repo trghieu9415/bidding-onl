@@ -6,6 +6,7 @@ namespace L0.API.Hubs;
 public class NotificationHub(ICurrentUser currentUser) : Hub {
   public override async Task OnConnectedAsync() {
     var userId = currentUser.User.Id;
+    Console.WriteLine($"Connected: {userId}");
     await Groups.AddToGroupAsync(Context.ConnectionId, userId.ToString());
     await base.OnConnectedAsync();
   }

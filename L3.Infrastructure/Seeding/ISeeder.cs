@@ -1,4 +1,4 @@
-﻿namespace L3.Infrastructure.Persistence.Seeding;
+﻿namespace L3.Infrastructure.Seeding;
 
 public interface ISeeder {
   int Order { get; }

@@ -10,7 +10,7 @@ public class AuthController(IMediator mediator) : DashboardController {
   [HttpPost("login")]
   public async Task<IActionResult> Login([FromBody] LoginCommand command) {
     var result = await mediator.Send(command);
-    return AppResponse.Success(result, "Đăng nhập thành công");
+    return AppResponse.Success(result.Tokens, "Đăng nhập thành công");
   }
 
   [HttpPost("change-password")]

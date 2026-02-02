@@ -6,7 +6,7 @@ using L0.API.Middlewares;
 using L2.Application;
 using L3.Infrastructure;
 using L3.Infrastructure.Behaviors;
-using L3.Infrastructure.Persistence;
+using L3.Infrastructure.Seeding;
 using L3.Worker;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.SwaggerUI;

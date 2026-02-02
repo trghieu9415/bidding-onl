@@ -15,13 +15,13 @@ public class AuthController(IMediator mediator) : UserController {
   [HttpPost("register")]
   public async Task<IActionResult> Register([FromBody] RegisterCommand command) {
     var result = await mediator.Send(command);
-    return AppResponse.Success(result, "Đăng ký tài khoản thành công");
+    return AppResponse.Success(result.Tokens, "Đăng ký tài khoản thành công");
   }
 
   [HttpPost("login")]
   public async Task<IActionResult> Login([FromBody] LoginCommand command) {
     var result = await mediator.Send(command);
-    return AppResponse.Success(result, "Đăng nhập thành công");
+    return AppResponse.Success(result.Tokens, "Đăng nhập thành công");
   }
 
   [HttpGet("profile")]

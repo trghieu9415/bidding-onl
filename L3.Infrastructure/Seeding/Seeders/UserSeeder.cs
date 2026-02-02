@@ -4,7 +4,7 @@ using L3.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace L3.Infrastructure.Persistence.Seeding;
+namespace L3.Infrastructure.Seeding.Seeders;
 
 public class UserSeeder(UserManager<AppUser> userManager) : ISeeder {
   public int Order => 1;

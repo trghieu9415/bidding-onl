@@ -27,9 +27,11 @@ public class TransactionBehavior<TRequest, TResponse>(
         .SelectMany(x => x.DomainEvents)
         .ToList();
 
+      Console.WriteLine($"Domain Events: {domainEvents.Count}");
+
       domainEntities.ForEach(x => x.ClearEvents());
 
-      await Task.WhenAll(domainEvents.Select(evt => publishEndpoint.Publish(evt, ct)));
+      await Task.WhenAll(domainEvents.Select(evt => publishEndpoint.Publish((object)evt, ct)));
 
       await dbContext.SaveChangesAsync(ct);
       await dbContext.CommitTransactionAsync(ct);

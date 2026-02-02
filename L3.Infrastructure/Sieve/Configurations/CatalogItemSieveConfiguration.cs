@@ -1,7 +1,7 @@
 ﻿using L1.Core.Domain.Catalog.Entities;
 using Sieve.Services;
 
-namespace L3.Infrastructure.Persistence.Sieve;
+namespace L3.Infrastructure.Sieve.Configurations;
 
 public class CatalogItemSieveConfiguration : BaseSieveConfiguration<CatalogItem> {
   public override void Configure(SievePropertyMapper mapper) {

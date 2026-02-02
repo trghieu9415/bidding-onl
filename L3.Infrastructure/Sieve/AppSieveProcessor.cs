@@ -2,7 +2,7 @@
 using Sieve.Models;
 using Sieve.Services;
 
-namespace L3.Infrastructure.Persistence;
+namespace L3.Infrastructure.Sieve;
 
 public class AppSieveProcessor(
   IOptions<SieveOptions> options

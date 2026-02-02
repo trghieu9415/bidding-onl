@@ -1,7 +1,7 @@
 ﻿using L3.Infrastructure.Identity;
 using Sieve.Services;
 
-namespace L3.Infrastructure.Persistence.Sieve;
+namespace L3.Infrastructure.Sieve.Configurations;
 
 public class AppUserSieveConfiguration : ISieveConfiguration {
   public void Configure(SievePropertyMapper mapper) {

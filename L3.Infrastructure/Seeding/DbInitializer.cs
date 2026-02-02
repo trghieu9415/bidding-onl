@@ -1,9 +1,9 @@
-﻿using L3.Infrastructure.Persistence.Seeding;
+﻿using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 
-namespace L3.Infrastructure.Persistence;
+namespace L3.Infrastructure.Seeding;
 
 public class DbInitializer(AppDbContext context, IEnumerable<ISeeder> seeders, IConfiguration configuration) {
   public async Task SeedAsync() {

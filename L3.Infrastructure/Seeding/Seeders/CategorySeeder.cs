@@ -1,7 +1,8 @@
 ﻿using L1.Core.Domain.Catalog.Entities;
+using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace L3.Infrastructure.Persistence.Seeding;
+namespace L3.Infrastructure.Seeding.Seeders;
 
 public class CategorySeeder(AppDbContext context) : ISeeder {
   public int Order => 2;
