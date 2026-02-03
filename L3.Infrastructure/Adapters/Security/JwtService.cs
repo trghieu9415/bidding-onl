@@ -14,7 +14,9 @@ public class JwtService(IConfiguration config) : IJwtService {
       new(ClaimTypes.NameIdentifier, user.Id.ToString()),
       new(ClaimTypes.Email, user.Email),
       new(ClaimTypes.Name, user.FullName),
-      new(ClaimTypes.Role, nameof(user.Role))
+      new(ClaimTypes.Role, nameof(user.Role)),
+      new("security_stamp", user.SecurityStamp ?? ""),
+      new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
     return GenerateToken(claims, int.Parse(config["Jwt:AccessExpiration"] ?? "60"));
   }
@@ -22,17 +24,11 @@ public class JwtService(IConfiguration config) : IJwtService {
   public TokenModel GenerateRefreshToken(User user) {
     var claims = new List<Claim> {
       new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-      new("token_type", "refresh")
+      new("security_stamp", user.SecurityStamp ?? ""),
+      new("token_type", "refresh"),
+      new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
     return GenerateToken(claims, int.Parse(config["Jwt:RefreshExpiration"] ?? "1440"));
-  }
-
-  public TokenModel GenerateRequestToken(User user) {
-    var claims = new List<Claim> {
-      new(ClaimTypes.Email, user.Email),
-      new("token_type", "reset_password")
-    };
-    return GenerateToken(claims, 15);
   }
 
   private TokenModel GenerateToken(IEnumerable<Claim> claims, int expirationMinutes) {

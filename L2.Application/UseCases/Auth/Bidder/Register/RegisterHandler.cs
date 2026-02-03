@@ -4,7 +4,7 @@ using MediatR;
 
 namespace L2.Application.UseCases.Auth.Bidder.Register;
 
-public class RegisterHandler(IAuthentication authService) : IRequestHandler<RegisterCommand, RegisterResult> {
+public class RegisterHandler(IAuthService authService) : IRequestHandler<RegisterCommand, RegisterResult> {
   public async Task<RegisterResult> Handle(RegisterCommand request, CancellationToken ct) {
     var user = new User {
       Email = request.Email,

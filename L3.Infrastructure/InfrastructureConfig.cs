@@ -102,7 +102,7 @@ public static class InfrastructureConfig {
   // NOTE: ========== [Xác thực] ==========
   private static IServiceCollection AddAuthStrategy(this IServiceCollection services, IConfiguration config) {
     services.AddScoped<IJwtService, JwtService>();
-    services.AddScoped<IAuthentication, AuthenticationService>();
+    services.AddScoped<IAuthService, AuthService>();
     services.AddScoped<ICurrentUser, CurrentUser>();
     services.AddScoped<IUserService, UserService>();
 

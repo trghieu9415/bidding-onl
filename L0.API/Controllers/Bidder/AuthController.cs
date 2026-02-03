@@ -2,6 +2,8 @@
 using L2.Application.UseCases.Auth.Bidder.ChangePassword;
 using L2.Application.UseCases.Auth.Bidder.GetProfile;
 using L2.Application.UseCases.Auth.Bidder.Login;
+using L2.Application.UseCases.Auth.Bidder.Logout;
+using L2.Application.UseCases.Auth.Bidder.RefreshAccess;
 using L2.Application.UseCases.Auth.Bidder.Register;
 using L2.Application.UseCases.Auth.Bidder.RequestPassword;
 using L2.Application.UseCases.Auth.Bidder.ResetPassword;
@@ -52,5 +54,17 @@ public class AuthController(IMediator mediator) : UserController {
   public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command) {
     await mediator.Send(command);
     return AppResponse.Success("Mật khẩu đã được đặt lại thành công");
+  }
+
+  [HttpPost("refresh")]
+  public async Task<IActionResult> Refresh([FromBody] RefreshAccessCommand command) {
+    var result = await mediator.Send(command);
+    return AppResponse.Success(result.Tokens);
+  }
+
+  [HttpPost("logout")]
+  public async Task<IActionResult> Logout([FromBody] LogoutCommand command) {
+    await mediator.Send(command);
+    return AppResponse.Success("Đăng xuất thành công");
   }
 }

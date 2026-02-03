@@ -4,7 +4,7 @@ using MediatR;
 namespace L2.Application.UseCases.Auth.Bidder.ChangePassword;
 
 public class ChangePasswordHandler(
-  IAuthentication authService,
+  IAuthService authService,
   ICurrentUser currentUser
 ) : IRequestHandler<ChangePasswordCommand, Unit> {
   public async Task<Unit> Handle(ChangePasswordCommand request, CancellationToken ct) {

@@ -8,18 +8,19 @@ using L2.Application.Ports.Security;
 using L2.Application.Ports.Storage;
 using L3.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace L3.Infrastructure.Adapters.Security;
 
-public class AuthenticationService(
+public class AuthService(
   UserManager<AppUser> userManager,
   IJwtService jwtService,
   IConfiguration config,
   IEmailService emailService,
   ICacheStorage cache
-) : IAuthentication {
+) : IAuthService {
   public async Task<AuthTokens> LoginUserAsync(string email, string password, CancellationToken ct) {
     return await AuthenticateAsync(email, password, UserRole.Bidder);
   }
@@ -75,8 +76,9 @@ public class AuthenticationService(
       return;
     }
 
-    var tokenModel = jwtService.GenerateRequestToken(ToUserModel(user));
-    await emailService.SendResetPasswordEmailAsync(user.Email!, tokenModel.Token, ct);
+    var token = await userManager.GeneratePasswordResetTokenAsync(user);
+    var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+    await emailService.SendResetPasswordEmailAsync(user.Email!, encodedToken, ct);
   }
 
 
@@ -86,80 +88,76 @@ public class AuthenticationService(
       throw new AppException("Thông tin không hợp lệ", 404);
     }
 
-    var tokenHandler = new JwtSecurityTokenHandler();
-    var key = Encoding.UTF8.GetBytes(config["Jwt:Secret"]!);
-
     try {
-      tokenHandler.ValidateToken(token, new TokenValidationParameters {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = true,
-        ValidIssuer = config["Jwt:Issuer"],
-        ValidateAudience = true,
-        ValidAudience = config["Jwt:Audience"],
-        ClockSkew = TimeSpan.Zero
-      }, out var validatedToken);
-
-      var jwtToken = (JwtSecurityToken)validatedToken;
-      var emailFromToken = jwtToken.Claims.First(x => x.Type == ClaimTypes.Email).Value;
-      var typeFromToken = jwtToken.Claims.First(x => x.Type == "token_type").Value;
-
-      if (emailFromToken != email || typeFromToken != "reset_password") {
-        throw new AppException("Mã xác nhận không hợp lệ hoặc không đúng loại");
+      var decodedBytes = WebEncoders.Base64UrlDecode(token);
+      var originalToken = Encoding.UTF8.GetString(decodedBytes);
+      var result = await userManager.ResetPasswordAsync(user, originalToken, newPassword);
+      if (!result.Succeeded) {
+        var errorMsg = result.Errors.FirstOrDefault()?.Description;
+        Console.WriteLine(errorMsg);
+        throw new AppException("Đổi mật khẩu thất bại");
       }
+
+      await userManager.UpdateSecurityStampAsync(user);
     } catch {
       throw new AppException("Mã xác nhận đã hết hạn hoặc không hợp lệ", 401);
-    }
-
-    var resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
-    var result = await userManager.ResetPasswordAsync(user, resetToken, newPassword);
-
-    if (!result.Succeeded) {
-      throw new AppException(result.Errors.First().Description);
     }
   }
 
   public async Task<AuthTokens> RefreshAsync(string refreshToken, CancellationToken ct) {
-    var isBlacklisted = await cache.GetAsync<bool>($"blacklist:{refreshToken}", ct);
+    var tokenHandler = new JwtSecurityTokenHandler();
+    var key = Encoding.UTF8.GetBytes(config["Jwt:Secret"]!);
+
+    tokenHandler.ValidateToken(refreshToken, new TokenValidationParameters {
+      ValidateIssuerSigningKey = true,
+      IssuerSigningKey = new SymmetricSecurityKey(key),
+      ValidateIssuer = true,
+      ValidIssuer = config["Jwt:Issuer"],
+      ValidateAudience = true,
+      ValidAudience = config["Jwt:Audience"],
+      ClockSkew = TimeSpan.Zero
+    }, out var validatedToken);
+
+    var jwtToken = (JwtSecurityToken)validatedToken;
+
+    var tokenType = jwtToken.Claims.FirstOrDefault(x => x.Type == "token_type")?.Value;
+    if (tokenType != "refresh") {
+      throw new AppException("Token không hợp lệ");
+    }
+
+    var isBlacklisted = await cache.IsBlacklistedAsync(jwtToken.Id, ct);
     if (isBlacklisted) {
       throw new AppException("Phiên đăng nhập đã bị vô hiệu hóa", 401);
     }
 
-    var tokenHandler = new JwtSecurityTokenHandler();
-    var key = Encoding.UTF8.GetBytes(config["Jwt:Secret"]!);
+    var userId = jwtToken.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
-    try {
-      tokenHandler.ValidateToken(refreshToken, new TokenValidationParameters {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = true,
-        ValidIssuer = config["Jwt:Issuer"],
-        ValidateAudience = true,
-        ValidAudience = config["Jwt:Audience"],
-        ClockSkew = TimeSpan.Zero
-      }, out var validatedToken);
-
-      var jwtToken = (JwtSecurityToken)validatedToken;
-      var userId = jwtToken.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-
-      var user = await userManager.FindByIdAsync(userId);
-      if (user == null || user.IsDeleted) {
-        throw new AppException("Tài khoản không hợp lệ", 401);
-      }
-
-      var remainingTime = jwtToken.ValidTo - DateTime.UtcNow;
-      if (remainingTime.TotalSeconds > 0) {
-        await cache.SetAsync($"blacklist:{refreshToken}", true, remainingTime, ct);
-      }
-
-      var userModel = ToUserModel(user);
-      return new AuthTokens(jwtService.GenerateAccessToken(userModel), jwtService.GenerateRefreshToken(userModel));
-    } catch {
-      throw new AppException("Phiên đăng nhập không hợp lệ hoặc đã hết hạn", 401);
+    var user = await userManager.FindByIdAsync(userId);
+    if (user == null || user.IsDeleted) {
+      throw new AppException("Tài khoản không hợp lệ", 401);
     }
+
+    if (user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.UtcNow) {
+      throw new AppException("Tài khoản đã bị khóa", 403);
+    }
+
+    var tokenStamp = jwtToken.Claims.FirstOrDefault(x => x.Type == "security_stamp")?.Value;
+    Console.WriteLine(tokenStamp);
+    Console.WriteLine(user.SecurityStamp);
+    if (tokenStamp != user.SecurityStamp) {
+      throw new AppException("Thông tin bảo mật đã thay đổi, vui lòng đăng nhập lại", 401);
+    }
+
+    await cache.BlacklistAsync(jwtToken.Id, jwtToken.ValidTo - DateTime.UtcNow, ct);
+
+    var userModel = ToUserModel(user);
+    return new AuthTokens(
+      jwtService.GenerateAccessToken(userModel),
+      jwtService.GenerateRefreshToken(userModel)
+    );
   }
 
-  public async Task LogoutAsync(string refreshToken, CancellationToken ct) {
+  public async Task LogoutAsync(string refreshToken, bool revokeAll, CancellationToken ct) {
     if (string.IsNullOrEmpty(refreshToken)) {
       return;
     }
@@ -167,10 +165,19 @@ public class AuthenticationService(
     var tokenHandler = new JwtSecurityTokenHandler();
     try {
       var jwtToken = tokenHandler.ReadJwtToken(refreshToken);
-      var remainingTime = jwtToken.ValidTo - DateTime.UtcNow;
 
-      if (remainingTime.TotalSeconds > 0) {
-        await cache.SetAsync($"blacklist:{refreshToken}", true, remainingTime, ct);
+      if (revokeAll) {
+        var userId = jwtToken.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        var user = await userManager.FindByIdAsync(userId);
+        if (user != null) {
+          await userManager.UpdateSecurityStampAsync(user);
+        }
+      } else {
+        var remainingTime = jwtToken.ValidTo - DateTime.UtcNow;
+
+        if (remainingTime.TotalSeconds > 0) {
+          await cache.BlacklistAsync(jwtToken.Id, remainingTime, ct);
+        }
       }
     } catch {
       // ignored
@@ -201,7 +208,8 @@ public class AuthenticationService(
       PhoneNumber = u.PhoneNumber,
       Url = u.Url,
       IsActive = u.LockoutEnd == null || u.LockoutEnd <= DateTimeOffset.UtcNow,
-      Role = u.Role
+      Role = u.Role,
+      SecurityStamp = u.SecurityStamp
     };
   }
 }

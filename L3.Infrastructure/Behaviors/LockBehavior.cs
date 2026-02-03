@@ -5,8 +5,9 @@ using MediatR;
 
 namespace L3.Infrastructure.Behaviors;
 
-public class LockBehavior<TRequest, TResponse>(IDistributedLockService lockService)
-  : IPipelineBehavior<TRequest, TResponse>
+public class LockBehavior<TRequest, TResponse>(
+  IDistributedLockService lockService
+  ) : IPipelineBehavior<TRequest, TResponse>
   where TRequest : ILockable {
   public async Task<TResponse> Handle(
     TRequest request,
