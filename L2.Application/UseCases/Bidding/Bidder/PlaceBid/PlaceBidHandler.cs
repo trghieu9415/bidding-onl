@@ -11,8 +11,9 @@ public class PlaceBidHandler(
   ICurrentUser currentUser
 ) : IRequestHandler<PlaceBidCommand, Guid> {
   public async Task<Guid> Handle(PlaceBidCommand request, CancellationToken ct) {
-    var auction = await repository.GetByIdAsync(request.AuctionId, ct)
-                  ?? throw new AppException("Cuộc đấu giá không tồn tại", 404);
+    var auction =
+      await repository.GetByIdAsync(request.AuctionId, ct)
+      ?? throw new AppException("Cuộc đấu giá không tồn tại", 404);
 
     auction.PlaceBid(currentUser.User.Id, request.Amount);
 
