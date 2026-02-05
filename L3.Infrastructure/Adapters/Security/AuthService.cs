@@ -67,7 +67,10 @@ public class AuthService(
     }
 
     var userModel = ToUserModel(user);
-    return new AuthTokens(jwtService.GenerateAccessToken(userModel), jwtService.GenerateRefreshToken(userModel));
+    return new AuthTokens(
+      jwtService.GenerateAccessToken(userModel),
+      jwtService.GenerateRefreshToken(userModel)
+    );
   }
 
   public async Task RequestPasswordAsync(string email, CancellationToken ct) {

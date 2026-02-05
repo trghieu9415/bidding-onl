@@ -21,7 +21,7 @@ public class UserSeeder(UserManager<AppUser> userManager) : ISeeder {
       var firstName = faker.Name.FirstName();
       var lastName = faker.Name.LastName();
       var fullName = $"{lastName} {firstName}";
-      var email = faker.Internet.Email(firstName, lastName).ToLower();
+      var email = $"user.num{i}@gmail.com";
 
       var user = new AppUser {
         Id = Guid.NewGuid(),
@@ -37,7 +37,7 @@ public class UserSeeder(UserManager<AppUser> userManager) : ISeeder {
     }
 
     foreach (var u in users) {
-      await userManager.CreateAsync(u, "User@123");
+      await userManager.CreateAsync(u, "111qqq...");
     }
   }
 }

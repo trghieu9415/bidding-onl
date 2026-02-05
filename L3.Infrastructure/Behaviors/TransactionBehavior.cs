@@ -1,8 +1,10 @@
 ﻿using L1.Core.Base.Event;
 using L2.Application.Abstractions;
+using L2.Application.Exceptions;
 using L3.Infrastructure.Persistence;
 using MassTransit;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace L3.Infrastructure.Behaviors;
 
@@ -36,6 +38,9 @@ public class TransactionBehavior<TRequest, TResponse>(
       await dbContext.SaveChangesAsync(ct);
       await dbContext.CommitTransactionAsync(ct);
       return response;
+    } catch (DbUpdateConcurrencyException) {
+      await dbContext.RollbackTransactionAsync(ct);
+      throw new AppException("Dữ liệu đã bị thay đổi. Vui lòng thử lại.", 409);
     } catch (Exception) {
       await dbContext.RollbackTransactionAsync(ct);
       throw;
