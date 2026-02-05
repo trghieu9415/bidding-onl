@@ -7,7 +7,7 @@ namespace L3.Infrastructure.Behaviors;
 
 public class LockBehavior<TRequest, TResponse>(
   IDistributedLockService lockService
-  ) : IPipelineBehavior<TRequest, TResponse>
+) : IPipelineBehavior<TRequest, TResponse>
   where TRequest : ILockable {
   public async Task<TResponse> Handle(
     TRequest request,
@@ -21,7 +21,7 @@ public class LockBehavior<TRequest, TResponse>(
     );
 
     if (distributedLock == null) {
-      throw new AppException($"Hệ thống đang bận xử lý yêu cầu này (Key: {request.LockKey}). Vui lòng thử lại.", 429);
+      throw new AppException("Hệ thống đang bận xử lý yêu cầu này. Vui lòng thử lại.", 429);
     }
 
     return await next();

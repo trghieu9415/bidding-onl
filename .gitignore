@@ -5,6 +5,8 @@ out/
 [Mm]igrations/
 
 appsettings.json
+logs/
+wwwroot/
 
 .vs/
 *.user

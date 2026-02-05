@@ -15,6 +15,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0"/>
     <PackageReference Include="Sieve" Version="2.5.5"/>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6"/>
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0"/>
@@ -24,6 +25,10 @@
     <ProjectReference Include="..\L2.Application\L2.Application.csproj"/>
     <ProjectReference Include="..\L3.Infrastructure\L3.Infrastructure.csproj"/>
     <ProjectReference Include="..\L3.Worker\L3.Worker.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\"/>
   </ItemGroup>
 
 </Project>

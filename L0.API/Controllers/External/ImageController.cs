@@ -50,7 +50,7 @@ public class ImageController(IBinaryStorage storage) : ExternalController {
     try {
       await storage.DeleteAsync(fileName, "catalog", ct);
       return AppResponse.Success("Đã xóa ảnh thành công");
-    } catch (Exception ex) {
+    } catch (Exception) {
       return AppResponse.Fail("Không thể xóa ảnh", 400);
     }
   }

@@ -5,6 +5,10 @@ namespace L2.Application.UseCases.Bidding.Bidder.Test;
 
 public class TestHandler(ILogger<TestHandler> logger) : IRequestHandler<TestCommand, Unit> {
   public async Task<Unit> Handle(TestCommand request, CancellationToken ct) {
+    if (request.Id == "error") {
+      throw new Exception("Error");
+    }
+
     logger.LogInformation(
       "[{Id}] === BẮT ĐẦU xử lý. LockKey: {Key}",
       request.Id, request.LockKey

@@ -21,6 +21,6 @@ public class AdminSeeder(UserManager<AppUser> userManager) : ISeeder {
       Role = UserRole.Admin,
       EmailConfirmed = true
     };
-    await userManager.CreateAsync(admin, "Admin@123");
+    await userManager.CreateAsync(admin, "222aaa,,,");
   }
 }

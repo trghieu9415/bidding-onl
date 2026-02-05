@@ -162,6 +162,7 @@ public static class InfrastructureConfig {
   // NOTE: ========== [Dữ liệu mẫu] ==========
   private static IServiceCollection AddSeeders(this IServiceCollection services) {
     services.AddScoped<ISeeder, UserSeeder>();
+    services.AddScoped<ISeeder, AdminSeeder>();
     services.AddScoped<ISeeder, CategorySeeder>();
     services.AddScoped<ISeeder, CatalogItemSeeder>();
     services.AddScoped<ISeeder, AuctionSessionSeeder>();

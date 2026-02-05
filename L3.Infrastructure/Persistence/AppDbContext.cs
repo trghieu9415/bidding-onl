@@ -61,6 +61,9 @@ public class AppDbContext(
   protected override void OnModelCreating(ModelBuilder modelBuilder) {
     modelBuilder.HasPostgresExtension("pg_trgm");
     base.OnModelCreating(modelBuilder);
+    modelBuilder.Entity<AppUser>()
+      .Property(u => u.Role)
+      .HasConversion<string>();
 
     // NOTE: ========== [MassTransit Outbox Entities] ==========
     modelBuilder.AddInboxStateEntity();

@@ -31,6 +31,9 @@ builder.Services.AddRouting(options => {
   options.LowercaseQueryStrings = true;
 });
 
+// --- Serilog Configuration ---
+builder.AddSerilogCustom();
+
 // --- SignalR Configuration ---
 builder.Services.AddSignalRServices();
 

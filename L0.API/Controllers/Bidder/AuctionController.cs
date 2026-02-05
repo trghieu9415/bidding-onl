@@ -4,6 +4,7 @@ using L2.Application.UseCases.Bidding.Bidder.GetBiddingActivity;
 using L2.Application.UseCases.Bidding.Bidder.GetBidHistory;
 using L2.Application.UseCases.Bidding.Bidder.GetWonAuctions;
 using L2.Application.UseCases.Bidding.Bidder.PlaceBid;
+using L2.Application.UseCases.Bidding.Bidder.Test;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
@@ -40,5 +41,11 @@ public class AuctionController(IMediator mediator) : UserController {
   public async Task<IActionResult> GetMyWins([FromQuery] SieveModel sieveModel) {
     var result = await mediator.Send(new GetWonAuctionsQuery(sieveModel));
     return AppResponse.Success(result.Auctions, result.Meta);
+  }
+
+  [HttpPost("test")]
+  public async Task<IActionResult> Test([FromBody] TestCommand command) {
+    await mediator.Send(command);
+    return AppResponse.Success();
   }
 }
