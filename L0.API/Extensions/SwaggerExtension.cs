@@ -37,7 +37,6 @@ public static class SwaggerExtension {
       });
     });
 
-
     return services;
   }
 }

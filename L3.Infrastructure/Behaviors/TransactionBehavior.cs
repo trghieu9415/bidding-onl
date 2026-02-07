@@ -13,7 +13,11 @@ public class TransactionBehavior<TRequest, TResponse>(
   IPublishEndpoint publishEndpoint
 ) : IPipelineBehavior<TRequest, TResponse>
   where TRequest : ITransactional {
-  public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct) {
+  public async Task<TResponse> Handle(
+    TRequest request,
+    RequestHandlerDelegate<TResponse> next,
+    CancellationToken ct
+  ) {
     await dbContext.BeginTransactionAsync(ct);
 
     try {

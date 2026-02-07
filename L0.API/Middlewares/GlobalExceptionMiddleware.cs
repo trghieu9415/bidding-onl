@@ -6,9 +6,9 @@ using ValidationException = L2.Application.Exceptions.ValidationException;
 
 namespace L0.API.Middlewares;
 
-public class GlobalExceptionHandler(
+public class GlobalExceptionMiddleware(
   RequestDelegate next,
-  ILogger<GlobalExceptionHandler> logger
+  ILogger<GlobalExceptionMiddleware> logger
 ) {
   public async Task InvokeAsync(HttpContext context) {
     try {

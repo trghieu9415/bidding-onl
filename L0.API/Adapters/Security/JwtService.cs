@@ -3,11 +3,12 @@ using System.Security.Claims;
 using System.Text;
 using L2.Application.Models;
 using L2.Application.Ports.Security;
+using L3.Infrastructure.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace L0.API.Adapters.Security;
 
-public class JwtService(IConfiguration config) : IJwtService {
+public class JwtService(JwtOptions jwtOptions) : IJwtService {
   public TokenModel GenerateAccessToken(User user) {
     var claims = new List<Claim> {
       new(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -17,7 +18,7 @@ public class JwtService(IConfiguration config) : IJwtService {
       new("security_stamp", user.SecurityStamp ?? ""),
       new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
-    return GenerateToken(claims, int.Parse(config["Jwt:AccessExpiration"] ?? "60"));
+    return GenerateToken(claims, jwtOptions.AccessExpiration);
   }
 
   public TokenModel GenerateRefreshToken(User user) {
@@ -27,17 +28,17 @@ public class JwtService(IConfiguration config) : IJwtService {
       new("token_type", "refresh"),
       new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
-    return GenerateToken(claims, int.Parse(config["Jwt:RefreshExpiration"] ?? "1440"));
+    return GenerateToken(claims, jwtOptions.RefreshExpiration);
   }
 
   private TokenModel GenerateToken(IEnumerable<Claim> claims, int expirationMinutes) {
-    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Secret"]!));
+    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret));
     var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
     var expiry = DateTime.UtcNow.AddMinutes(expirationMinutes);
 
     var token = new JwtSecurityToken(
-      config["Jwt:Issuer"],
-      config["Jwt:Audience"],
+      jwtOptions.Issuer,
+      jwtOptions.Audience,
       claims,
       expires: expiry,
       signingCredentials: creds

@@ -7,9 +7,9 @@ using L2.Application.Ports.Notification;
 using L2.Application.Ports.Security;
 using L2.Application.Ports.Storage;
 using L3.Infrastructure.Identity;
+using L3.Infrastructure.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace L3.Infrastructure.Adapters.Security;
@@ -17,9 +17,9 @@ namespace L3.Infrastructure.Adapters.Security;
 public class AuthService(
   UserManager<AppUser> userManager,
   IJwtService jwtService,
-  IConfiguration config,
   IEmailService emailService,
-  ICacheStorage cache
+  ICacheStorage cache,
+  JwtOptions jwtOptions
 ) : IAuthService {
   public async Task<AuthTokens> LoginUserAsync(string email, string password, CancellationToken ct) {
     return await AuthenticateAsync(email, password, UserRole.Bidder);
@@ -109,15 +109,15 @@ public class AuthService(
 
   public async Task<AuthTokens> RefreshAsync(string refreshToken, CancellationToken ct) {
     var tokenHandler = new JwtSecurityTokenHandler();
-    var key = Encoding.UTF8.GetBytes(config["Jwt:Secret"]!);
+    var key = Encoding.UTF8.GetBytes(jwtOptions.Secret!);
 
     tokenHandler.ValidateToken(refreshToken, new TokenValidationParameters {
       ValidateIssuerSigningKey = true,
       IssuerSigningKey = new SymmetricSecurityKey(key),
       ValidateIssuer = true,
-      ValidIssuer = config["Jwt:Issuer"],
+      ValidIssuer = jwtOptions.Issuer,
       ValidateAudience = true,
-      ValidAudience = config["Jwt:Audience"],
+      ValidAudience = jwtOptions.Audience,
       ClockSkew = TimeSpan.Zero
     }, out var validatedToken);
 

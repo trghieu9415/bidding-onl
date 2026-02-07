@@ -1,140 +1,35 @@
-﻿using L2.Application.Abstractions;
-using L2.Application.Ports.Concurrency;
-using L2.Application.Ports.Identity;
-using L2.Application.Ports.Notification;
-using L2.Application.Ports.Repositories;
-using L2.Application.Ports.Search;
-using L2.Application.Ports.Security;
-using L2.Application.Ports.Storage;
-using L3.Infrastructure.Adapters.Concurrency;
-using L3.Infrastructure.Adapters.Identity;
-using L3.Infrastructure.Adapters.Notification;
-using L3.Infrastructure.Adapters.Repositories;
-using L3.Infrastructure.Adapters.Search;
-using L3.Infrastructure.Adapters.Security;
-using L3.Infrastructure.Adapters.Storage;
-using L3.Infrastructure.Identity;
-using L3.Infrastructure.Persistence;
-using L3.Infrastructure.Seeding;
-using L3.Infrastructure.Seeding.Seeders;
-using L3.Infrastructure.Sieve;
-using Medallion.Threading;
-using Medallion.Threading.Redis;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
+﻿using L3.Infrastructure.Extensions;
+using L3.Infrastructure.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
-using Sieve.Services;
-using StackExchange.Redis;
 
 namespace L3.Infrastructure;
 
 public static class InfrastructureConfig {
   public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config) {
     services
-      .AddPersistence(config)
-      .AddMongo()
-      .AddIdentityConfig()
-      .AddRepositories()
-      .AddAuthStrategy(config)
-      .AddThirdPartyServices(config)
-      .AddSeeders();
+      .AddPostgresPersistence(config)
+      .AddIdentityInfrastructure()
+      .AddDistributedInfrastructure(config)
+      .AddMediatorPipeline()
+      .AddExternalServices();
 
     return services;
   }
 
-  // NOTE: ========== [Cơ sở dữ liệu] ==========
-  private static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration config) {
-    var connectionString = config.GetConnectionString("DefaultConnection");
-    var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-    dataSourceBuilder.EnableDynamicJson();
-    var dataSource = dataSourceBuilder.Build();
-    services.AddSingleton(dataSource);
-    services.AddDbContext<AppDbContext>((
-        sp, options
-      ) => {
-        var ds = sp.GetRequiredService<NpgsqlDataSource>();
-        options.UseNpgsql(ds, b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName));
-        options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
-      }
-    );
+  private static IServiceCollection AddConfigurationOptions(
+    this IServiceCollection services,
+    IConfiguration config
+  ) {
+    services.AddOptions<JwtOptions>()
+      .Bind(config.GetSection(JwtOptions.SectionName))
+      .ValidateDataAnnotations()
+      .ValidateOnStart();
 
-    services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
-    services.AddScoped<DbInitializer>();
-
-    return services;
-  }
-
-  // NOTE: ========== [Cơ sở dữ liệu tìm kiếm] ==========
-  private static IServiceCollection AddMongo(this IServiceCollection services) {
-    services.AddScoped<IAuctionSearchService, PostgresAuctionSearchService>();
-    return services;
-  }
-
-  // NOTE: ========== [Identity User] ==========
-  private static IServiceCollection AddIdentityConfig(this IServiceCollection services) {
-    services.AddIdentityCore<AppUser>(options => {
-        options.Password.RequireDigit = false;
-        options.Password.RequiredLength = 6;
-        options.Password.RequireNonAlphanumeric = false;
-        options.Password.RequireUppercase = false;
-        options.Password.RequireLowercase = false;
-      })
-      .AddEntityFrameworkStores<AppDbContext>()
-      .AddDefaultTokenProviders();
-
-    return services;
-  }
-
-  // NOTE: ========== [Repositories] ==========
-  private static IServiceCollection AddRepositories(this IServiceCollection services) {
-    services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-    services.AddScoped(typeof(IReadRepository<>), typeof(EfReadRepository<>));
-
-    return services;
-  }
-
-  // NOTE: ========== [Xác thực] ==========
-  private static IServiceCollection AddAuthStrategy(this IServiceCollection services, IConfiguration config) {
-    services.AddScoped<IAuthService, AuthService>();
-    services.AddScoped<IUserService, UserService>();
-    return services;
-  }
-
-  // NOTE: ========== [Dịch vụ ngoài] ==========
-  private static IServiceCollection AddThirdPartyServices(this IServiceCollection services, IConfiguration config) {
-    services.AddScoped<ISieveProcessor, AppSieveProcessor>();
-    services.AddScoped<IEmailService, EmailService>();
-    services.AddScoped<IBinaryStorage, LocalBinaryStorage>();
-
-    var redisConfiguration = config["Redis:Configuration"] ?? "localhost:6379";
-    var connectionMultiplexer = ConnectionMultiplexer.Connect(redisConfiguration);
-    services.AddSingleton<IConnectionMultiplexer>(connectionMultiplexer);
-
-    services.AddSingleton<IDistributedLockProvider>(_ =>
-      new RedisDistributedSynchronizationProvider(connectionMultiplexer.GetDatabase()));
-    services.AddScoped<IDistributedLockService, RedisLockService>();
-
-
-    services.AddStackExchangeRedisCache(options => {
-      options.Configuration = redisConfiguration;
-      options.InstanceName = config["Redis:InstanceName"] ?? "Bidding_";
-    });
-    services.AddScoped<ICacheStorage, RedisCacheStorage>();
-
-    return services;
-  }
-
-  // NOTE: ========== [Dữ liệu mẫu] ==========
-  private static IServiceCollection AddSeeders(this IServiceCollection services) {
-    services.AddScoped<ISeeder, UserSeeder>();
-    services.AddScoped<ISeeder, AdminSeeder>();
-    services.AddScoped<ISeeder, CategorySeeder>();
-    services.AddScoped<ISeeder, CatalogItemSeeder>();
-    services.AddScoped<ISeeder, AuctionSessionSeeder>();
-
+    services.AddOptions<RedisOptions>()
+      .Bind(config.GetSection(RedisOptions.SectionName))
+      .ValidateDataAnnotations()
+      .ValidateOnStart();
     return services;
   }
 }

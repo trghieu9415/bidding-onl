@@ -1,11 +1,7 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using L0.API.Extensions;
 using L0.API.Hubs;
 using L0.API.Middlewares;
-using L2.Application;
 using L3.Infrastructure;
-using L3.Infrastructure.Behaviors;
 using L3.Infrastructure.Seeding;
 using L3.Worker;
 using Microsoft.EntityFrameworkCore;
@@ -13,57 +9,26 @@ using Swashbuckle.AspNetCore.SwaggerUI;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- Web API & JSON Configuration ---
-builder.Services
-  .AddControllers()
-  .ConfigureApiBehaviorOptions(options => {
-    options.SuppressModelStateInvalidFilter = true;
-  })
-  .AddJsonOptions(options => {
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-  });
-
-// --- Routing Configuration ---
-builder.Services.AddRouting(options => {
-  options.LowercaseUrls = true;
-  options.LowercaseQueryStrings = true;
-});
-
-// --- Serilog Configuration ---
-builder.AddSerilogCustom();
-
-// --- Identity Configuration ---
-builder.Services.AddApiSecurity(builder.Configuration);
-
-// --- SignalR Configuration ---
-builder.Services.AddSignalRServices();
-
-// --- Swagger Documentation ---
-builder.Services.AddSwaggerDocument();
-
-// --- Application Layer ---
-var applicationAssembly = typeof(IApplicationMarker).Assembly;
-
-// --- Behaviors Registration ---
-builder.Services.AddMediatR(cfg => {
-  cfg.RegisterServicesFromAssembly(applicationAssembly);
-  cfg.AddOpenBehavior(typeof(LockBehavior<,>));
-  cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
-  cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
-});
-
-builder.Services.AddAutoMapper(config => {}, applicationAssembly);
-
-// --- Infrastructure & Third-Party Layers ---
+// --- Infrastructure ---
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddHttpContextAccessor();
 
+// --- Worker ---
 if (!args.Contains("--seeding") && !EF.IsDesignTime) {
   builder.Services.AddWorker(builder.Configuration);
 }
 
+// --- Presentation Extension ---
+builder.Services.AddPresentationInfrastructure();
+builder.Services.AddWebFramework();
+builder.Services.AddSwaggerDocument();
+builder.AddSerilogCustom();
+
+builder.Services.AddHttpContextAccessor();
+
+
+// =========================================================================
+// ||_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ APP BUILD _-_-_-_-_-_-_-_-_-_-_-_-_-_-_||
+// =========================================================================
 var app = builder.Build();
 
 // --- CLI Flag: Seeding Data ---
@@ -79,8 +44,8 @@ if (args.Contains("--seeding")) {
   return;
 }
 
-// --- Error Handling & Security ---
-app.UseMiddleware<GlobalExceptionHandler>();
+// --- Custom Middlewares ---
+app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseHttpsRedirection();
 
 // --- Swagger UI ---
@@ -94,6 +59,16 @@ if (app.Environment.IsDevelopment()) {
   });
 }
 
+// --- Allow Static Files ---
+app.UseStaticFiles();
+
+// --- CORS ---
+// app.UseCors(options => options
+//   .AllowAnyMethod()
+//   .AllowAnyHeader()
+//   .SetIsOriginAllowed(_ => true)
+//   .AllowCredentials());
+
 // --- Authentication & Authorization ---
 // app.UseAuthentication();
 // app.UseAuthorization();
@@ -102,8 +77,5 @@ if (app.Environment.IsDevelopment()) {
 app.MapControllers();
 app.MapHub<BiddingHub>("/hubs/bidding");
 app.MapHub<NotificationHub>("/hubs/notification");
-
-// --- Allow Static Files ---
-app.UseStaticFiles();
 
 app.Run();
