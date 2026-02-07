@@ -39,7 +39,7 @@ public class Auction : AggregateRoot {
     Rules = new AuctionRules(stepPrice, reservePrice);
   }
 
-  public void PlaceBid(Guid bidderId, decimal amount) {
+  public void PlaceBid(Guid bidderId, string bidderName, decimal amount) {
     if (Status != AuctionStatus.Active) {
       throw new DomainException("Chỉ có thể đặt giá khi đấu giá đang diễn ra.");
     }
@@ -55,7 +55,7 @@ public class Auction : AggregateRoot {
     _bids.Add(bid);
     CurrentPrice = amount;
 
-    AddDomainEvent(new BidPlacedEvent(Id, bidderId, amount));
+    AddDomainEvent(new BidPlacedEvent(Id, bidderId, bidderName, amount));
     if (previousBidderId.HasValue && previousBidderId != bidderId) {
       AddDomainEvent(new OutbidEvent(Id, previousBidderId.Value, amount));
     }

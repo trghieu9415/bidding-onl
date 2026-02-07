@@ -37,7 +37,7 @@ public class AuctionSessionSeeder(AppDbContext context) : ISeeder {
         currentPrice += 20;
         var bidder = faker.PickRandom(bidders);
         if (bidder.Id != item.OwnerId) {
-          auction.PlaceBid(bidder.Id, currentPrice);
+          auction.PlaceBid(bidder.Id, bidder.FullName, currentPrice);
         }
       }
 

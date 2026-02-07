@@ -9,6 +9,12 @@ namespace L3.Worker;
 
 public static class WorkerConfiguration {
   public static IServiceCollection AddWorker(this IServiceCollection services, IConfiguration config) {
+    var timeZoneId =
+      Environment.OSVersion.Platform == PlatformID.Win32NT
+        ? "SE Asia Standard Time"
+        : "Asia/Ho_Chi_Minh";
+    var vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+
     var connectionString =
       config.GetConnectionString("DefaultConnection")
       ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -25,23 +31,30 @@ public static class WorkerConfiguration {
       q.AddJob<StartupSyncJob>(opts => opts.WithIdentity(startupSyncKey));
       q.AddTrigger(opts => opts
         .ForJob(startupSyncKey)
-        .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.Now.AddSeconds(60)))
+        .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.Now.AddSeconds(30)))
       );
 
       // NOTE: ========== [02:00 Sáng] ==========
       var imageCleanupKey = new JobKey("ImageCleanupJob");
       q.AddJob<ImageCleanupJob>(opts => opts.WithIdentity(imageCleanupKey));
-      q.AddTrigger(opts => opts.ForJob(imageCleanupKey).WithCronSchedule("0 0 2 * * ?"));
+      q.AddTrigger(opts => opts
+        .ForJob(imageCleanupKey)
+        .WithCronSchedule("0 0 2 * * ?", builder => builder.InTimeZone(vnTimeZone))
+      );
 
       // NOTE: ========== [03:00 Sáng] ==========
       var purgeKey = new JobKey("SoftDeletePurgeJob");
       q.AddJob<SoftDeletePurgeJob>(opts => opts.WithIdentity(purgeKey));
-      q.AddTrigger(opts => opts.ForJob(purgeKey).WithCronSchedule("0 0 3 * * ?"));
+      q.AddTrigger(opts => opts
+        .ForJob(purgeKey)
+        .WithCronSchedule("0 0 3 * * ?", builder => builder.InTimeZone(vnTimeZone))
+      );
 
       // NOTE: ========== [Mỗi 1 tiếng] ==========
       var timeoutKey = new JobKey("UnpaidWinnerTimeoutJob");
       q.AddJob<UnpaidWinnerTimeoutJob>(opts => opts.WithIdentity(timeoutKey));
-      q.AddTrigger(opts => opts.ForJob(timeoutKey)
+      q.AddTrigger(opts => opts
+        .ForJob(timeoutKey)
         .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever()));
     });
 

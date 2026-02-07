@@ -13,6 +13,7 @@ public class BidPlacedConsumer(
     await biddingNotifier.NotifyNewBid(
       msg.AuctionId,
       msg.BidderId,
+      msg.BidderName,
       msg.Amount,
       context.CancellationToken
     );

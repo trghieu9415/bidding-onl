@@ -5,8 +5,8 @@ namespace L1.Core.Domain.Bidding.Events;
 public record BidPlacedEvent(
   Guid AuctionId,
   Guid BidderId,
+  string BidderName,
   decimal Amount = 0
 ) : DomainEvent {
-  public BidPlacedEvent() : this(Guid.Empty, Guid.Empty) {}
   public override Guid AggregateId => AuctionId;
 }

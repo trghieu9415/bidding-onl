@@ -7,6 +7,5 @@ public record ItemRejectedEvent(
   Guid OwnerId,
   string Reason
 ) : DomainEvent {
-  public ItemRejectedEvent() : this(Guid.Empty, Guid.Empty, "") {}
   public override Guid AggregateId => ItemId;
 }

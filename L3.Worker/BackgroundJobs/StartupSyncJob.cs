@@ -17,7 +17,9 @@ public class StartupSyncJob(
     var ct = context.CancellationToken;
 
     var missedStartSessions = await sessionRepo.GetAsync(
-      s => s.Status == SessionStatus.Published && s.TimeFrame.StartTime <= DateTime.UtcNow,
+      s =>
+        s.Status == SessionStatus.Published
+        && s.TimeFrame.StartTime <= DateTime.UtcNow,
       ct: ct);
 
     foreach (var session in missedStartSessions) {

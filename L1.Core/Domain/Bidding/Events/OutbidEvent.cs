@@ -7,6 +7,5 @@ public record OutbidEvent(
   Guid PreviousBidderId,
   decimal NewPrice
 ) : DomainEvent {
-  public OutbidEvent() : this(Guid.Empty, Guid.Empty, 0) {}
   public override Guid AggregateId => AuctionId;
 }

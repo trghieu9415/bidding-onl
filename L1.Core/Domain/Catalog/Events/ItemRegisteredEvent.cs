@@ -7,6 +7,5 @@ public record ItemRegisteredEvent(
   Guid OwnerId,
   string Name
 ) : DomainEvent {
-  public ItemRegisteredEvent() : this(Guid.Empty, Guid.Empty, "") {}
   public override Guid AggregateId => ItemId;
 }
