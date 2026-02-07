@@ -1,4 +1,5 @@
-﻿using L2.Application.Ports.Repositories;
+﻿using L2.Application.Abstractions;
+using L2.Application.Ports.Repositories;
 using L3.Infrastructure.Adapters.Repositories;
 using L3.Infrastructure.Persistence;
 using L3.Infrastructure.Seeding;
@@ -26,6 +27,8 @@ public static class PersistenceExtensions {
       );
       options.ConfigureWarnings(warning => warning.Ignore(RelationalEventId.PendingModelChangesWarning));
     });
+
+    services.AddScoped<IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<AppDbContext>());
 
     // Repositories
     services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));

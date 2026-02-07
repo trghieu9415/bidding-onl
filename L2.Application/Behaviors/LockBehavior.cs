@@ -3,7 +3,7 @@ using L2.Application.Exceptions;
 using L2.Application.Ports.Concurrency;
 using MediatR;
 
-namespace L3.Infrastructure.Behaviors;
+namespace L2.Application.Behaviors;
 
 public class LockBehavior<TRequest, TResponse>(
   IDistributedLockService lockService

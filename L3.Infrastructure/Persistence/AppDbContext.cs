@@ -2,6 +2,7 @@
 using L1.Core.Domain.Bidding.Entities;
 using L1.Core.Domain.Catalog.Entities;
 using L2.Application.Abstractions;
+using L2.Application.Exceptions;
 using L3.Infrastructure.Identity;
 using MassTransit;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -34,6 +35,9 @@ public class AppDbContext(
       if (_currentTransaction != null) {
         await _currentTransaction.CommitAsync(ct);
       }
+    } catch (DbUpdateConcurrencyException) {
+      await RollbackTransactionAsync(ct);
+      throw new AppException("Dữ liệu đã bị thay đổi. Vui lòng thử lại.", 409);
     } catch {
       await RollbackTransactionAsync(ct);
       throw;

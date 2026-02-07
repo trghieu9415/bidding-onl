@@ -1,7 +1,7 @@
-﻿using L2.Application.Ports.Notification;
+﻿using L2.Application.Ports.Gateways;
 using Microsoft.Extensions.Logging;
 
-namespace L3.Infrastructure.Adapters.Notification;
+namespace L3.Infrastructure.Adapters.Gateways;
 
 public class EmailService(ILogger<EmailService> logger) : IEmailService {
   public async Task SendResetPasswordEmailAsync(string email, string token, CancellationToken ct = default) {

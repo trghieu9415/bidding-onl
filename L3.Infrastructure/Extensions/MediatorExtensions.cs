@@ -1,5 +1,5 @@
 ﻿using L2.Application;
-using L3.Infrastructure.Behaviors;
+using L2.Application.Behaviors;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace L3.Infrastructure.Extensions;
