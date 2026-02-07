@@ -1,9 +1,8 @@
 ﻿using System.Security.Claims;
 using L2.Application.Models;
 using L2.Application.Ports.Security;
-using Microsoft.AspNetCore.Http;
 
-namespace L3.Infrastructure.Adapters.Security;
+namespace L0.API.Adapters.Security;
 
 public class CurrentUser : ICurrentUser {
   public CurrentUser(IHttpContextAccessor accessor) {

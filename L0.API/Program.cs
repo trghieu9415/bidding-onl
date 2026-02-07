@@ -34,6 +34,9 @@ builder.Services.AddRouting(options => {
 // --- Serilog Configuration ---
 builder.AddSerilogCustom();
 
+// --- Identity Configuration ---
+builder.Services.AddApiSecurity(builder.Configuration);
+
 // --- SignalR Configuration ---
 builder.Services.AddSignalRServices();
 

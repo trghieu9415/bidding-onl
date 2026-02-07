@@ -1,5 +1,4 @@
-﻿using System.Text;
-using L2.Application.Abstractions;
+﻿using L2.Application.Abstractions;
 using L2.Application.Ports.Concurrency;
 using L2.Application.Ports.Identity;
 using L2.Application.Ports.Notification;
@@ -21,13 +20,11 @@ using L3.Infrastructure.Seeding.Seeders;
 using L3.Infrastructure.Sieve;
 using Medallion.Threading;
 using Medallion.Threading.Redis;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using Sieve.Services;
 using StackExchange.Redis;
@@ -101,37 +98,8 @@ public static class InfrastructureConfig {
 
   // NOTE: ========== [Xác thực] ==========
   private static IServiceCollection AddAuthStrategy(this IServiceCollection services, IConfiguration config) {
-    services.AddScoped<IJwtService, JwtService>();
     services.AddScoped<IAuthService, AuthService>();
-    services.AddScoped<ICurrentUser, CurrentUser>();
     services.AddScoped<IUserService, UserService>();
-
-    services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-      .AddJwtBearer(options => {
-        options.TokenValidationParameters = new TokenValidationParameters {
-          ValidateIssuer = true,
-          ValidateAudience = true,
-          ValidateLifetime = true,
-          ValidateIssuerSigningKey = true,
-          ValidIssuer = config["Jwt:Issuer"],
-          ValidAudience = config["Jwt:Audience"],
-          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Secret"]!))
-        };
-
-        options.Events = new JwtBearerEvents {
-          OnMessageReceived = context => {
-            var accessToken = context.Request.Query["access_token"];
-            var path = context.HttpContext.Request.Path;
-
-            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs")) {
-              context.Token = accessToken;
-            }
-
-            return Task.CompletedTask;
-          }
-        };
-      });
-
     return services;
   }
 

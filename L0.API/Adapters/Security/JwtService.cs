@@ -3,10 +3,9 @@ using System.Security.Claims;
 using System.Text;
 using L2.Application.Models;
 using L2.Application.Ports.Security;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace L3.Infrastructure.Adapters.Security;
+namespace L0.API.Adapters.Security;
 
 public class JwtService(IConfiguration config) : IJwtService {
   public TokenModel GenerateAccessToken(User user) {
