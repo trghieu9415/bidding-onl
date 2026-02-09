@@ -6,7 +6,6 @@ using L3.Infrastructure.Options;
 using Medallion.Threading;
 using Medallion.Threading.Redis;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
@@ -15,7 +14,7 @@ namespace L3.Infrastructure.Extensions;
 
 public static class DistributedExtensions {
   public static IServiceCollection
-    AddDistributedInfrastructure(this IServiceCollection services, IConfiguration config) {
+    AddDistributedInfrastructure(this IServiceCollection services) {
     // Redis Cache
     services.AddOptions<RedisCacheOptions>()
       .Configure<IOptions<RedisOptions>>((cacheOptions, redisOptionsRef) => {

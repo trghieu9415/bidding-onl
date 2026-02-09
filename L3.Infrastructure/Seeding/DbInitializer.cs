@@ -5,7 +5,11 @@ using Npgsql;
 
 namespace L3.Infrastructure.Seeding;
 
-public class DbInitializer(AppDbContext context, IEnumerable<ISeeder> seeders, IConfiguration configuration) {
+public class DbInitializer(
+  AppDbContext context,
+  IEnumerable<ISeeder> seeders,
+  IConfiguration configuration
+) {
   public async Task SeedAsync() {
     var connectionString = configuration.GetConnectionString("DefaultConnection");
     await EnsureQuartzTablesResourceCreated(connectionString!);

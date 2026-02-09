@@ -13,7 +13,7 @@ public class TestHandler(ILogger<TestHandler> logger) : IRequestHandler<TestComm
       "[{Id}] === BẮT ĐẦU xử lý. LockKey: {Key}",
       request.Id, request.LockKey
     );
-    await Task.Delay(3000, ct);
+    await Task.Delay(10000, ct);
     logger.LogInformation("[{Id}] === KẾT THÚC xử lý thành công.", request.Value);
 
     return Unit.Value;

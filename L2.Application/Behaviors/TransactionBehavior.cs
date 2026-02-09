@@ -1,5 +1,5 @@
 ﻿using L2.Application.Abstractions;
-using L2.Application.Ports.Gateways;
+using L2.Application.Ports.Messaging;
 using MediatR;
 
 namespace L2.Application.Behaviors;

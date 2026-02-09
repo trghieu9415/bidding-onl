@@ -1,7 +1,7 @@
-﻿using L2.Application.Ports.Gateways;
+﻿using L2.Application.Ports.Notification;
 using L2.Application.Ports.Search;
 using L2.Application.Ports.Storage;
-using L3.Infrastructure.Adapters.Gateways;
+using L3.Infrastructure.Adapters.Notification;
 using L3.Infrastructure.Adapters.Search;
 using L3.Infrastructure.Adapters.Storage;
 using L3.Infrastructure.Sieve;
@@ -19,7 +19,6 @@ public static class ExternalServiceExtensions {
     services.AddScoped<ISieveProcessor, AppSieveProcessor>();
     services.AddScoped<IEmailService, EmailService>();
     services.AddScoped<IBinaryStorage, LocalBinaryStorage>();
-    services.AddScoped<IEventDispatcher, MassTransitEventDispatcher>();
 
     return services;
   }

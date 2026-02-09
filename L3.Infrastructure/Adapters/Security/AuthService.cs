@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using L2.Application.Exceptions;
 using L2.Application.Models;
-using L2.Application.Ports.Gateways;
+using L2.Application.Ports.Notification;
 using L2.Application.Ports.Security;
 using L2.Application.Ports.Storage;
 using L3.Infrastructure.Identity;

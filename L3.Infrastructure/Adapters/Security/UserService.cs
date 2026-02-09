@@ -1,6 +1,6 @@
 ﻿using L2.Application.Exceptions;
 using L2.Application.Models;
-using L2.Application.Ports.Identity;
+using L2.Application.Ports.Security;
 using L3.Infrastructure.Exceptions;
 using L3.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Sieve.Models;
 using Sieve.Services;
 
-namespace L3.Infrastructure.Adapters.Identity;
+namespace L3.Infrastructure.Adapters.Security;
 
 public class UserService(
   UserManager<AppUser> userManager,

@@ -1,7 +1,7 @@
 ﻿using L2.Application.Models;
 using Sieve.Models;
 
-namespace L2.Application.Ports.Identity;
+namespace L2.Application.Ports.Security;
 
 public interface IUserService {
   Task<User?> GetByIdAsync(Guid id,

@@ -16,7 +16,6 @@ public class LockBehavior<TRequest, TResponse>(
   ) {
     using var distributedLock = await lockService.AcquireLockAsync(
       request.LockKey,
-      request.Expiration,
       request.WaitTime
     );
 

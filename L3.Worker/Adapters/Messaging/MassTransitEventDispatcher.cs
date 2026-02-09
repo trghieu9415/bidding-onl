@@ -1,9 +1,9 @@
 ﻿using L1.Core.Base.Event;
-using L2.Application.Ports.Gateways;
+using L2.Application.Ports.Messaging;
 using L3.Infrastructure.Persistence;
 using MassTransit;
 
-namespace L3.Infrastructure.Adapters.Gateways;
+namespace L3.Worker.Adapters.Messaging;
 
 public class MassTransitEventDispatcher(
   AppDbContext dbContext,
@@ -12,7 +12,7 @@ public class MassTransitEventDispatcher(
   public async Task DispatchEventsAsync(CancellationToken ct = default) {
     var domainEntities = dbContext.ChangeTracker
       .Entries<IHasDomainEvent>()
-      .Where(x => x.Entity.DomainEvents.Any())
+      .Where(x => x.Entity.DomainEvents.Count != 0)
       .Select(x => x.Entity)
       .ToList();
 

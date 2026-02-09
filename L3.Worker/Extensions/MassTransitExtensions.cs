@@ -1,4 +1,6 @@
-﻿using L3.Infrastructure.Persistence;
+﻿using L2.Application.Ports.Messaging;
+using L3.Infrastructure.Persistence;
+using L3.Worker.Adapters.Messaging;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,6 +30,7 @@ public static class MassTransitExtensions {
       });
     });
 
+    services.AddScoped<IEventDispatcher, MassTransitEventDispatcher>();
     return services;
   }
 }

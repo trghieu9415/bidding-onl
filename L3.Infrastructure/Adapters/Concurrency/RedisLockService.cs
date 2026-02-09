@@ -4,7 +4,7 @@ using Medallion.Threading;
 namespace L3.Infrastructure.Adapters.Concurrency;
 
 public class RedisLockService(IDistributedLockProvider lockProvider) : IDistributedLockService {
-  public async Task<IDisposable?> AcquireLockAsync(string resourceKey, TimeSpan expiry, TimeSpan wait) {
+  public async Task<IDisposable?> AcquireLockAsync(string resourceKey, TimeSpan wait) {
     try {
       var handle = await lockProvider.TryAcquireLockAsync(resourceKey, wait);
       return handle;

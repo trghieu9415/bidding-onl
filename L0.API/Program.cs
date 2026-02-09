@@ -27,7 +27,7 @@ builder.Services.AddHttpContextAccessor();
 
 
 // =========================================================================
-// ||_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ APP BUILD _-_-_-_-_-_-_-_-_-_-_-_-_-_-_||
+// || -_-_-_-_-_-_-_-_-_-_-_-_-_-_ APP BUILD _-_-_-_-_-_-_-_-_-_-_-_-_-_- ||
 // =========================================================================
 var app = builder.Build();
 
@@ -76,6 +76,6 @@ app.UseStaticFiles();
 // --- Endpoints ---
 app.MapControllers();
 app.MapHub<BiddingHub>("/hubs/bidding");
-app.MapHub<NotificationHub>("/hubs/notification");
+app.MapHub<UserHub>("/hubs/notification");
 
 app.Run();

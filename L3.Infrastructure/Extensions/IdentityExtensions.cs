@@ -1,6 +1,4 @@
-﻿using L2.Application.Ports.Identity;
-using L2.Application.Ports.Security;
-using L3.Infrastructure.Adapters.Identity;
+﻿using L2.Application.Ports.Security;
 using L3.Infrastructure.Adapters.Security;
 using L3.Infrastructure.Identity;
 using L3.Infrastructure.Persistence;

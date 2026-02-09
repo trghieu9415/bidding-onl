@@ -1,6 +1,5 @@
 using L2.Application.Exceptions;
 using L2.Application.Models;
-using L2.Application.Ports.Identity;
 using L2.Application.Ports.Security;
 using MediatR;
 

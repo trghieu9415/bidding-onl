@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace L0.API.Adapters.Realtime;
 
-public class UserNotifier(IHubContext<NotificationHub> hubContext) : IUserNotifier {
+public class UserNotifier(IHubContext<UserHub> hubContext) : IUserNotifier {
   public async Task SendToUser(Guid userId, string method, object data, CancellationToken ct = default) {
-    await hubContext.Clients.Group(userId.ToString()).SendAsync(method, data, ct);
+    await hubContext.Clients.User(userId.ToString()).SendAsync(method, data, ct);
   }
 }
