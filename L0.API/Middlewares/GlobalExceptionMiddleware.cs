@@ -1,14 +1,16 @@
 ﻿using L0.API.Response;
 using L1.Core.Base.Exception;
 using L2.Application.Exceptions;
+using L2.Application.Ports.Logging;
 using L3.Infrastructure.Exceptions;
+using Serilog.Context;
 using ValidationException = L2.Application.Exceptions.ValidationException;
 
 namespace L0.API.Middlewares;
 
 public class GlobalExceptionMiddleware(
   RequestDelegate next,
-  ILogger<GlobalExceptionMiddleware> logger
+  IAppLogger<GlobalExceptionMiddleware> logger
 ) {
   public async Task InvokeAsync(HttpContext context) {
     try {
@@ -21,10 +23,9 @@ public class GlobalExceptionMiddleware(
         or InfrastructureException;
 
       if (shouldLogToFile) {
-        logger.LogError("{Message}", ex.Message);
+        logger.LogBusinessError(ex, "{Message}", ex.Message);
       } else {
-        Console.WriteLine($"[UNEXPECTED ERROR] {DateTime.Now:HH:mm:ss}");
-        Console.WriteLine(ex.ToString());
+        logger.LogSystemError(ex, "{Message}", ex.Message);
       }
 
 
