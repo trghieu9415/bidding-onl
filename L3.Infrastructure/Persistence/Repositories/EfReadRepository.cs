@@ -63,6 +63,20 @@ public class EfReadRepository<TEntity, TDto>(
     return (total, entities);
   }
 
+  public virtual async Task<TDto?> GetFirstAsync(
+    Expression<Func<TEntity, bool>>? criteria = null,
+    CancellationToken ct = default) {
+    var query = DbSet.AsNoTracking().Where(x => !x.IsDeleted);
+
+    if (criteria != null) {
+      query = query.Where(criteria);
+    }
+
+    return await query
+      .ProjectTo<TDto>(mapper.ConfigurationProvider)
+      .FirstOrDefaultAsync(ct);
+  }
+
 
   // NOTE: ========== [Helper Methods] ==========
   private async Task<(int total, IQueryable<TEntity> query)> GetBaseQueryAsync(
@@ -84,9 +98,7 @@ public class EfReadRepository<TEntity, TDto>(
 
     query = sieveProcessor.Apply(sieveModel, query, applyPagination: false);
     var total = await query.CountAsync(ct);
-
     query = sieveProcessor.Apply(sieveModel, query, applyFiltering: false, applySorting: false);
-
     return (total, query);
   }
 }

@@ -27,4 +27,6 @@ public interface IReadRepository<TEntity, TDto>
     List<Expression<Func<TEntity, object>>>? includes = null,
     CancellationToken ct = default
   );
+
+  Task<TDto?> GetFirstAsync(Expression<Func<TEntity, bool>>? criteria = null, CancellationToken ct = default);
 }
