@@ -1,5 +1,7 @@
-﻿using L1.Core.Domain.Bidding.Enums;
-using L2.Application.DTOs;
+﻿using L1.Core.Domain.Bidding.Entities;
+using L1.Core.Domain.Bidding.Enums;
+using L1.Core.Domain.Catalog.Entities;
+using L2.Application.Models;
 using L2.Application.Ports.Search;
 using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace L3.Infrastructure.Adapters.Search;
 
 public class PostgresAuctionSearchService(AppDbContext context) : IAuctionSearchService {
-  public async Task<(int total, List<AuctionSearchDto> items)> SearchAsync(
+  public async Task<(int total, List<AuctionSearchModel> items)> SearchAsync(
     string? keyword,
     List<Guid>? categoryIds,
     decimal? minPrice,
@@ -19,9 +21,9 @@ public class PostgresAuctionSearchService(AppDbContext context) : IAuctionSearch
     int pageSize,
     CancellationToken ct
   ) {
-    var query = from auction in context.Auctions.AsNoTracking()
-      join item in context.CatalogItems.AsNoTracking() on auction.CatalogItemId equals item.Id
-      from session in context.AuctionSessions.AsNoTracking()
+    var query = from auction in context.Set<Auction>().AsNoTracking()
+      join item in context.Set<CatalogItem>().AsNoTracking() on auction.CatalogItemId equals item.Id
+      from session in context.Set<AuctionSession>().AsNoTracking()
       where !auction.IsDeleted && !item.IsDeleted && !session.IsDeleted
             && session.AuctionIds.Contains(auction.Id)
       select new { auction, item, session };
@@ -60,7 +62,7 @@ public class PostgresAuctionSearchService(AppDbContext context) : IAuctionSearch
       .OrderByDescending(x => x.session.TimeFrame.StartTime)
       .Skip((page - 1) * pageSize)
       .Take(pageSize)
-      .Select(x => new AuctionSearchDto(
+      .Select(x => new AuctionSearchModel(
         x.auction.Id,
         x.item.Id,
         x.item.Name,

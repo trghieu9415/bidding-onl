@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using L1.Core.Base.Entity;
-using L1.Core.Base.Exception;
+using L1.Core.Exceptions;
 
 namespace L1.Core.Domain.Catalog.Entities;
 

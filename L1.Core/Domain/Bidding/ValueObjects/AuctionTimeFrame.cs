@@ -1,4 +1,4 @@
-﻿using L1.Core.Base.Exception;
+﻿using L1.Core.Exceptions;
 
 namespace L1.Core.Domain.Bidding.ValueObjects;
 

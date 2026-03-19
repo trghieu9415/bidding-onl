@@ -8,7 +8,7 @@ public class ChangePasswordHandler(
   ICurrentUser currentUser
 ) : IRequestHandler<ChangePasswordCommand, Unit> {
   public async Task<Unit> Handle(ChangePasswordCommand request, CancellationToken ct) {
-    var userId = currentUser.User.Id;
+    var userId = currentUser.Id;
 
     await authService.ChangePasswordAsync(
       userId,

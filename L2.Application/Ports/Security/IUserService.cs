@@ -4,28 +4,23 @@ using Sieve.Models;
 namespace L2.Application.Ports.Security;
 
 public interface IUserService {
-  Task<User?> GetByIdAsync(Guid id,
-    UserRole role = UserRole.Bidder,
-    CancellationToken ct = default
-  );
+  Task<User?> GetByIdAsync(Guid id, UserRole? role, CancellationToken ct = default);
 
   Task<(int total, List<User> users)> GetAsync(
     SieveModel? sieveModel = null,
-    UserRole role = UserRole.Bidder,
+    UserRole? role = UserRole.Bidder,
     CancellationToken ct = default
   );
 
   Task<(int total, List<User> users)> GetDeletedAsync(
     SieveModel? sieveModel = null,
-    UserRole role = UserRole.Bidder,
+    UserRole? role = UserRole.Bidder,
     CancellationToken ct = default
   );
 
   Task<Guid> CreateAsync(
-    User user,
-    string password,
-    UserRole role,
-    CancellationToken ct = default
+    User user, string password,
+    UserRole role, CancellationToken ct = default
   );
 
   Task UpdateAsync(User user, CancellationToken ct = default);

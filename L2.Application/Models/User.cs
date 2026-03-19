@@ -8,7 +8,7 @@ public record User {
   public string? Url { get; init; }
   public bool IsActive { get; init; } = true;
   public UserRole Role { get; init; }
-  public string? SecurityStamp { get; set; }
+  public string? SecurityStamp { get; init; }
 }
 
 public enum UserRole {

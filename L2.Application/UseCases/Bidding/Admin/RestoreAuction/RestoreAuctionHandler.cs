@@ -1,5 +1,5 @@
 using L1.Core.Domain.Bidding.Entities;
-using L2.Application.Ports.Repositories;
+using L2.Application.Repositories;
 using MediatR;
 
 namespace L2.Application.UseCases.Bidding.Admin.RestoreAuction;

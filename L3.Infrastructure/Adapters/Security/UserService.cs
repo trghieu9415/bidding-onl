@@ -14,55 +14,6 @@ public class UserService(
   UserManager<AppUser> userManager,
   ISieveProcessor sieveProcessor
 ) : IUserService {
-  public async Task<User?> GetByIdAsync(Guid id, UserRole role = UserRole.Bidder, CancellationToken ct = default) {
-    var user = await userManager.Users
-      .FirstOrDefaultAsync(u => u.Id == id && u.Role == role, ct);
-
-    return user == null ? null : ToUser(user);
-  }
-
-  public async Task<(int total, List<User> users)> GetAsync(
-    SieveModel? sieveModel = null,
-    UserRole role = UserRole.Bidder,
-    CancellationToken ct = default
-  ) {
-    var query = userManager.Users.AsNoTracking()
-      .Where(u => u.Role == role && !u.IsDeleted);
-    if (sieveModel != null) {
-      query = sieveProcessor.Apply(sieveModel, query, applyPagination: false);
-    }
-
-    var total = await query.CountAsync(ct);
-    if (sieveModel != null) {
-      query = sieveProcessor.Apply(sieveModel, query, applyFiltering: false, applySorting: false);
-    }
-
-    var appUsers = await query.ToListAsync(ct);
-    var users = appUsers.Select(ToUser).ToList();
-    return (total, users);
-  }
-
-  public async Task<(int total, List<User> users)> GetDeletedAsync(
-    SieveModel? sieveModel = null,
-    UserRole role = UserRole.Bidder,
-    CancellationToken ct = default
-  ) {
-    var query = userManager.Users.AsNoTracking()
-      .Where(u => u.Role == role && u.IsDeleted);
-    if (sieveModel != null) {
-      query = sieveProcessor.Apply(sieveModel, query, applyPagination: false);
-    }
-
-    var total = await query.CountAsync(ct);
-    if (sieveModel != null) {
-      query = sieveProcessor.Apply(sieveModel, query, applyFiltering: false, applySorting: false);
-    }
-
-    var appUsers = await query.ToListAsync(ct);
-    var users = appUsers.Select(ToUser).ToList();
-    return (total, users);
-  }
-
   public async Task<Guid> CreateAsync(
     User user,
     string password,
@@ -85,7 +36,7 @@ public class UserService(
   public async Task UpdateAsync(User user, CancellationToken ct = default) {
     var existingUser = await userManager.FindByIdAsync(user.Id.ToString());
     if (existingUser == null || existingUser.IsDeleted) {
-      throw new AppException($"Người dùng không tồn tại - Id: {user.Id}.", 404);
+      throw new WorkflowException($"Người dùng không tồn tại - Id: {user.Id}.", 404);
     }
 
     existingUser.FullName = user.FullName;
@@ -122,6 +73,46 @@ public class UserService(
     await userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow);
   }
 
+  public async Task<User?> GetByIdAsync(Guid id, UserRole? role = UserRole.Bidder, CancellationToken ct = default) {
+    var user = await userManager.Users
+      .FirstOrDefaultAsync(u => u.Id == id && u.Role == role, ct);
+
+    return user == null ? null : ToUser(user);
+  }
+
+  public async Task<(int total, List<User> users)> GetAsync(
+    SieveModel? sieveModel = null,
+    UserRole? role = UserRole.Bidder,
+    CancellationToken ct = default
+  ) {
+    var query = userManager.Users.AsNoTracking()
+      .Where(u => u.Role == role && !u.IsDeleted);
+
+    var filteredQuery = sieveProcessor.Apply(sieveModel, query, applyPagination: false);
+    var total = await filteredQuery.CountAsync(ct);
+
+    var pagedQuery = sieveProcessor.Apply(sieveModel, filteredQuery);
+
+    var appUsers = await pagedQuery.ToListAsync(ct);
+    return (total, appUsers.Select(ToUser).ToList());
+  }
+
+  public async Task<(int total, List<User> users)> GetDeletedAsync(
+    SieveModel? sieveModel = null,
+    UserRole? role = UserRole.Bidder, CancellationToken ct = default
+  ) {
+    var query = userManager.Users.AsNoTracking()
+      .Where(u => u.Role == role && u.IsDeleted);
+
+    var filteredQuery = sieveProcessor.Apply(sieveModel, query, applyPagination: false);
+    var total = await filteredQuery.CountAsync(ct);
+
+    var pagedQuery = sieveProcessor.Apply(sieveModel, filteredQuery);
+
+    var appUsers = await pagedQuery.ToListAsync(ct);
+    return (total, appUsers.Select(ToUser).ToList());
+  }
+
   // NOTE: ========== [Helper Methods] ==========
   private static User ToUser(AppUser appUser) {
     if (appUser.Email == null) {
@@ -142,6 +133,6 @@ public class UserService(
 
   private async Task<AppUser> FindOrThrowAsync(Guid id, CancellationToken ct) {
     var user = await userManager.Users.FirstOrDefaultAsync(u => u.Id == id, ct);
-    return user ?? throw new AppException($"Người dùng không tồn tại - Id: {id}.", 404);
+    return user ?? throw new WorkflowException($"Người dùng không tồn tại - Id: {id}.", 404);
   }
 }

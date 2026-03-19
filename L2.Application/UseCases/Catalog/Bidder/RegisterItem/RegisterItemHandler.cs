@@ -1,6 +1,6 @@
 using L1.Core.Domain.Catalog.Entities;
-using L2.Application.Ports.Repositories;
 using L2.Application.Ports.Security;
+using L2.Application.Repositories;
 using MediatR;
 
 namespace L2.Application.UseCases.Catalog.Bidder.RegisterItem;
@@ -10,7 +10,7 @@ public class RegisterItemHandler(
   ICurrentUser currentUser
 ) : IRequestHandler<RegisterItemCommand, Guid> {
   public async Task<Guid> Handle(RegisterItemCommand request, CancellationToken ct) {
-    var item = CatalogItem.Create(currentUser.User.Id, request.Name, request.Description);
+    var item = CatalogItem.Create(currentUser.Id, request.Name, request.Description);
 
     item.SetStartingPrice(request.StartingPrice)
       .SetCondition(request.Condition)

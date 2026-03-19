@@ -2,6 +2,8 @@
 using L3.Infrastructure.Adapters.Security;
 using L3.Infrastructure.Identity;
 using L3.Infrastructure.Persistence;
+using L3.Infrastructure.Services;
+using L3.Infrastructure.Services.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,6 +25,9 @@ public static class IdentityExtensions {
     // Auth Services Implementation
     services.AddScoped<IAuthService, AuthService>();
     services.AddScoped<IUserService, UserService>();
+
+    // Jwt Service
+    services.AddScoped<IJwtService, JwtService>();
 
     return services;
   }

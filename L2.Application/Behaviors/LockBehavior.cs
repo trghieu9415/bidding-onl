@@ -20,7 +20,7 @@ public class LockBehavior<TRequest, TResponse>(
     );
 
     if (distributedLock == null) {
-      throw new AppException("Hệ thống đang bận xử lý yêu cầu này. Vui lòng thử lại.", 429);
+      throw new WorkflowException("Hệ thống đang bận xử lý yêu cầu này. Vui lòng thử lại.", 429);
     }
 
     return await next();

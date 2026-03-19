@@ -11,13 +11,13 @@ public class CatalogItemSeeder(AppDbContext context) : ISeeder {
   public int Order => 3;
 
   public async Task SeedAsync() {
-    if (await context.CatalogItems.AnyAsync()) {
+    if (await context.Set<CatalogItem>().AnyAsync()) {
       return;
     }
 
     var faker = new Faker("vi");
     var bidders = await context.Users.Where(u => u.Role == UserRole.Bidder).ToListAsync();
-    var subCategories = await context.Categories.Where(c => c.ParentId != null).ToListAsync();
+    var subCategories = await context.Set<Category>().Where(c => c.ParentId != null).ToListAsync();
 
     foreach (var user in bidders.Take(10)) {
       var itemsCount = faker.Random.Int(3, 5);
@@ -37,7 +37,7 @@ public class CatalogItemSeeder(AppDbContext context) : ISeeder {
         item.SetImageUrls(mainImg, subImgs);
         item.Approve();
 
-        context.CatalogItems.Add(item);
+        context.Set<CatalogItem>().Add(item);
       }
     }
 

@@ -1,12 +1,25 @@
 ﻿namespace L2.Application.Models;
 
-public record Meta(int Page, int PageSize, int Total, int TotalPages) {
+public record Meta(
+  int Page,
+  int PageSize,
+  int Total,
+  int TotalPages,
+  bool HasPagination,
+  bool HasPreviousPage,
+  bool HasNextPage
+) {
   public static Meta Create(int page, int pageSize, int total) {
-    ArgumentOutOfRangeException.ThrowIfNegativeOrZero(page);
-    ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pageSize);
-    ArgumentOutOfRangeException.ThrowIfNegative(total);
+    page = page < 1 ? 1 : page;
+    pageSize = pageSize < 1 ? 1 : pageSize;
+    total = total < 1 ? 1 : total;
 
     var totalPages = (total + pageSize - 1) / pageSize;
-    return new Meta(page, pageSize, total, totalPages);
+
+    page = Math.Min(page, totalPages);
+    var hasPagination = totalPages > 1;
+    var hasPreviousPage = hasPagination && page > 1;
+    var hasNextPage = hasPagination && page != totalPages;
+    return new Meta(page, pageSize, total, totalPages, hasPagination, hasPreviousPage, hasNextPage);
   }
 }

@@ -1,0 +1,17 @@
+﻿using L1.Core.Base.Entity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace L3.Infrastructure.Persistence;
+
+public abstract class BaseConfiguration<T> : IEntityTypeConfiguration<T> where T : BaseEntity {
+  public virtual void Configure(EntityTypeBuilder<T> builder) {
+    builder.HasKey(e => e.Id);
+
+    builder.Property(x => x.CreatedAt).IsRequired();
+    builder.Property(x => x.DeletedAt).IsRequired(false);
+    builder.Property(x => x.IsDeleted).HasDefaultValue(false);
+
+    builder.Property(x => x.RowVersion).IsRowVersion();
+  }
+}

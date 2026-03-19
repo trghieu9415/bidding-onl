@@ -1,5 +1,6 @@
 ﻿using Bogus;
 using L1.Core.Domain.Bidding.Entities;
+using L1.Core.Domain.Catalog.Entities;
 using L1.Core.Domain.Catalog.Enums;
 using L2.Application.Models;
 using L3.Infrastructure.Persistence;
@@ -11,17 +12,17 @@ public class AuctionSessionSeeder(AppDbContext context) : ISeeder {
   public int Order => 4;
 
   public async Task SeedAsync() {
-    if (await context.AuctionSessions.AnyAsync()) {
+    if (await context.Set<Auction>().AnyAsync()) {
       return;
     }
 
     var faker = new Faker("vi");
-    var approvedItems = await context.CatalogItems.Where(x => x.Status == ItemStatus.Approval).ToListAsync();
+    var approvedItems = await context.Set<CatalogItem>().Where(x => x.Status == ItemStatus.Approval).ToListAsync();
     var bidders = await context.Users.Where(u => u.Role == UserRole.Bidder).ToListAsync();
 
     var liveSession = AuctionSession.Create("Đại tiệc Đấu giá Cuối tuần", DateTime.UtcNow.AddHours(-2),
       DateTime.UtcNow.AddDays(1));
-    context.AuctionSessions.Add(liveSession);
+    context.Set<AuctionSession>().Add(liveSession);
     await context.SaveChangesAsync();
 
     var auctionIds = new List<Guid>();
@@ -41,7 +42,7 @@ public class AuctionSessionSeeder(AppDbContext context) : ISeeder {
         }
       }
 
-      context.Auctions.Add(auction);
+      context.Set<Auction>().Add(auction);
       auctionIds.Add(auction.Id);
     }
 

@@ -3,5 +3,7 @@
 namespace L2.Application.Ports.Security;
 
 public interface ICurrentUser {
-  User User { get; init; }
+  Guid Id { get; init; }
+  string FullName { get; init; }
+  public UserRole Role { get; init; }
 }

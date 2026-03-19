@@ -4,7 +4,7 @@ using L1.Core.Base.Event;
 
 namespace L1.Core.Base.Entity;
 
-public class AggregateRoot : BaseEntity, IHasDomainEvent {
+public abstract class AggregateRoot : BaseEntity, IHasDomainEvent {
   private readonly List<DomainEvent> _domainEvents = [];
   [NotMapped] [JsonIgnore] public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 

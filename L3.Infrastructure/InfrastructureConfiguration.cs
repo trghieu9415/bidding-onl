@@ -1,6 +1,4 @@
-﻿using L2.Application.Ports.Logging;
-using L3.Infrastructure.Adapters.Logging;
-using L3.Infrastructure.Extensions;
+﻿using L3.Infrastructure.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,7 +14,6 @@ public static class InfrastructureConfiguration {
       .AddMediatorPipeline()
       .AddExternalServices();
 
-    services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));
 
     return services;
   }

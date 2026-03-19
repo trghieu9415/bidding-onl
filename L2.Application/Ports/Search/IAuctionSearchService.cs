@@ -1,9 +1,9 @@
-﻿using L2.Application.DTOs;
+﻿using L2.Application.Models;
 
 namespace L2.Application.Ports.Search;
 
 public interface IAuctionSearchService {
-  Task<(int total, List<AuctionSearchDto> items)> SearchAsync(
+  Task<(int total, List<AuctionSearchModel> items)> SearchAsync(
     string? keyword,
     List<Guid>? categoryIds,
     decimal? minPrice,

@@ -1,8 +1,8 @@
 using L1.Core.Domain.Catalog.Entities;
 using L1.Core.Domain.Catalog.Enums;
 using L2.Application.Exceptions;
-using L2.Application.Ports.Repositories;
 using L2.Application.Ports.Security;
+using L2.Application.Repositories;
 using MediatR;
 
 namespace L2.Application.UseCases.Catalog.Bidder.UpdateRegisteredItem;
@@ -13,14 +13,14 @@ public class UpdateRegisteredItemHandler(
 ) : IRequestHandler<UpdateRegisteredItemCommand, Unit> {
   public async Task<Unit> Handle(UpdateRegisteredItemCommand request, CancellationToken ct) {
     var item = await repository.GetByIdAsync(request.Id, ct)
-               ?? throw new AppException("Sản phẩm không tồn tại", 404);
+               ?? throw new WorkflowException("Sản phẩm không tồn tại", 404);
 
-    if (item.OwnerId != currentUser.User.Id) {
-      throw new AppException("Bạn không có quyền chỉnh sửa sản phẩm này", 403);
+    if (item.OwnerId != currentUser.Id) {
+      throw new WorkflowException("Bạn không có quyền chỉnh sửa sản phẩm này", 403);
     }
 
     if (item.Status != ItemStatus.Pending && item.Status != ItemStatus.Rejected) {
-      throw new AppException("Không thể sửa sản phẩm đã được duyệt hoặc đã bán");
+      throw new WorkflowException("Không thể sửa sản phẩm đã được duyệt hoặc đã bán");
     }
 
     item.Update(request.Name, request.Description);

@@ -1,9 +1,10 @@
-﻿namespace L2.Application.DTOs;
+﻿using L2.Application.DTOs.Base;
 
-public record BidDto(
-  Guid Id,
-  Guid AuctionId,
-  Guid BidderId,
-  decimal Amount,
-  DateTime TimePoint
-);
+namespace L2.Application.DTOs;
+
+public record BidDto : IdDto {
+  public Guid AuctionId { get; init; }
+  public Guid BidderId { get; init; }
+  public decimal Amount { get; init; }
+  public DateTime TimePoint { get; init; }
+}

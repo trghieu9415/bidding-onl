@@ -8,7 +8,7 @@ namespace L2.Application.UseCases.Bidder.Admin.GetBidder;
 public class GetBidderHandler(IUserService userService) : IRequestHandler<GetBidderQuery, GetBidderResult> {
   public async Task<GetBidderResult> Handle(GetBidderQuery request, CancellationToken ct) {
     var user = await userService.GetByIdAsync(request.Id, UserRole.Bidder, ct)
-               ?? throw new AppException("Không tìm thấy người dùng", 404);
+               ?? throw new WorkflowException("Không tìm thấy người dùng", 404);
 
     return new GetBidderResult(user);
   }

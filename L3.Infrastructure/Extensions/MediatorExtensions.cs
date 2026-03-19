@@ -1,5 +1,8 @@
-﻿using L2.Application;
+﻿using FluentValidation;
+using L2.Application;
 using L2.Application.Behaviors;
+using L2.Application.Ports.Logging;
+using L3.Infrastructure.Adapters.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace L3.Infrastructure.Extensions;
@@ -16,7 +19,9 @@ public static class MediatorExtensions {
       cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
     });
 
-    services.AddAutoMapper(_ => {}, applicationAssembly);
+    services.AddValidatorsFromAssembly(applicationAssembly);
+    services.AddSingleton(typeof(IBusinessLogger<>), typeof(BusinessLogger<>));
+    services.AddSingleton(typeof(ISystemLogger<>), typeof(SystemLogger<>));
     return services;
   }
 }

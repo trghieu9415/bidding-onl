@@ -1,6 +1,4 @@
 ﻿using System.Data;
-using L1.Core.Domain.Bidding.Entities;
-using L1.Core.Domain.Catalog.Entities;
 using L2.Application.Abstractions;
 using L2.Application.Exceptions;
 using L3.Infrastructure.Identity;
@@ -15,12 +13,6 @@ public class AppDbContext(
   DbContextOptions<AppDbContext> options
 ) : IdentityUserContext<AppUser, Guid>(options), IUnitOfWork {
   private IDbContextTransaction? _currentTransaction;
-  public DbSet<Auction> Auctions => Set<Auction>();
-  public DbSet<AuctionSession> AuctionSessions => Set<AuctionSession>();
-  public DbSet<Bid> Bids => Set<Bid>();
-  public DbSet<CatalogItem> CatalogItems => Set<CatalogItem>();
-  public DbSet<Category> Categories => Set<Category>();
-
 
   public async Task BeginTransactionAsync(CancellationToken ct = default) {
     if (_currentTransaction != null) {
@@ -37,7 +29,7 @@ public class AppDbContext(
       }
     } catch (DbUpdateConcurrencyException) {
       await RollbackTransactionAsync(ct);
-      throw new AppException("Dữ liệu đã bị thay đổi. Vui lòng thử lại.", 409);
+      throw new WorkflowException("Dữ liệu đã bị thay đổi. Vui lòng thử lại.", 409);
     } catch {
       await RollbackTransactionAsync(ct);
       throw;
@@ -65,9 +57,6 @@ public class AppDbContext(
   protected override void OnModelCreating(ModelBuilder modelBuilder) {
     modelBuilder.HasPostgresExtension("pg_trgm");
     base.OnModelCreating(modelBuilder);
-    modelBuilder.Entity<AppUser>()
-      .Property(u => u.Role)
-      .HasConversion<string>();
 
     // NOTE: ========== [MassTransit Outbox Entities] ==========
     modelBuilder.AddInboxStateEntity();

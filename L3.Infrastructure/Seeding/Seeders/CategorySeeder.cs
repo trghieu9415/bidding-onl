@@ -8,7 +8,7 @@ public class CategorySeeder(AppDbContext context) : ISeeder {
   public int Order => 2;
 
   public async Task SeedAsync() {
-    if (await context.Categories.AnyAsync()) {
+    if (await context.Set<Category>().AnyAsync()) {
       return;
     }
 
@@ -21,11 +21,11 @@ public class CategorySeeder(AppDbContext context) : ISeeder {
 
     foreach (var parent in categories) {
       var parentCat = Category.Create(parent.Key);
-      context.Categories.Add(parentCat);
+      context.Set<Category>().Add(parentCat);
       await context.SaveChangesAsync();
 
       foreach (var childName in parent.Value) {
-        context.Categories.Add(Category.Create(childName, parentCat.Id));
+        context.Set<Category>().Add(Category.Create(childName, parentCat.Id));
       }
     }
 

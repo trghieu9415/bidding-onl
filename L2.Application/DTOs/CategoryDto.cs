@@ -1,8 +1,9 @@
-﻿namespace L2.Application.DTOs;
+﻿using L2.Application.DTOs.Base;
 
-public record CategoryDto(
-  Guid Id,
-  string Name,
-  Guid? ParentId,
-  DateTime CreatedAt
-);
+namespace L2.Application.DTOs;
+
+public record CategoryDto : IdDto {
+  public string Name { get; init; } = null!;
+  public Guid? ParentId { get; init; }
+  public DateTime CreatedAt { get; init; }
+}

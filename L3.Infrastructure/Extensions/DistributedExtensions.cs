@@ -1,8 +1,10 @@
-﻿using L2.Application.Ports.Concurrency;
-using L2.Application.Ports.Storage;
+﻿using L2.Application.Ports.Cache;
+using L2.Application.Ports.Concurrency;
+using L3.Infrastructure.Adapters.Cache;
 using L3.Infrastructure.Adapters.Concurrency;
-using L3.Infrastructure.Adapters.Storage;
-using L3.Infrastructure.Options;
+using L3.Infrastructure.Configs.Options;
+using L3.Infrastructure.Services;
+using L3.Infrastructure.Services.Abstractions;
 using Medallion.Threading;
 using Medallion.Threading.Redis;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
@@ -23,7 +25,8 @@ public static class DistributedExtensions {
         cacheOptions.InstanceName = redisOptions.InstanceName;
       });
     services.AddStackExchangeRedisCache(_ => {});
-    services.AddScoped<ICacheStorage, RedisCacheStorage>();
+    services.AddScoped<ICacheService, RedisCacheService>();
+    services.AddScoped<IBusinessCache, BusinessCache>();
 
     // Redis Connection (Multiplexer for Locking)
     services.AddSingleton<IConnectionMultiplexer>(serviceProvider => {

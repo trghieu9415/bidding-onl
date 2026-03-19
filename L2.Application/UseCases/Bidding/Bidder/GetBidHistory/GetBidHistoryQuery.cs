@@ -1,6 +1,5 @@
 ﻿using L2.Application.Abstractions;
-using Sieve.Models;
 
 namespace L2.Application.UseCases.Bidding.Bidder.GetBidHistory;
 
-public record GetBidHistoryQuery(Guid AuctionId, SieveModel SieveModel) : IQuery<GetBidHistoryResult>;
+public record GetBidHistoryQuery(Guid AuctionId, int Page, int PageSize) : IQuery<GetBidHistoryResult>;

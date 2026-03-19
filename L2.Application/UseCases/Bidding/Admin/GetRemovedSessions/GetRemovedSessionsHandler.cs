@@ -1,19 +1,16 @@
-using AutoMapper;
 using L1.Core.Domain.Bidding.Entities;
 using L2.Application.DTOs;
 using L2.Application.Models;
-using L2.Application.Ports.Repositories;
+using L2.Application.Repositories;
 using MediatR;
 
 namespace L2.Application.UseCases.Bidding.Admin.GetRemovedSessions;
 
-public class GetRemovedSessionsHandler(IReadRepository<AuctionSession> readRepository, IMapper mapper)
+public class GetRemovedSessionsHandler(IReadRepository<AuctionSession, AuctionSessionDto> readRepository)
   : IRequestHandler<GetRemovedSessionsQuery, GetRemovedSessionsResult> {
   public async Task<GetRemovedSessionsResult> Handle(GetRemovedSessionsQuery request, CancellationToken ct) {
-    var (total, entities) = await readRepository.GetDeletedAsync(request.SieveModel, ct: ct);
-    var dtos = mapper.Map<List<AuctionSessionDto>>(entities);
-
+    var (total, entities) = await readRepository.GetDeletedAsync(sieveModel: request.SieveModel, ct: ct);
     var meta = Meta.Create(request.SieveModel.Page ?? 1, request.SieveModel.PageSize ?? 10, total);
-    return new GetRemovedSessionsResult(dtos, meta);
+    return new GetRemovedSessionsResult(entities, meta);
   }
 }

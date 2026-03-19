@@ -1,7 +1,7 @@
 ﻿using L2.Application.Abstractions;
-using L2.Application.Ports.Repositories;
-using L3.Infrastructure.Adapters.Repositories;
+using L2.Application.Repositories;
 using L3.Infrastructure.Persistence;
+using L3.Infrastructure.Persistence.Repositories;
 using L3.Infrastructure.Seeding;
 using L3.Infrastructure.Seeding.Seeders;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +34,7 @@ public static class PersistenceExtensions {
 
     // Repositories
     services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-    services.AddScoped(typeof(IReadRepository<>), typeof(EfReadRepository<>));
+    services.AddScoped(typeof(IReadRepository<,>), typeof(EfReadRepository<,>));
 
     // Seeders
     services.AddScoped<DbInitializer>();
