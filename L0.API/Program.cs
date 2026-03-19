@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // --- Infrastructure ---
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Configuration.AddJsonFile("secrets.json", true, true);
 
 // --- Worker ---
 if (!args.Contains("--seeding") && !EF.IsDesignTime) {
@@ -18,9 +19,10 @@ if (!args.Contains("--seeding") && !EF.IsDesignTime) {
 }
 
 // --- Presentation Extension ---
-builder.Services.AddPresentationInfrastructure();
-builder.Services.AddWebFramework();
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddWebApiDefaults();
 builder.Services.AddSwaggerDocument();
+builder.Services.AddSignalRAdapters();
 builder.AddSerilogCustom();
 
 builder.Services.AddHttpContextAccessor();
@@ -44,6 +46,7 @@ if (args.Contains("--seeding")) {
   return;
 }
 
+
 // --- Custom Middlewares ---
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseHttpsRedirection();
@@ -63,15 +66,15 @@ if (app.Environment.IsDevelopment()) {
 app.UseStaticFiles();
 
 // --- CORS ---
-// app.UseCors(options => options
-//   .AllowAnyMethod()
-//   .AllowAnyHeader()
-//   .SetIsOriginAllowed(_ => true)
-//   .AllowCredentials());
+app.UseCors(options => options
+  .AllowAnyMethod()
+  .AllowAnyHeader()
+  .SetIsOriginAllowed(_ => true)
+  .AllowCredentials());
 
 // --- Authentication & Authorization ---
-// app.UseAuthentication();
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 // --- Endpoints ---
 app.MapControllers();

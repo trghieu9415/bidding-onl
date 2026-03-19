@@ -1,6 +1,6 @@
 ﻿using L2.Application.Ports.Messaging;
 using L3.Infrastructure.Persistence;
-using L3.Worker.Adapters.Messaging;
+using L3.Worker.Adapters.Notification;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,7 +24,14 @@ public static class MassTransitExtensions {
       x.UsingInMemory((context, cfg) => {
         cfg.UsePublishMessageScheduler();
         cfg.UseMessageRetry(r =>
-          r.Incremental(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2)));
+          r.Incremental(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2))
+        );
+        cfg.UseCircuitBreaker(cb => {
+          cb.TrackingPeriod = TimeSpan.FromMinutes(1);
+          cb.TripThreshold = 15;
+          cb.ActiveThreshold = 10;
+          cb.ResetInterval = TimeSpan.FromMinutes(5);
+        });
 
         cfg.ConfigureEndpoints(context);
       });

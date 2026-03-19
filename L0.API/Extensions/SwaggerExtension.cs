@@ -9,7 +9,6 @@ public static class SwaggerExtension {
     services.AddSwaggerGen(c => {
       c.SwaggerDoc("v1", new OpenApiInfo { Title = "Bidding App - User API", Version = "v1" });
       c.SwaggerDoc("v2", new OpenApiInfo { Title = "Bidding App - Dashboard API", Version = "v2" });
-      c.SwaggerDoc("v3", new OpenApiInfo { Title = "Bidding App - External API", Version = "v3" });
 
       c.DescribeAllParametersInCamelCase();
       c.DocInclusionPredicate((docName, apiDesc) =>

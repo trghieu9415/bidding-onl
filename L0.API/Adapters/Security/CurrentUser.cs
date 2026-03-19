@@ -10,16 +10,15 @@ public class CurrentUser : ICurrentUser {
     var id = user?.FindFirstValue(ClaimTypes.NameIdentifier);
 
     if (id != null) {
-      User = new User {
-        Id = Guid.Parse(id),
-        Email = user?.FindFirstValue(ClaimTypes.Email) ?? "",
-        FullName = user?.Identity?.Name ?? "",
-        Role = user?.FindFirstValue(ClaimTypes.Role) == nameof(UserRole.Admin) ? UserRole.Admin : UserRole.Bidder
-      };
+      Id = Guid.Parse(id);
+      FullName = user?.Identity?.Name ?? "Guest";
+      Role = user?.FindFirstValue(ClaimTypes.Role) == nameof(UserRole.Admin) ? UserRole.Admin : UserRole.Bidder;
     } else {
-      User = new User { FullName = "Guest" };
+      Id = Guid.Empty;
     }
   }
 
-  public User User { get; init; }
+  public Guid Id { get; init; }
+  public string FullName { get; init; } = "Guest";
+  public UserRole Role { get; init; }
 }

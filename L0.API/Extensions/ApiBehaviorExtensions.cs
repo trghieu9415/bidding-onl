@@ -3,8 +3,8 @@ using System.Text.Json.Serialization;
 
 namespace L0.API.Extensions;
 
-public static class FrameworkExtensions {
-  public static IServiceCollection AddWebFramework(this IServiceCollection services) {
+public static class ApiBehaviorExtensions {
+  public static IServiceCollection AddWebApiDefaults(this IServiceCollection services) {
     // --- Controller & JSON Config ---
     services
       .AddControllers()

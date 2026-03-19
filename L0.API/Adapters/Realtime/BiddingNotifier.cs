@@ -16,8 +16,12 @@ public class BiddingNotifier(IHubContext<BiddingHub> hubContext) : IBiddingNotif
       .SendAsync("NewBidReceived", new { bidderId, bidderName, amount }, ct);
   }
 
-  public async Task NotifyAuctionEnded(Guid auctionId, Guid? winnerId, decimal finalPrice,
-    CancellationToken ct = default) {
+  public async Task NotifyAuctionEnded(
+    Guid auctionId,
+    Guid? winnerId,
+    decimal finalPrice,
+    CancellationToken ct = default
+  ) {
     await hubContext.Clients.Group(auctionId.ToString())
       .SendAsync("AuctionEnded", new { winnerId, finalPrice }, ct);
   }

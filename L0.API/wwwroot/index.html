@@ -1,0 +1,204 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Query Viewer</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Inter", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 20% 20%, #3b82f6, transparent 40%),
+      radial-gradient(circle at 80% 80%, #9333ea, transparent 40%), #0f172a;
+      color: white;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 700px;
+      padding: 40px;
+    }
+
+    .card {
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .title {
+      font-size: 26px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      opacity: 0.7;
+      margin-bottom: 30px;
+    }
+
+    .param-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .param-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: 0.25s;
+    }
+
+    .param-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .key {
+      font-weight: 600;
+      color: #60a5fa;
+      background: rgba(96, 165, 250, 0.12);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .value {
+      font-weight: 500;
+      color: #e2e8f0;
+      word-break: break-all;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.2);
+      transition: all 0.2s;
+      position: relative;
+      white-space: pre-wrap;
+    }
+
+    .json-value {
+      font-family: monospace;
+      font-size: 14px;
+    }
+
+    .value:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .value:active {
+      transform: scale(0.98);
+    }
+
+    .value.copied::after {
+      content: "Copied!";
+      position: absolute;
+      right: 10px;
+      top: -20px;
+      font-size: 10px;
+      color: #10b981;
+      font-weight: bold;
+    }
+
+    .empty {
+      padding: 18px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      text-align: center;
+      opacity: 0.8;
+    }
+
+    code {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="card">
+    <div class="title">Query Parameters</div>
+    <div class="subtitle">Bấm vào nội dung để Copy</div>
+    <div class="param-list" id="query-container"></div>
+  </div>
+</div>
+
+<script>
+  const container = document.getElementById("query-container");
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.toString() === "") {
+    container.innerHTML = `
+      <div class="empty">
+        Không có query parameter.<br><br>
+        Thử thêm: <br><br>
+        <code>?payment_id=12345&name=Hieu&role=admin</code>
+      </div>`;
+  } else {
+    let paymentIdValue = null;
+    const otherParams = {};
+
+    params.forEach((value, key) => {
+      if (key === 'payment_id') {
+        paymentIdValue = value;
+      } else {
+        otherParams[key] = value;
+      }
+    });
+
+    function renderBlock(title, content, isJson = false) {
+      const item = document.createElement("div");
+      item.className = "param-item";
+
+      const valueClass = isJson ? "value json-value" : "value";
+
+      item.innerHTML = `
+        <div class="param-header">
+          <span class="key">${title}</span>
+        </div>
+        <div class="${valueClass}" title="Click to copy">${content}</div>
+      `;
+
+      const valueEl = item.querySelector('.value');
+      valueEl.addEventListener('click', () => {
+        navigator.clipboard.writeText(content).then(() => {
+          valueEl.classList.add('copied');
+          setTimeout(() => valueEl.classList.remove('copied'), 1500);
+        });
+      });
+
+      container.appendChild(item);
+    }
+
+    if (paymentIdValue !== null) {
+      renderBlock('payment_id', paymentIdValue);
+    }
+
+    if (Object.keys(otherParams).length > 0) {
+      const jsonString = JSON.stringify(otherParams, null, 2);
+      renderBlock('other_attributes', jsonString, true);
+    }
+  }
+</script>
+</body>
+</html>

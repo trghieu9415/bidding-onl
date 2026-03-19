@@ -16,4 +16,8 @@
     <ProjectReference Include="..\L1.Core\L1.Core.csproj"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UseCases\Transaction\System\"/>
+  </ItemGroup>
+
 </Project>

@@ -2,7 +2,6 @@
 
 namespace L0.API.Controllers;
 
-[ApiController]
 [Route("api/external/[controller]")]
 [ApiExplorerSettings(GroupName = "v3")]
-public abstract class ExternalController;
+public abstract class ExternalController : BaseController;

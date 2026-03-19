@@ -4,9 +4,10 @@ out/
 
 [Mm]igrations/
 
-appsettings.json
 logs/
-wwwroot/
+
+.env
+secrets.json
 
 .vs/
 *.user

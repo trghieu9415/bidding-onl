@@ -5,7 +5,7 @@ namespace L0.API.Response;
 
 public static class AppResponse {
   public static ObjectResult Success(string? message = null) {
-    var response = new {
+    var response = new ResponseData<object> {
       Status = 200,
       Message = message ?? "Thao tác thành công"
     };
@@ -17,7 +17,7 @@ public static class AppResponse {
   }
 
   public static ObjectResult Success(string? message, int status) {
-    var response = new {
+    var response = new ResponseData<object> {
       Status = status,
       Message = message ?? "Thao tác thành công"
     };
@@ -29,7 +29,7 @@ public static class AppResponse {
   }
 
   public static ObjectResult Success<T>(T data, string? message = null, int status = 200) {
-    var response = new {
+    var response = new ResponseData<T> {
       Status = status,
       Message = message ?? "Thao tác thành công",
       Data = data
@@ -41,7 +41,7 @@ public static class AppResponse {
   }
 
   public static ObjectResult Success<T>(T data, Meta meta, string? message = null, int status = 200) {
-    var response = new {
+    var response = new ResponseData<T> {
       Status = status,
       Message = message ?? "Thao tác thành công",
       Data = data,
@@ -54,10 +54,10 @@ public static class AppResponse {
   }
 
   public static ObjectResult Success(Guid id, string? message = null, int status = 200) {
-    var response = new {
+    var response = new ResponseData<IdData> {
       Status = status,
       Message = message ?? "Thao tác thành công",
-      Data = new {
+      Data = new IdData {
         Id = id
       }
     };

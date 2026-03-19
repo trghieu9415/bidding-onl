@@ -1,16 +1,15 @@
 ﻿using L0.API.Response;
-using L1.Core.Base.Exception;
+using L1.Core.Exceptions;
 using L2.Application.Exceptions;
 using L2.Application.Ports.Logging;
 using L3.Infrastructure.Exceptions;
-using Serilog.Context;
-using ValidationException = L2.Application.Exceptions.ValidationException;
 
 namespace L0.API.Middlewares;
 
 public class GlobalExceptionMiddleware(
   RequestDelegate next,
-  IAppLogger<GlobalExceptionMiddleware> logger
+  IBusinessLogger<GlobalExceptionMiddleware> businessLogger,
+  ISystemLogger<GlobalExceptionMiddleware> systemLogger
 ) {
   public async Task InvokeAsync(HttpContext context) {
     try {
@@ -18,14 +17,14 @@ public class GlobalExceptionMiddleware(
     } catch (Exception ex) {
       var shouldLogToFile = ex
         is DomainException
-        or AppException
-        or ValidationException
+        or WorkflowException
+        or InvalidInputException
         or InfrastructureException;
 
       if (shouldLogToFile) {
-        logger.LogBusinessError(ex, "{Message}", ex.Message);
+        businessLogger.LogError(ex, "{Message}", ex.Message);
       } else {
-        logger.LogSystemError(ex, "{Message}", ex.Message);
+        systemLogger.LogError(ex, "{Message}", ex.Message);
       }
 
 
@@ -38,15 +37,15 @@ public class GlobalExceptionMiddleware(
 
   private static (int StatusCode, object ResponseValue) MapException(Exception ex) {
     return ex switch {
-      ValidationException vEx => (
+      InvalidInputException iIEx => (
         422,
         AppResponse.Fail(
-          vEx.Errors,
-          vEx.Errors.FirstOrDefault() ?? "Dữ liệu không hợp lệ", 422).Value!
+          iIEx.Errors,
+          iIEx.Errors.FirstOrDefault() ?? "Dữ liệu không hợp lệ", 422).Value!
       ),
       DomainException dEx => (400, AppResponse.Fail(dEx.Message, 400).Value!),
       InfrastructureException iEx => (500, AppResponse.Fail(iEx.Message, 500).Value!),
-      AppException appEx => (appEx.StatusCode, AppResponse.Fail(appEx.Message, appEx.StatusCode).Value!),
+      WorkflowException wfEx => (wfEx.StatusCode, AppResponse.Fail(wfEx.Message, wfEx.StatusCode).Value!),
       _ => (500, AppResponse.Fail("Lỗi hệ thống không xác định", 500).Value!)
     };
   }

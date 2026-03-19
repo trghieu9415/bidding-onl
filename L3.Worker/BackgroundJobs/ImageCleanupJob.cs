@@ -1,4 +1,5 @@
-﻿using L3.Infrastructure.Persistence;
+﻿using L1.Core.Domain.Catalog.Entities;
+using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 
@@ -11,14 +12,14 @@ public class ImageCleanupJob(AppDbContext dbContext) : IJob {
       return;
     }
 
-    var dbImages = await dbContext.CatalogItems
+    var dbImages = await dbContext.Set<CatalogItem>()
       .AsNoTracking()
       .Select(x => new { x.Images.MainImageUrl, x.Images.SubImageUrls })
       .ToListAsync();
 
     var activeImageUrls = dbImages
       .Select(x => x.MainImageUrl)
-      .Concat(dbImages.SelectMany(x => x.SubImageUrls ?? new List<string>()))
+      .Concat(dbImages.SelectMany(x => x.SubImageUrls))
       .Where(url => !string.IsNullOrEmpty(url))
       .ToHashSet();
 

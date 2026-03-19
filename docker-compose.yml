@@ -1,0 +1,77 @@
+services:
+  postgres_db:
+    image: postgres:17-alpine
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: bidding_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  redis_cache:
+    image: redis:alpine
+    container_name: redis_cache
+    restart: always
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  mail_local:
+    image: axllent/mailpit:v1.29
+    container_name: mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    restart: unless-stopped
+    environment:
+      - MP_DATA_FILE=/data/mailpit.db
+    volumes:
+      - mailpit_data:/data
+
+  rabbitmq:
+    image: rabbitmq:4.2.4-management-alpine
+    container_name: rabbitmq
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABITTMQ_ADMIN}
+      - RABBITMQ_DEFAULT_PASS=${RABITTMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  minio:
+    image: minio/minio:RELEASE.2025-02-28T09-55-16Z
+    container_name: minio_s3_simulator
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ADMIN}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
+  stripe_listener:
+    image: stripe/stripe-cli:latest
+    container_name: stripe_listener
+    command: >
+      listen --api-key ${STRIPE_SECRET_KEY}
+      --forward-to http://host.docker.internal:5202/api/webhooks/stripe
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  pg_data:
+  redis_data:
+  rabbitmq_data:
+  mailpit_data:
+  minio_data:
