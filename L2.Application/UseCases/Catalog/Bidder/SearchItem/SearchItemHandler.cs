@@ -4,7 +4,7 @@ using MediatR;
 
 namespace L2.Application.UseCases.Catalog.Bidder.SearchItem;
 
-public class SearchItemHandler(IAuctionSearchService searchService)
+public class SearchItemHandler(ISearchService searchService)
   : IRequestHandler<SearchItemQuery, SearchItemResult> {
   public async Task<SearchItemResult> Handle(SearchItemQuery request, CancellationToken ct) {
     var (total, items) = await searchService.SearchAsync(

@@ -1,4 +1,5 @@
 ﻿using L1.Core.Domain.Transaction.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace L3.Infrastructure.Persistence.Configurations;
@@ -26,6 +27,12 @@ public class OrderConfiguration : BaseConfiguration<Order> {
       .HasConversion<string>()
       .HasMaxLength(50)
       .IsRequired();
+
+    builder.OwnsOne(x => x.Address, nav => {
+      nav.Property(a => a.PhoneNumber).HasColumnName("PhoneNumber").IsRequired();
+      nav.Property(a => a.ReceiverName).HasColumnName("ReceiverName").IsRequired();
+      nav.Property(a => a.ShippingAddress).HasColumnName("ShippingAddress").IsRequired();
+    });
 
 
     builder.HasIndex(o => o.AuctionId);

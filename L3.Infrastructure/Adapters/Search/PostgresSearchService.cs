@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace L3.Infrastructure.Adapters.Search;
 
-public class PostgresAuctionSearchService(AppDbContext context) : IAuctionSearchService {
+public class PostgresSearchService(AppDbContext context) : ISearchService {
   public async Task<(int total, List<AuctionSearchModel> items)> SearchAsync(
     string? keyword,
     List<Guid>? categoryIds,

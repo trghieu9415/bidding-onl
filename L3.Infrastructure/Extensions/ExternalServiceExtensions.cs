@@ -1,8 +1,10 @@
 ﻿using L1.Core.Domain.Transaction.Enums;
 using L2.Application.Constants;
 using L2.Application.Ports.Gateway;
+using L2.Application.Ports.Search;
 using L3.Infrastructure.Adapters.Gateway;
 using L3.Infrastructure.Adapters.Gateway.Transaction;
+using L3.Infrastructure.Adapters.Search;
 using L3.Infrastructure.Services;
 using L3.Infrastructure.Services.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +19,7 @@ public static class ExternalServiceExtensions {
     services.AddScoped<IEmailService, EmailService>();
     services.AddScoped<IStorageService, S3StorageService>();
     services.AddScoped<IImageTracker, ImageTracker>();
+    services.AddScoped<ISearchService, PostgresSearchService>();
 
     services.AddHttpClient(HttpClientNames.Paypal)
       .AddStandardResilienceHandler(ConfigureExternalServicesResilience());

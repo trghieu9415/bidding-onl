@@ -2,7 +2,7 @@
 
 namespace L2.Application.Ports.Search;
 
-public interface IAuctionSearchService {
+public interface ISearchService {
   Task<(int total, List<AuctionSearchModel> items)> SearchAsync(
     string? keyword,
     List<Guid>? categoryIds,

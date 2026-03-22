@@ -1,5 +1,4 @@
 ﻿using L1.Core.Domain.Transaction.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace L3.Infrastructure.Persistence.Configurations;
@@ -16,8 +15,7 @@ public class PaymentConfiguration : BaseConfiguration<Payment> {
       .IsRequired();
 
     builder.Property(p => p.TransactionId)
-      .HasMaxLength(255)
-      .IsRequired(false);
+      .HasMaxLength(255);
 
     builder.Property(p => p.Method)
       .HasConversion<string>()
@@ -32,7 +30,6 @@ public class PaymentConfiguration : BaseConfiguration<Payment> {
     builder.Ignore(p => p.DomainEvents);
     builder.HasIndex(p => p.OrderId);
     builder.HasIndex(p => p.TransactionId)
-      .IsUnique()
-      .HasFilter("[TransactionId] IS NOT NULL");
+      .IsUnique();
   }
 }

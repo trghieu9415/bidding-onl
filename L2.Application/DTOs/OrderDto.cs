@@ -1,4 +1,5 @@
 ﻿using L1.Core.Domain.Transaction.Enums;
+using L1.Core.Domain.Transaction.ValueObjects;
 using L2.Application.DTOs.Base;
 
 namespace L2.Application.DTOs;
@@ -12,4 +13,5 @@ public record OrderDto : IdDto {
   public string CatalogImage { get; init; } = null!;
   public OrderStatus Status { get; init; }
   public decimal Price { get; init; }
+  public Address Address { get; init; } = null!;
 }

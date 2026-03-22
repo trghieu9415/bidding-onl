@@ -30,11 +30,11 @@
     <PackageReference Include="Sieve" Version="2.5.5"/>
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0"/>
     <PackageReference Include="Stripe.net" Version="50.4.0"/>
-    <PackageReference Include="AutoMapper" Version="16.1.1" />
+    <PackageReference Include="AutoMapper" Version="16.1.1"/>
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Persistence\Scripts\tables_postgres.sql">
+    <None Update="Templates\Email\*.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

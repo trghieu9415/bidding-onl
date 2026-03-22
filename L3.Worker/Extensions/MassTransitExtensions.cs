@@ -1,8 +1,10 @@
 ﻿using L2.Application.Ports.Messaging;
+using L3.Infrastructure.Configs.Options;
 using L3.Infrastructure.Persistence;
 using L3.Worker.Adapters.Notification;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace L3.Worker.Extensions;
 
@@ -20,8 +22,15 @@ public static class MassTransitExtensions {
         o.DuplicateDetectionWindow = TimeSpan.FromMinutes(30);
       });
 
-      // TODO: Chuyển sang RabbitMq
-      x.UsingInMemory((context, cfg) => {
+      x.UsingRabbitMq((context, cfg) => {
+        var options = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
+
+        cfg.Host(options.Host, options.VirtualHost, h => {
+          h.Username(options.Username);
+          h.Password(options.Password);
+        });
+
+
         cfg.UsePublishMessageScheduler();
         cfg.UseMessageRetry(r =>
           r.Incremental(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2))

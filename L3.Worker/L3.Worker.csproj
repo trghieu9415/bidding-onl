@@ -9,7 +9,8 @@
   <ItemGroup>
     <PackageReference Include="Hangfire" Version="1.8.23"/>
     <PackageReference Include="Hangfire.PostgreSql" Version="1.21.1"/>
-    <PackageReference Include="MassTransit.Hangfire" Version="9.0.1"/>
+    <PackageReference Include="MassTransit.Hangfire" Version="8.5.7"/>
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.7"/>
   </ItemGroup>
 
   <ItemGroup>
