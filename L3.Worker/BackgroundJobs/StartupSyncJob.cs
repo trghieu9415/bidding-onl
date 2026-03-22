@@ -1,21 +1,19 @@
-﻿using L1.Core.Domain.Bidding.Entities;
+﻿using Hangfire;
+using L1.Core.Domain.Bidding.Entities;
 using L1.Core.Domain.Bidding.Enums;
 using L2.Application.Repositories;
 using L2.Application.UseCases.Bidding.System.EndSession;
 using L2.Application.UseCases.Bidding.System.StartSession;
 using MediatR;
-using Quartz;
 
 namespace L3.Worker.BackgroundJobs;
 
-[DisallowConcurrentExecution]
+[DisableConcurrentExecution(300)]
 public class StartupSyncJob(
   IMediator mediator,
   IRepository<AuctionSession> sessionRepo
-) : IJob {
-  public async Task Execute(IJobExecutionContext context) {
-    var ct = context.CancellationToken;
-
+) {
+  public async Task Execute(CancellationToken ct) {
     var missedStartSessions = await sessionRepo.GetAsync(
       s =>
         s.Status == SessionStatus.Published

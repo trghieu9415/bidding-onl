@@ -1,12 +1,11 @@
 ﻿using L1.Core.Domain.Catalog.Entities;
 using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Quartz;
 
 namespace L3.Worker.BackgroundJobs;
 
-public class SoftDeletePurgeJob(AppDbContext dbContext) : IJob {
-  public async Task Execute(IJobExecutionContext context) {
+public class SoftDeletePurgeJob(AppDbContext dbContext) {
+  public async Task Execute() {
     var threshold = DateTime.UtcNow.AddDays(-30);
 
     var oldCategories = await dbContext.Set<Category>()

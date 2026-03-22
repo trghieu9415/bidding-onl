@@ -5,7 +5,9 @@ namespace L1.Core.Domain.Transaction.Events;
 public record OrderCompletedEvent(
   Guid OrderId,
   Guid BidderId,
-  Guid AuctionId
+  Guid AuctionId,
+  string BidderName,
+  string BidderEmail
 ) : DomainEvent {
   public override Guid AggregateId => OrderId;
 }

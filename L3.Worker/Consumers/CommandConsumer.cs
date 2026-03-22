@@ -3,9 +3,9 @@ using L2.Application.UseCases.Bidding.System.StartSession;
 using MassTransit;
 using MediatR;
 
-namespace L3.Worker.Consumers.Bidding.Command;
+namespace L3.Worker.Consumers;
 
-public class SessionCommandConsumer(IMediator mediator) :
+public class CommandConsumer(IMediator mediator) :
   IConsumer<EndSessionCommand>,
   IConsumer<StartSessionCommand> {
   public async Task Consume(ConsumeContext<EndSessionCommand> context) {

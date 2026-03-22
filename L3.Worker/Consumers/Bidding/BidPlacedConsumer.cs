@@ -2,7 +2,7 @@
 using L2.Application.Ports.Realtime;
 using MassTransit;
 
-namespace L3.Worker.Consumers.Bidding.Events;
+namespace L3.Worker.Consumers.Bidding;
 
 public class BidPlacedConsumer(
   IBiddingNotifier biddingNotifier

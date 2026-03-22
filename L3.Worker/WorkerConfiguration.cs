@@ -7,9 +7,9 @@ namespace L3.Worker;
 public static class WorkerConfiguration {
   public static IServiceCollection AddWorker(this IServiceCollection services, IConfiguration config) {
     services
-      .AddQuartzInfrastructure(config)
       .AddCustomMassTransit();
 
+    services.AddHostedService<HangfireBootstrapper>();
     return services;
   }
 }

@@ -5,7 +5,7 @@ using L3.Infrastructure.Persistence;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
-namespace L3.Worker.Consumers.Catalog.Events;
+namespace L3.Worker.Consumers.Catalog;
 
 public class ItemRegisteredConsumer(
   AppDbContext dbContext,

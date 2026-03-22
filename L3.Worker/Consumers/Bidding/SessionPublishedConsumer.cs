@@ -3,7 +3,7 @@ using L2.Application.UseCases.Bidding.System.EndSession;
 using L2.Application.UseCases.Bidding.System.StartSession;
 using MassTransit;
 
-namespace L3.Worker.Consumers.Bidding.Events;
+namespace L3.Worker.Consumers.Bidding;
 
 public class SessionPublishedConsumer(
   IMessageScheduler scheduler

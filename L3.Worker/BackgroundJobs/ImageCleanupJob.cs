@@ -1,12 +1,13 @@
 ﻿using L1.Core.Domain.Catalog.Entities;
 using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Quartz;
 
 namespace L3.Worker.BackgroundJobs;
 
-public class ImageCleanupJob(AppDbContext dbContext) : IJob {
-  public async Task Execute(IJobExecutionContext context) {
+// Đã bỏ hoàn toàn IJob của Quartz
+public class ImageCleanupJob(AppDbContext dbContext) {
+  // Không cần truyền IJobExecutionContext vào nữa
+  public async Task Execute() {
     var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "catalog");
     if (!Directory.Exists(uploadPath)) {
       return;
@@ -37,7 +38,5 @@ public class ImageCleanupJob(AppDbContext dbContext) : IJob {
         File.Delete(filePath);
       }
     }
-
-    await Task.CompletedTask;
   }
 }

@@ -46,7 +46,8 @@ public class CreateOrderHandler(
       auction.Id,
       auction.CatalogItemId,
       item.Name,
-      item.MainImageUrl ?? string.Empty
+      item.MainImageUrl ?? string.Empty,
+      request.Address
     );
 
     await orderRepository.CreateAsync(newOrder, ct);

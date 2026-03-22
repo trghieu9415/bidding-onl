@@ -1,6 +1,7 @@
 ﻿using L1.Core.Base.Entity;
 using L1.Core.Domain.Transaction.Enums;
 using L1.Core.Domain.Transaction.Events;
+using L1.Core.Domain.Transaction.ValueObjects;
 using L1.Core.Exceptions;
 
 namespace L1.Core.Domain.Transaction.Entities;
@@ -13,6 +14,7 @@ public class Order : AggregateRoot {
   public Guid CatalogId { get; private set; }
   public string CatalogName { get; private set; } = null!;
   public string CatalogImage { get; private set; } = null!;
+  public Address Address { get; private set; } = null!;
 
   public OrderStatus Status { get; private set; } = OrderStatus.Pending;
   public decimal Price { get; private set; }
@@ -20,7 +22,8 @@ public class Order : AggregateRoot {
   public static Order Create(
     Guid customerId, string customerName,
     Guid auctionId, Guid catalogId,
-    string catalogName, string catalogImage
+    string catalogName, string catalogImage,
+    Address shippingAddress
   ) {
     var order = new Order {
       BidderId = customerId,
@@ -28,7 +31,8 @@ public class Order : AggregateRoot {
       AuctionId = auctionId,
       CatalogId = catalogId,
       CatalogName = catalogName,
-      CatalogImage = catalogImage
+      CatalogImage = catalogImage,
+      Address = shippingAddress
     };
     order.AddDomainEvent(new OrderCreatedEvent(
       order.Id,
@@ -39,14 +43,14 @@ public class Order : AggregateRoot {
   }
 
 
-  public void MarkAsPaid() {
+  public void MarkAsPaid(string bidderEmail) {
     if (Status != OrderStatus.Pending) {
       throw new DomainException("Chỉ có thể thanh toán đơn khi đơn ở trạng thái Chờ");
     }
 
     Status = OrderStatus.Confirmed;
     AddDomainEvent(new OrderCompletedEvent(
-      Id, BidderId, AuctionId
+      Id, BidderId, AuctionId, BidderName, bidderEmail
     ));
   }
 

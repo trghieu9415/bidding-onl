@@ -11,7 +11,7 @@ public static class MassTransitExtensions {
     services.AddMassTransit(x => {
       x.AddConsumers(typeof(WorkerConfiguration).Assembly);
 
-      x.AddQuartzConsumers();
+      x.AddHangfireConsumers();
       x.AddPublishMessageScheduler();
 
       x.AddEntityFrameworkOutbox<AppDbContext>(o => {

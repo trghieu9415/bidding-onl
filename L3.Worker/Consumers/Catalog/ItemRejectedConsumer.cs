@@ -2,7 +2,7 @@
 using L2.Application.Ports.Realtime;
 using MassTransit;
 
-namespace L3.Worker.Consumers.Catalog.Events;
+namespace L3.Worker.Consumers.Catalog;
 
 public class ItemRejectedConsumer(IUserNotifier userNotifier) : IConsumer<ItemRejectedEvent> {
   public async Task Consume(ConsumeContext<ItemRejectedEvent> context) {

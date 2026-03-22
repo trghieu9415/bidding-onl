@@ -4,7 +4,6 @@ using L0.API.Middlewares;
 using L3.Infrastructure;
 using L3.Infrastructure.Seeding;
 using L3.Worker;
-using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,9 +13,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Configuration.AddJsonFile("secrets.json", true, true);
 
 // --- Worker ---
-if (!args.Contains("--seeding") && !EF.IsDesignTime) {
-  builder.Services.AddWorker(builder.Configuration);
-}
+builder.Services.AddWorker(builder.Configuration);
 
 // --- Presentation Extension ---
 builder.Services.AddJwtAuthentication(builder.Configuration);
