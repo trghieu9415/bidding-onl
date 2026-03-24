@@ -13,4 +13,8 @@ public class SystemLogger<T>(ILogger<T> logger) : ISystemLogger<T> {
   public void LogError(Exception ex, string message, params object[] args) {
     logger.LogError(ex, message, args);
   }
+
+  public void LogInformation(string message, params object[] args) {
+    logger.LogInformation(message, args);
+  }
 }

@@ -9,8 +9,8 @@ using Swashbuckle.AspNetCore.SwaggerUI;
 var builder = WebApplication.CreateBuilder(args);
 
 // --- Infrastructure ---
-builder.Services.AddInfrastructure(builder.Configuration);
 builder.Configuration.AddJsonFile("secrets.json", true, true);
+builder.Services.AddInfrastructure(builder.Configuration);
 
 // --- Worker ---
 builder.Services.AddWorker(builder.Configuration);
@@ -19,7 +19,7 @@ builder.Services.AddWorker(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddWebApiDefaults();
 builder.Services.AddSwaggerDocument();
-builder.Services.AddSignalRAdapters();
+builder.Services.AddSignalRAdapters(builder.Configuration);
 builder.AddSerilogCustom();
 
 builder.Services.AddHttpContextAccessor();
@@ -63,6 +63,7 @@ if (app.Environment.IsDevelopment()) {
 app.UseStaticFiles();
 
 // --- CORS ---
+// TODO: In production, restrict CORS to known frontend domains using .WithOrigins(...).
 app.UseCors(options => options
   .AllowAnyMethod()
   .AllowAnyHeader()

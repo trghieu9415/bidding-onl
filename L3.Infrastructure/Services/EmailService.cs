@@ -25,7 +25,6 @@ public class EmailService(
   public async Task SendResetPasswordEmailAsync(string email, string token, CancellationToken ct = default) {
     const string subject = "[Movie Online] Khôi phục mật khẩu của bạn";
 
-    // TODO: Thay đổi theo Link FrontEnd
     var resetLink = $"{options.FrontEndUrl}?token={token}&email={email}";
 
     var placeholders = new Dictionary<string, string> {

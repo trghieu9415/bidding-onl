@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using L2.Application.Exceptions;
 using L2.Application.Models;
+using L2.Application.Ports.Background;
 using L2.Application.Ports.Security;
 using L3.Infrastructure.Identity;
 using L3.Infrastructure.Services.Abstractions;
@@ -14,8 +15,8 @@ namespace L3.Infrastructure.Adapters.Security;
 public class AuthService(
   UserManager<AppUser> userManager,
   IJwtService jwtService,
-  IEmailService emailService,
-  ICacheService cache
+  ICacheService cache,
+  ITaskQueue queue
 ) : IAuthService {
   public async Task<AuthTokens> LoginAsync(string email, string password, UserRole role, CancellationToken ct) {
     var user = await userManager.FindByEmailAsync(email);
@@ -144,7 +145,7 @@ public class AuthService(
 
     var token = await userManager.GeneratePasswordResetTokenAsync(user);
     var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-    await emailService.SendResetPasswordEmailAsync(user.Email!, encodedToken, ct);
+    queue.Queue<IEmailService>(e => e.SendResetPasswordEmailAsync(user.Email!, encodedToken, CancellationToken.None));
   }
 
   public async Task ResetPasswordAsync(string email, string token, string newPassword, CancellationToken ct) {
