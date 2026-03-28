@@ -9,10 +9,10 @@ public class CommandConsumer(IMediator mediator) :
   IConsumer<EndSessionCommand>,
   IConsumer<StartSessionCommand> {
   public async Task Consume(ConsumeContext<EndSessionCommand> context) {
-    await mediator.Send(context.Message);
+    await mediator.Send(context.Message, context.CancellationToken);
   }
 
   public async Task Consume(ConsumeContext<StartSessionCommand> context) {
-    await mediator.Send(context.Message);
+    await mediator.Send(context.Message, context.CancellationToken);
   }
 }

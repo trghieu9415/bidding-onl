@@ -7,8 +7,8 @@ namespace L0.API.Controllers.Bidder;
 
 public class SessionController : UserController {
   [HttpGet]
-  public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel) {
-    var result = await Mediator.Send(new GetSessionsQuery(sieveModel));
+  public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel, CancellationToken ct) {
+    var result = await Mediator.Send(new GetSessionsQuery(sieveModel), ct);
     return AppResponse.Success(result.Sessions, result.Meta);
   }
 }

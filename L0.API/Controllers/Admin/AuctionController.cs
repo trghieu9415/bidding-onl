@@ -13,45 +13,45 @@ namespace L0.API.Controllers.Admin;
 
 public class AuctionController : DashboardController {
   [HttpGet]
-  public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel) {
-    var result = await Mediator.Send(new GetAuctionsQuery(sieveModel));
+  public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel, CancellationToken ct) {
+    var result = await Mediator.Send(new GetAuctionsQuery(sieveModel), ct);
     return AppResponse.Success(result.Auctions, result.Meta);
   }
 
   [HttpGet("{id:guid}")]
-  public async Task<IActionResult> GetById(Guid id) {
-    var result = await Mediator.Send(new GetAuctionQuery(id));
+  public async Task<IActionResult> GetById(Guid id, CancellationToken ct) {
+    var result = await Mediator.Send(new GetAuctionQuery(id), ct);
     return AppResponse.Success(result.Auction);
   }
 
   [HttpPost]
-  public async Task<IActionResult> Create([FromBody] AddAuctionCommand command) {
-    var id = await Mediator.Send(command);
+  public async Task<IActionResult> Create([FromBody] AddAuctionCommand command, CancellationToken ct) {
+    var id = await Mediator.Send(command, ct);
     return AppResponse.Success(id, "Tạo cuộc đấu giá thành công");
   }
 
   [HttpPut("{id:guid}")]
-  public async Task<IActionResult> Update(Guid id, [FromBody] UpdateAuctionCommand command) {
+  public async Task<IActionResult> Update(Guid id, [FromBody] UpdateAuctionCommand command, CancellationToken ct) {
     command = command with { Id = id };
-    await Mediator.Send(command);
+    await Mediator.Send(command, ct);
     return AppResponse.Success("Cập nhật thông tin đấu giá thành công");
   }
 
   [HttpDelete("{id:guid}")]
-  public async Task<IActionResult> Delete(Guid id) {
-    await Mediator.Send(new RemoveAuctionCommand(id));
+  public async Task<IActionResult> Delete(Guid id, CancellationToken ct) {
+    await Mediator.Send(new RemoveAuctionCommand(id), ct);
     return AppResponse.Success("Đã xóa cuộc đấu giá");
   }
 
   [HttpGet("removed")]
-  public async Task<IActionResult> GetRemoved([FromQuery] SieveModel sieveModel) {
-    var result = await Mediator.Send(new GetRemovedAuctionsQuery(sieveModel));
+  public async Task<IActionResult> GetRemoved([FromQuery] SieveModel sieveModel, CancellationToken ct) {
+    var result = await Mediator.Send(new GetRemovedAuctionsQuery(sieveModel), ct);
     return AppResponse.Success(result.Auctions, result.Meta);
   }
 
   [HttpPatch("{id:guid}/restore")]
-  public async Task<IActionResult> Restore(Guid id) {
-    await Mediator.Send(new RestoreAuctionCommand(id));
+  public async Task<IActionResult> Restore(Guid id, CancellationToken ct) {
+    await Mediator.Send(new RestoreAuctionCommand(id), ct);
     return AppResponse.Success("Cuộc đấu giá đã được khôi phục");
   }
 }

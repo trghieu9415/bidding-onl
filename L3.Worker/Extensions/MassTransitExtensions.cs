@@ -30,11 +30,22 @@ public static class MassTransitExtensions {
           h.Password(options.Password);
         });
 
-
         cfg.UsePublishMessageScheduler();
+
+        // Retry
         cfg.UseMessageRetry(r =>
-          r.Incremental(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2))
+          r.Exponential(4, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(2))
         );
+
+        // Redelivery
+        cfg.UseDelayedRedelivery(r => {
+          r.Intervals(
+            TimeSpan.FromMinutes(5),
+            TimeSpan.FromMinutes(15),
+            TimeSpan.FromMinutes(30));
+        });
+
+        // Circuit Breaker
         cfg.UseCircuitBreaker(cb => {
           cb.TrackingPeriod = TimeSpan.FromMinutes(1);
           cb.TripThreshold = 15;

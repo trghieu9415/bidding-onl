@@ -13,46 +13,46 @@ namespace L0.API.Controllers.Admin;
 
 public class CategoryController : DashboardController {
   [HttpGet("{id:guid}")]
-  public async Task<IActionResult> GetById(Guid id) {
+  public async Task<IActionResult> GetById(Guid id, CancellationToken ct) {
     var query = new GetCategoryQuery(id);
-    var result = await Mediator.Send(query);
+    var result = await Mediator.Send(query, ct);
     return AppResponse.Success(result.Category);
   }
 
   [HttpGet]
-  public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel) {
-    var result = await Mediator.Send(new GetCategoriesQuery(sieveModel));
+  public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel, CancellationToken ct) {
+    var result = await Mediator.Send(new GetCategoriesQuery(sieveModel), ct);
     return AppResponse.Success(result.Categories, result.Meta);
   }
 
   [HttpGet("removed")]
-  public async Task<IActionResult> GetRemoved([FromQuery] SieveModel sieveModel) {
-    var result = await Mediator.Send(new GetRemovedCategoriesQuery(sieveModel));
+  public async Task<IActionResult> GetRemoved([FromQuery] SieveModel sieveModel, CancellationToken ct) {
+    var result = await Mediator.Send(new GetRemovedCategoriesQuery(sieveModel), ct);
     return AppResponse.Success(result.Categories, result.Meta);
   }
 
   [HttpPost]
-  public async Task<IActionResult> Create(AddCategoryCommand command) {
-    var id = await Mediator.Send(command);
+  public async Task<IActionResult> Create(AddCategoryCommand command, CancellationToken ct) {
+    var id = await Mediator.Send(command, ct);
     return AppResponse.Success(id, "Danh mục đã được tạo");
   }
 
   [HttpPut("{id:guid}")]
-  public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCategoryCommand command) {
+  public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCategoryCommand command, CancellationToken ct) {
     command = command with { Id = id };
-    await Mediator.Send(command);
+    await Mediator.Send(command, ct);
     return AppResponse.Success("Danh mục đã được cập nhật");
   }
 
   [HttpDelete("{id:guid}")]
-  public async Task<IActionResult> Remove(Guid id) {
-    await Mediator.Send(new RemoveCategoryCommand(id));
+  public async Task<IActionResult> Remove(Guid id, CancellationToken ct) {
+    await Mediator.Send(new RemoveCategoryCommand(id), ct);
     return AppResponse.Success("Danh mục đã được xóa");
   }
 
   [HttpPatch("{id:guid}/restore")]
-  public async Task<IActionResult> Restore(Guid id) {
-    await Mediator.Send(new RestoreCategoryCommand(id));
+  public async Task<IActionResult> Restore(Guid id, CancellationToken ct) {
+    await Mediator.Send(new RestoreCategoryCommand(id), ct);
     return AppResponse.Success("Danh mục đã được khôi phục");
   }
 }

@@ -7,8 +7,8 @@ namespace L0.API.Controllers.Bidder;
 
 public class CategoryController : UserController {
   [HttpGet]
-  public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel) {
-    var result = await Mediator.Send(new GetCategoriesQuery(sieveModel));
+  public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel, CancellationToken ct) {
+    var result = await Mediator.Send(new GetCategoriesQuery(sieveModel), ct);
     return AppResponse.Success(result.Category, result.Meta);
   }
 }

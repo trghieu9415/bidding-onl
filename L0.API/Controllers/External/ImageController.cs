@@ -9,7 +9,7 @@ namespace L0.API.Controllers.External;
 [Authorize]
 public class ImageController(IStorageService storage) : ExternalController {
   [HttpPost("upload")]
-  public async Task<IActionResult> Upload(IFormFile? file, CancellationToken ct = default) {
+  public async Task<IActionResult> Upload(IFormFile? file, CancellationToken ct) {
     if (file == null || file.Length == 0) {
       return AppResponse.Fail("Vui lòng chọn ảnh để tải lên", 400);
     }
@@ -44,7 +44,7 @@ public class ImageController(IStorageService storage) : ExternalController {
   }
 
   [HttpDelete("remove")]
-  public async Task<IActionResult> Delete([FromQuery] string fileName, CancellationToken ct = default) {
+  public async Task<IActionResult> Delete([FromQuery] string fileName, CancellationToken ct) {
     if (string.IsNullOrEmpty(fileName)) {
       return AppResponse.Fail("Thiếu tên tệp", 400);
     }
