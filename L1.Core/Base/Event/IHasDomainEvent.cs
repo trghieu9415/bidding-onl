@@ -1,4 +1,6 @@
-﻿namespace L1.Core.Base.Event;
+﻿using System.Collections.Generic;
+
+namespace L1.Core.Base.Event;
 
 public interface IHasDomainEvent {
   IReadOnlyCollection<DomainEvent> DomainEvents { get; }

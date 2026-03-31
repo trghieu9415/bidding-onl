@@ -7,7 +7,7 @@ public class RefreshAccessHandler(
   IAuthService authService
 ) : IRequestHandler<RefreshAccessCommand, RefreshAccessResult> {
   public async Task<RefreshAccessResult> Handle(RefreshAccessCommand request, CancellationToken ct) {
-    var token = await authService.RefreshAsync(request.RefreshToken, ct);
-    return new RefreshAccessResult(token);
+    var tokens = await authService.RefreshAsync(request.RefreshToken, ct);
+    return new RefreshAccessResult(tokens);
   }
 }

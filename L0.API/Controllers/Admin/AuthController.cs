@@ -11,7 +11,17 @@ public class AuthController : DashboardController {
   [HttpPost("login")]
   public async Task<IActionResult> Login([FromBody] LoginCommand command, CancellationToken ct) {
     var result = await Mediator.Send(command, ct);
-    return AppResponse.Success(result.Tokens, "Đăng nhập thành công");
+    var tokens = result.Tokens;
+
+    var cookieOptions = new CookieOptions {
+      Expires = tokens.Refresh.ExpiredAt,
+      Secure = true,
+      SameSite = SameSiteMode.None,
+      HttpOnly = true
+    };
+
+    Response.Cookies.Append("Refresh", tokens.Refresh.Token, cookieOptions);
+    return AppResponse.Success(tokens.Access, "Đăng nhập thành công");
   }
 
   [HttpPatch("change-password")]
@@ -21,9 +31,20 @@ public class AuthController : DashboardController {
   }
 
   [HttpPost("refresh")]
-  public async Task<IActionResult> Refresh([FromBody] RefreshAccessCommand command, CancellationToken ct) {
+  public async Task<IActionResult> Refresh(CancellationToken ct) {
+    var command = new RefreshAccessCommand(Request.Cookies["Refresh"] ?? string.Empty);
     var result = await Mediator.Send(command, ct);
-    return AppResponse.Success(result.Tokens);
+    var tokens = result.Tokens;
+
+    var cookieOptions = new CookieOptions {
+      Expires = tokens.Refresh.ExpiredAt,
+      Secure = true,
+      SameSite = SameSiteMode.None,
+      HttpOnly = true
+    };
+
+    Response.Cookies.Append("Refresh", tokens.Refresh.Token, cookieOptions);
+    return AppResponse.Success(tokens.Access, "Làm mới thành công");
   }
 
   [HttpPost("logout")]
