@@ -1,11 +1,11 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Catalog.Admin.AddCategory;
-using L2.Application.UseCases.Catalog.Admin.GetCategories;
-using L2.Application.UseCases.Catalog.Admin.GetCategory;
-using L2.Application.UseCases.Catalog.Admin.GetRemovedCategories;
-using L2.Application.UseCases.Catalog.Admin.RemoveCategory;
-using L2.Application.UseCases.Catalog.Admin.RestoreCategory;
-using L2.Application.UseCases.Catalog.Admin.UpdateCategory;
+using L2.Application.UseCases.Catalog.AddCategory;
+using L2.Application.UseCases.Catalog.GetCategories;
+using L2.Application.UseCases.Catalog.GetCategory;
+using L2.Application.UseCases.Catalog.GetRemovedCategories;
+using L2.Application.UseCases.Catalog.RemoveCategory;
+using L2.Application.UseCases.Catalog.RestoreCategory;
+using L2.Application.UseCases.Catalog.UpdateCategory;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 

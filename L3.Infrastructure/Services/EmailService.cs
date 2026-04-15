@@ -1,4 +1,4 @@
-﻿using L3.Infrastructure.Configs.Options;
+﻿using L3.Infrastructure.Options;
 using L3.Infrastructure.Services.Abstractions;
 using MailKit.Net.Smtp;
 using MailKit.Security;

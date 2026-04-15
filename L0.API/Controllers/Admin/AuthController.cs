@@ -1,8 +1,8 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Auth.Admin.ChangePassword;
-using L2.Application.UseCases.Auth.Admin.Login;
-using L2.Application.UseCases.Auth.Admin.Logout;
-using L2.Application.UseCases.Auth.Admin.RefreshAccess;
+using L2.Application.UseCases.Auth.ChangePassword;
+using L2.Application.UseCases.Auth.Login;
+using L2.Application.UseCases.Auth.Logout;
+using L2.Application.UseCases.Auth.RefreshAccess;
 using Microsoft.AspNetCore.Mvc;
 
 namespace L0.API.Controllers.Admin;

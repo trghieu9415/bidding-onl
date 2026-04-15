@@ -2,8 +2,8 @@
 using L1.Core.Domain.Bidding.Entities;
 using L1.Core.Domain.Bidding.Enums;
 using L2.Application.Repositories;
-using L2.Application.UseCases.Bidding.System.EndSession;
-using L2.Application.UseCases.Bidding.System.StartSession;
+using L2.Application.UseCases.System.EndSession;
+using L2.Application.UseCases.System.StartSession;
 using MediatR;
 
 namespace L3.Worker.BackgroundJobs;

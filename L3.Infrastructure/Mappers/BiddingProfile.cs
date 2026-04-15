@@ -14,8 +14,8 @@ public class BiddingProfile : Profile {
       .ForMember(d => d.Bids, o => o.MapFrom(s => s.Bids));
 
     CreateMap<AuctionSession, AuctionSessionDto>()
-      .ForMember(d => d.StartTime, o => o.MapFrom(s => s.TimeFrame != null ? s.TimeFrame.StartTime : (DateTime?)null))
-      .ForMember(d => d.EndTime, o => o.MapFrom(s => s.TimeFrame != null ? s.TimeFrame.EndTime : (DateTime?)null))
+      .ForMember(d => d.StartTime, o => o.MapFrom(s => s.TimeFrame.StartTime))
+      .ForMember(d => d.EndTime, o => o.MapFrom(s => s.TimeFrame.EndTime))
       .ForMember(d => d.AuctionIds, o => o.MapFrom(s => s.AuctionIds.ToList()));
   }
 }

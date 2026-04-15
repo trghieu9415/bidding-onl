@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using L0.API.Adapters.Security;
 using L2.Application.Ports.Security;
-using L3.Infrastructure.Configs.Options;
+using L3.Infrastructure.Options;
 using L3.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 

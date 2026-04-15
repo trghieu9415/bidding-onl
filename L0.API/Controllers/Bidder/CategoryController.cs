@@ -1,5 +1,5 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Catalog.Bidder.GetCategories;
+using L2.Application.UseCases.Catalog.GetCategories;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 
@@ -9,6 +9,6 @@ public class CategoryController : UserController {
   [HttpGet]
   public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel, CancellationToken ct) {
     var result = await Mediator.Send(new GetCategoriesQuery(sieveModel), ct);
-    return AppResponse.Success(result.Category, result.Meta);
+    return AppResponse.Success(result.Categories, result.Meta);
   }
 }

@@ -6,7 +6,7 @@ using System.Text.Json.Nodes;
 using L1.Core.Domain.Transaction.Entities;
 using L2.Application.Constants;
 using L2.Application.Ports.Gateway;
-using L3.Infrastructure.Configs.Options;
+using L3.Infrastructure.Options;
 
 namespace L3.Infrastructure.Adapters.Gateway.Transaction;
 
@@ -151,7 +151,7 @@ public class PaypalGateway : IPaymentGateway {
     }
   }
 
-  public GatewayPayload ToGatewayPayload(object data) {
+  public GatewayPayload ToGatewayPayload(JsonElement data) {
     var props = data.ExtractProperties("token", "PayerID");
     return new PaypalGatewayPayload(props["token"], props["PayerID"]);
   }

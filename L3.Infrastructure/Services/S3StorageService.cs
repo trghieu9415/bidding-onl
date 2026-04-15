@@ -1,6 +1,6 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
-using L3.Infrastructure.Configs.Options;
+using L3.Infrastructure.Options;
 using L3.Infrastructure.Services.Abstractions;
 
 namespace L3.Infrastructure.Services;

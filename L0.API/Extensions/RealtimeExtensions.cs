@@ -1,6 +1,6 @@
 ﻿using L0.API.Adapters.Realtime;
 using L2.Application.Ports.Realtime;
-using L3.Infrastructure.Configs.Options;
+using L3.Infrastructure.Options;
 using StackExchange.Redis;
 
 namespace L0.API.Extensions;

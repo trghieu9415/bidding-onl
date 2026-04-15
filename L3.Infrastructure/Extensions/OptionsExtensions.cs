@@ -1,5 +1,5 @@
-﻿using L3.Infrastructure.Configs;
-using L3.Infrastructure.Configs.Options;
+﻿using L2.Application.Ports.Configs;
+using L3.Infrastructure.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -11,6 +11,7 @@ public static class OptionsExtensions {
     this IServiceCollection services,
     IConfiguration config
   ) {
+    // NOTE: ========== [Options Hạ Tầng] ==========
     services.RegisterOption<JwtOptions>(config);
     services.RegisterOption<RedisOptions>(config);
     services.RegisterOption<EmailOptions>(config);
@@ -22,8 +23,10 @@ public static class OptionsExtensions {
     return services;
   }
 
-  private static void RegisterOption<TOptions>(this IServiceCollection services, IConfiguration config)
-    where TOptions : class, IOptionSection {
+  private static void RegisterOption<TOptions>(
+    this IServiceCollection services,
+    IConfiguration config
+  ) where TOptions : class, IOptionSection {
     var sectionName = typeof(TOptions).GetProperty("SectionName")?.GetValue(null) as string;
 
     services.AddOptions<TOptions>()

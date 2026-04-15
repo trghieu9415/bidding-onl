@@ -1,6 +1,7 @@
-﻿using L1.Core.Domain.Transaction.Entities;
+﻿using System.Text.Json;
+using L1.Core.Domain.Transaction.Entities;
 using L2.Application.Ports.Gateway;
-using L3.Infrastructure.Configs.Options;
+using L3.Infrastructure.Options;
 using Stripe;
 using Stripe.Checkout;
 
@@ -76,7 +77,7 @@ public class StripeGateway : IPaymentGateway {
     }
   }
 
-  public GatewayPayload ToGatewayPayload(object data) {
+  public GatewayPayload ToGatewayPayload(JsonElement data) {
     var props = data.ExtractProperties("session_id");
     return new StripeGatewayPayload(props["session_id"]);
   }

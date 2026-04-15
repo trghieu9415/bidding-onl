@@ -1,6 +1,6 @@
 ﻿using L1.Core.Domain.Bidding.Events;
-using L2.Application.UseCases.Bidding.System.EndSession;
-using L2.Application.UseCases.Bidding.System.StartSession;
+using L2.Application.UseCases.System.EndSession;
+using L2.Application.UseCases.System.StartSession;
 using MassTransit;
 
 namespace L3.Worker.Consumers.Bidding;

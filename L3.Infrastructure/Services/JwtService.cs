@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using L2.Application.Models;
-using L3.Infrastructure.Configs.Options;
+using L3.Infrastructure.Options;
 using L3.Infrastructure.Services.Abstractions;
 using Microsoft.IdentityModel.Tokens;
 

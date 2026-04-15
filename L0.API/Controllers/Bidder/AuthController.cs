@@ -1,25 +1,28 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Auth.Bidder.ChangePassword;
-using L2.Application.UseCases.Auth.Bidder.GetProfile;
-using L2.Application.UseCases.Auth.Bidder.Login;
-using L2.Application.UseCases.Auth.Bidder.Logout;
-using L2.Application.UseCases.Auth.Bidder.RefreshAccess;
-using L2.Application.UseCases.Auth.Bidder.Register;
-using L2.Application.UseCases.Auth.Bidder.RequestPassword;
-using L2.Application.UseCases.Auth.Bidder.ResetPassword;
-using L2.Application.UseCases.Auth.Bidder.UpdateProfile;
+using L2.Application.UseCases.Auth.ChangePassword;
+using L2.Application.UseCases.Auth.GetProfile;
+using L2.Application.UseCases.Auth.Login;
+using L2.Application.UseCases.Auth.Logout;
+using L2.Application.UseCases.Auth.RefreshAccess;
+using L2.Application.UseCases.Auth.Register;
+using L2.Application.UseCases.Auth.RequestPassword;
+using L2.Application.UseCases.Auth.ResetPassword;
+using L2.Application.UseCases.Auth.UpdateProfile;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace L0.API.Controllers.Bidder;
 
 public class AuthController : UserController {
   [HttpPost("register")]
+  [AllowAnonymous]
   public async Task<IActionResult> Register([FromBody] RegisterCommand command, CancellationToken ct) {
     var result = await Mediator.Send(command, ct);
     return AppResponse.Success(result.Tokens, "Đăng ký tài khoản thành công");
   }
 
   [HttpPost("login")]
+  [AllowAnonymous]
   public async Task<IActionResult> Login([FromBody] LoginCommand command, CancellationToken ct) {
     var result = await Mediator.Send(command, ct);
     var tokens = result.Tokens;

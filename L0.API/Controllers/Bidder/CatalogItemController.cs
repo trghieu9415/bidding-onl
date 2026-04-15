@@ -1,8 +1,8 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Catalog.Bidder.GetRegisteredItems;
-using L2.Application.UseCases.Catalog.Bidder.RegisterItem;
-using L2.Application.UseCases.Catalog.Bidder.SearchItem;
-using L2.Application.UseCases.Catalog.Bidder.UpdateRegisteredItem;
+using L2.Application.UseCases.Catalog.GetRegisteredItems;
+using L2.Application.UseCases.Catalog.RegisterItem;
+using L2.Application.UseCases.Catalog.SearchItem;
+using L2.Application.UseCases.Catalog.UpdateRegisteredItem;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 

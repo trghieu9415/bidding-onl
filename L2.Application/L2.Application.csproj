@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="UseCases\Transaction\System\"/>
+    <Folder Include="UseCases\System\"/>
   </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 using L2.Application.Ports.Concurrency;
 using L3.Infrastructure.Adapters.Cache;
 using L3.Infrastructure.Adapters.Concurrency;
-using L3.Infrastructure.Configs.Options;
+using L3.Infrastructure.Options;
 using L3.Infrastructure.Services;
 using L3.Infrastructure.Services.Abstractions;
 using Medallion.Threading;

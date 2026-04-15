@@ -1,10 +1,10 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Bidding.Bidder.GetAuction;
-using L2.Application.UseCases.Bidding.Bidder.GetBiddingActivity;
-using L2.Application.UseCases.Bidding.Bidder.GetBidHistory;
-using L2.Application.UseCases.Bidding.Bidder.GetWonAuctions;
-using L2.Application.UseCases.Bidding.Bidder.PlaceBid;
-using L2.Application.UseCases.Bidding.Bidder.Test;
+using L2.Application.UseCases.Bidding.GetAuction;
+using L2.Application.UseCases.Bidding.GetBiddingActivity;
+using L2.Application.UseCases.Bidding.GetBidHistory;
+using L2.Application.UseCases.Bidding.GetWonAuctions;
+using L2.Application.UseCases.Bidding.PlaceBid;
+using L2.Application.UseCases.Bidding.Test;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 

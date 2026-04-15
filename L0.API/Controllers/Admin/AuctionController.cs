@@ -1,11 +1,11 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Bidding.Admin.AddAuction;
-using L2.Application.UseCases.Bidding.Admin.GetAuction;
-using L2.Application.UseCases.Bidding.Admin.GetAuctions;
-using L2.Application.UseCases.Bidding.Admin.GetRemovedAuctions;
-using L2.Application.UseCases.Bidding.Admin.RemoveAuction;
-using L2.Application.UseCases.Bidding.Admin.RestoreAuction;
-using L2.Application.UseCases.Bidding.Admin.UpdateAuction;
+using L2.Application.UseCases.Bidding.AddAuction;
+using L2.Application.UseCases.Bidding.GetAuction;
+using L2.Application.UseCases.Bidding.GetAuctions;
+using L2.Application.UseCases.Bidding.GetRemovedAuctions;
+using L2.Application.UseCases.Bidding.RemoveAuction;
+using L2.Application.UseCases.Bidding.RestoreAuction;
+using L2.Application.UseCases.Bidding.UpdateAuction;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 
