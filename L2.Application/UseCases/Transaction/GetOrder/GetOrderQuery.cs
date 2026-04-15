@@ -1,8 +1,8 @@
-﻿using L2.Application.Abstractions;
-using L2.Application.DTOs;
+﻿using L2.Application.DTOs;
+using MediatR;
 
 namespace L2.Application.UseCases.Transaction.GetOrder;
 
-public record GetOrderQuery(Guid Id) : IQuery<GetOrderResult>;
+public record GetOrderQuery(Guid Id) : IRequest<GetOrderResult>;
 
 public record GetOrderResult(OrderDto Order, PaymentDto? Payment);

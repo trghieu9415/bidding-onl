@@ -4,17 +4,13 @@ using MassTransit;
 
 namespace L3.Worker.Consumers.Catalog;
 
-public class ItemRejectedConsumer(IUserNotifier userNotifier) : IConsumer<ItemRejectedEvent> {
+public class ItemRejectedConsumer(ISellerNotifier sellerNotifier) : IConsumer<ItemRejectedEvent> {
   public async Task Consume(ConsumeContext<ItemRejectedEvent> context) {
     var msg = context.Message;
 
-    await userNotifier.SendToUser(
+    await sellerNotifier.SendItemRejectedAlertAsync(
       msg.OwnerId,
-      "ItemRejected",
-      new {
-        msg.ItemId,
-        msg.Reason
-      },
+      msg.ItemId,
       context.CancellationToken
     );
   }

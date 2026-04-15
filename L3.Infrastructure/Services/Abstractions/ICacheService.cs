@@ -9,3 +9,13 @@ public interface ICacheService {
   Task SyncSecurityStampAsync(Guid userId, string securityStamp, CancellationToken ct);
   Task<string?> GetSecurityStampAsync(Guid userId, CancellationToken ct);
 }
+
+public static class CacheKeys {
+  public static string BlackList(string jti) {
+    return $"blacklist:{jti}";
+  }
+
+  public static string UserStamp(Guid id) {
+    return $"user:{id}:stamp";
+  }
+}

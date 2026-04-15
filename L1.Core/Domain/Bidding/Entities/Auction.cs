@@ -9,6 +9,7 @@ namespace L1.Core.Domain.Bidding.Entities;
 public class Auction : AggregateRoot {
   private readonly List<Bid> _bids = [];
   private Auction() {}
+  public Guid SessionId { get; private set; }
   public Guid CatalogItemId { get; private set; }
   public AuctionStatus Status { get; private set; } = AuctionStatus.Scheduled;
   public decimal CurrentPrice { get; private set; }
@@ -18,9 +19,13 @@ public class Auction : AggregateRoot {
   public AuctionRules Rules { get; private set; } = null!;
   public IReadOnlyCollection<Bid> Bids => _bids.AsReadOnly();
 
-  public static Auction Create(Guid catalogItemId, decimal startingPrice, decimal stepPrice, decimal reversePrice) {
+  public static Auction Create(
+    Guid catalogItemId, Guid sessionId,
+    decimal startingPrice, decimal stepPrice, decimal reversePrice
+  ) {
     return new Auction {
       CatalogItemId = catalogItemId,
+      SessionId = sessionId,
       CurrentPrice = startingPrice,
       Rules = new AuctionRules(stepPrice, reversePrice)
     };
@@ -87,7 +92,7 @@ public class Auction : AggregateRoot {
     }
 
     Status = AuctionStatus.Active;
-    AddDomainEvent(new AuctionStartedEvent(Id, OwnerId));
+    AddDomainEvent(new AuctionStartedEvent(Id, CatalogItemId, OwnerId));
   }
 
   public void Cancel() {

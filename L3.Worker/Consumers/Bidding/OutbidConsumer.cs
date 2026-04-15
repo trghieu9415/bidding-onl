@@ -4,17 +4,14 @@ using MassTransit;
 
 namespace L3.Worker.Consumers.Bidding;
 
-public class OutbidConsumer(IUserNotifier userNotifier) : IConsumer<OutbidEvent> {
+public class OutbidConsumer(IBidderNotifier bidderNotifier) : IConsumer<OutbidEvent> {
   public async Task Consume(ConsumeContext<OutbidEvent> context) {
     var msg = context.Message;
-    await userNotifier.SendToUser(
+    await bidderNotifier.SendOutbidAlertAsync(
       msg.PreviousBidderId,
-      "Outbid",
-      new {
-        Message = "Bạn đã bị đặt giá cao hơn!",
-        msg.NewPrice,
-        Timestamp = msg.OccurredOn
-      }
+      msg.AuctionId,
+      msg.NewPrice,
+      context.CancellationToken
     );
   }
 }

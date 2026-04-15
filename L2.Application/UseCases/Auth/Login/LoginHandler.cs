@@ -1,4 +1,3 @@
-using L2.Application.Models;
 using L2.Application.Ports.Security;
 using MediatR;
 
@@ -11,7 +10,7 @@ public class LoginHandler(
     LoginCommand request,
     CancellationToken ct
   ) {
-    var tokens = await authService.LoginAsync(request.Email, request.Password, UserRole.Bidder, ct);
+    var tokens = await authService.LoginAsync(request.Email, request.Password, request.Role, ct);
     return new LoginResult(tokens);
   }
 }

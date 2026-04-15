@@ -2,7 +2,7 @@
 
 namespace L0.API.Hubs;
 
-public class BiddingHub : Hub {
+public class AuctionHub : Hub {
   public async Task JoinAuction(Guid auctionId) {
     await Groups.AddToGroupAsync(Context.ConnectionId, auctionId.ToString());
   }

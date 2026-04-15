@@ -1,5 +1,6 @@
-﻿using Hangfire;
-using L3.Worker.BackgroundJobs;
+﻿using System.Linq.Expressions;
+using Hangfire;
+using L3.Worker.Jobs;
 using Microsoft.Extensions.Hosting;
 
 namespace L3.Worker;
@@ -8,40 +9,43 @@ public class HangfireBootstrapper(
   IBackgroundJobClient backgroundJobs,
   IRecurringJobManager recurringJobs
 ) : IHostedService {
-  public Task StartAsync(CancellationToken cancellationToken) {
-    var vnTimeZone = GetVnTimeZone();
+  // Cache múi giờ lại để không phải tính toán nhiều lần
+  private readonly TimeZoneInfo _vnTimeZone = GetVnTimeZone();
 
+  public Task StartAsync(CancellationToken ct) {
     backgroundJobs.Schedule<StartupSyncJob>(
-      job => job.Execute(cancellationToken),
+      job => job.Execute(CancellationToken.None),
       TimeSpan.FromSeconds(30)
     );
 
-    recurringJobs.AddOrUpdate<UnpaidWinnerTimeoutJob>(
-      "unpaid-winner-timeout",
-      job => job.Execute(cancellationToken),
-      Cron.Hourly(),
-      new RecurringJobOptions { TimeZone = vnTimeZone }
-    );
-
-    recurringJobs.AddOrUpdate<ImageCleanupJob>(
-      "image-cleanup-job",
-      job => job.Execute(),
-      "0 2 * * *",
-      new RecurringJobOptions { TimeZone = vnTimeZone }
-    );
-
-    recurringJobs.AddOrUpdate<SoftDeletePurgeJob>(
-      "soft-delete-purge-job",
-      job => job.Execute(),
-      "0 3 * * *",
-      new RecurringJobOptions { TimeZone = vnTimeZone }
-    );
+    AddRecurringJob<UnpaidWinnerTimeoutJob>(job => job.Execute(ct), Cron.Hourly());
+    AddRecurringJob<ImageCleanupJob>(job => job.Execute(), "0 2 * * *");
+    AddRecurringJob<SoftDeletePurgeJob>(job => job.Execute(), "0 3 * * *");
 
     return Task.CompletedTask;
   }
 
-  public Task StopAsync(CancellationToken cancellationToken) {
+  public Task StopAsync(CancellationToken ct) {
     return Task.CompletedTask;
+  }
+
+
+  private void AddRecurringJob<T>(Expression<Func<T, Task>> methodCall, string cronExpression) {
+    recurringJobs.AddOrUpdate(
+      typeof(T).Name,
+      methodCall,
+      cronExpression,
+      new RecurringJobOptions { TimeZone = _vnTimeZone }
+    );
+  }
+
+  private void AddRecurringJob<T>(Expression<Action<T>> methodCall, string cronExpression) {
+    recurringJobs.AddOrUpdate(
+      typeof(T).Name,
+      methodCall,
+      cronExpression,
+      new RecurringJobOptions { TimeZone = _vnTimeZone }
+    );
   }
 
   private static TimeZoneInfo GetVnTimeZone() {

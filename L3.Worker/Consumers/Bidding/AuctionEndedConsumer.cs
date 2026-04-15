@@ -5,27 +5,31 @@ using MassTransit;
 namespace L3.Worker.Consumers.Bidding;
 
 public class AuctionEndedConsumer(
-  IBiddingNotifier biddingNotifier,
-  IUserNotifier userNotifier
+  IAuctionNotifier auctionNotifier,
+  IBidderNotifier bidderNotifier,
+  ISellerNotifier sellerNotifier
 ) : IConsumer<AuctionEndedEvent> {
   public async Task Consume(ConsumeContext<AuctionEndedEvent> context) {
     var msg = context.Message;
 
-    await biddingNotifier.NotifyAuctionEnded(
-      msg.AuctionId,
-      msg.WinnerId,
-      msg.FinalPrice,
-      context.CancellationToken
+    await auctionNotifier.BroadcastAuctionEndedAsync(
+      msg.AuctionId, context.CancellationToken
     );
 
-    await userNotifier.SendToUser(
-      msg.OwerId,
-      "AuctionFinished",
-      new {
-        msg.IsSold,
-        msg.FinalPrice
-      },
-      context.CancellationToken
-    );
+
+    if (msg.IsSold) {
+      await bidderNotifier.SendAuctionWonAlertAsync(
+        msg.WinnerId!.Value, msg.AuctionId,
+        context.CancellationToken
+      );
+      await sellerNotifier.SendAuctionFinishedAlertAsync(
+        msg.OwnerId, msg.AuctionId, msg.FinalPrice,
+        context.CancellationToken
+      );
+    } else {
+      await sellerNotifier.SendAuctionFailedNoBidsAlertAsync(
+        msg.AuctionId, msg.AuctionId, context.CancellationToken
+      );
+    }
   }
 }

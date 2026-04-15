@@ -22,6 +22,7 @@ public class AddAuctionHandler(
 
     var auction = Auction.Create(
       item.Id,
+      request.SessionId,
       item.StartingPrice,
       request.StepPrice,
       request.ReservePrice

@@ -2,11 +2,9 @@
 using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace L3.Worker.BackgroundJobs;
+namespace L3.Worker.Jobs;
 
-// Đã bỏ hoàn toàn IJob của Quartz
 public class ImageCleanupJob(AppDbContext dbContext) {
-  // Không cần truyền IJobExecutionContext vào nữa
   public async Task Execute() {
     var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "catalog");
     if (!Directory.Exists(uploadPath)) {

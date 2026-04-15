@@ -1,6 +1,6 @@
+using L0.API.ExceptionHandler;
 using L0.API.Extensions;
 using L0.API.Hubs;
-using L0.API.Middlewares;
 using L3.Infrastructure;
 using L3.Infrastructure.Seeding;
 using L3.Worker;
@@ -22,6 +22,7 @@ builder.Services.AddSwaggerDocument();
 builder.Services.AddSignalRAdapters(builder.Configuration);
 builder.AddSerilogCustom();
 
+// --- Http Context ---
 builder.Services.AddHttpContextAccessor();
 
 
@@ -43,9 +44,11 @@ if (args.Contains("--seeding")) {
   return;
 }
 
+// --- Global Exception Handler ---
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 // --- Custom Middlewares ---
-app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseHttpsRedirection();
 
 // --- Swagger UI ---
@@ -58,6 +61,9 @@ if (app.Environment.IsDevelopment()) {
     c.DocExpansion(DocExpansion.None);
   });
 }
+
+// --- Exception Handler ---
+app.UseExceptionHandler();
 
 // --- Allow Static Files ---
 app.UseStaticFiles();
@@ -76,7 +82,7 @@ app.UseAuthorization();
 
 // --- Endpoints ---
 app.MapControllers();
-app.MapHub<BiddingHub>("/hubs/bidding");
+app.MapHub<AuctionHub>("/hubs/auction");
 app.MapHub<UserHub>("/hubs/notification");
 
 app.Run();

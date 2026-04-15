@@ -4,17 +4,14 @@ using MassTransit;
 
 namespace L3.Worker.Consumers.Catalog;
 
-public class ItemApprovedConsumer(IUserNotifier userNotifier) : IConsumer<ItemApprovedEvent> {
+public class ItemApprovedConsumer(ISellerNotifier sellerNotifier) : IConsumer<ItemApprovedEvent> {
   public async Task Consume(ConsumeContext<ItemApprovedEvent> context) {
     var msg = context.Message;
     Console.WriteLine($"Item {msg.ItemId} approved!");
 
-    await userNotifier.SendToUser(
+    await sellerNotifier.SendItemApprovedAlertAsync(
       msg.OwnerId,
-      "ItemApproved",
-      new {
-        msg.ItemId
-      },
+      msg.ItemId,
       context.CancellationToken
     );
   }

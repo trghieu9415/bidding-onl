@@ -13,8 +13,8 @@ public static class RealtimeExtensions {
       .AddStackExchangeRedis(redisOptions!.Configuration, options => {
         options.Configuration.ChannelPrefix = RedisChannel.Literal("Realtime_");
       });
-    services.AddTransient<IBiddingNotifier, BiddingNotifier>();
-    services.AddTransient<IUserNotifier, UserNotifier>();
+    services.AddTransient<IAuctionNotifier, SignalRAuctionNotifier>();
+    services.AddTransient<IBidderNotifier, SignalRBidderNotifier>();
 
     return services;
   }

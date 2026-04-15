@@ -4,7 +4,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using L1.Core.Domain.Transaction.Entities;
-using L2.Application.Constants;
 using L2.Application.Ports.Gateway;
 using L3.Infrastructure.Options;
 
@@ -16,7 +15,7 @@ public class PaypalGateway : IPaymentGateway {
 
   public PaypalGateway(PayPalOptions options, IHttpClientFactory clientFactory) {
     _options = options;
-    _client = clientFactory.CreateClient(HttpClientNames.Paypal);
+    _client = clientFactory.CreateClient(nameof(PaypalGateway));
 
     var baseUrl =
       options.Mode.Equals("live", StringComparison.CurrentCultureIgnoreCase)

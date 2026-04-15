@@ -27,7 +27,7 @@ public class AuctionSessionSeeder(AppDbContext context) : ISeeder {
 
     var auctionIds = new List<Guid>();
     foreach (var item in approvedItems.Take(15)) {
-      var auction = Auction.Create(item.Id, item.StartingPrice, 10, item.StartingPrice + 50)
+      var auction = Auction.Create(item.Id, liveSession.Id, item.StartingPrice, 10, item.StartingPrice + 50)
         .SetOwnerId(item.OwnerId);
 
       auction.Start();

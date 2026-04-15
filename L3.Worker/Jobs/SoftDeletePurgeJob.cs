@@ -2,7 +2,7 @@
 using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace L3.Worker.BackgroundJobs;
+namespace L3.Worker.Jobs;
 
 public class SoftDeletePurgeJob(AppDbContext dbContext) {
   public async Task Execute() {

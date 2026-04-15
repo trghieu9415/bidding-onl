@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using L2.Application.Constants;
 using L3.Infrastructure.Services.Abstractions;
 using Microsoft.Extensions.Caching.Distributed;
 
@@ -24,11 +23,11 @@ public class RedisCacheService(IDistributedCache cache) : ICacheService {
     var options = new DistributedCacheEntryOptions {
       AbsoluteExpirationRelativeToNow = duration
     };
-    await cache.SetStringAsync(CacheTags.BlackList(jti), "true", options, ct);
+    await cache.SetStringAsync(CacheKeys.BlackList(jti), "true", options, ct);
   }
 
   public async Task<bool> IsBlacklistedAsync(string jti, CancellationToken ct = default) {
-    var value = await cache.GetStringAsync(CacheTags.BlackList(jti), ct);
+    var value = await cache.GetStringAsync(CacheKeys.BlackList(jti), ct);
     return !string.IsNullOrEmpty(value);
   }
 
@@ -37,11 +36,11 @@ public class RedisCacheService(IDistributedCache cache) : ICacheService {
       AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1)
     };
 
-    await cache.SetStringAsync(CacheTags.UserStamp(userId), securityStamp, options, ct);
+    await cache.SetStringAsync(CacheKeys.UserStamp(userId), securityStamp, options, ct);
   }
 
   public async Task<string?> GetSecurityStampAsync(Guid userId, CancellationToken ct) {
-    var value = await cache.GetStringAsync(CacheTags.UserStamp(userId), ct);
+    var value = await cache.GetStringAsync(CacheKeys.UserStamp(userId), ct);
     return value;
   }
 

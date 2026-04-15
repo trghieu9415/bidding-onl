@@ -5,18 +5,15 @@ using MassTransit;
 namespace L3.Worker.Consumers.Bidding;
 
 public class AuctionStartedConsumer(
-  IUserNotifier userNotifier
+  ISellerNotifier sellerNotifier
 ) : IConsumer<AuctionStartedEvent> {
   public async Task Consume(ConsumeContext<AuctionStartedEvent> context) {
     var msg = context.Message;
 
-    await userNotifier.SendToUser(
+    await sellerNotifier.SendAuctionStartedAlertAsync(
       msg.OwnerId,
-      "AuctionStarted",
-      new {
-        Message = "Sản phẩm đã được mở đấu giá!",
-        msg.AuctionId
-      },
+      msg.ItemId,
+      msg.AuctionId,
       context.CancellationToken
     );
   }

@@ -145,7 +145,9 @@ public class AuthService(
 
     var token = await userManager.GeneratePasswordResetTokenAsync(user);
     var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-    queue.Queue<IEmailService>(e => e.SendResetPasswordEmailAsync(user.Email!, encodedToken, CancellationToken.None));
+    queue.Queue<IEmailService>(e => e
+      .SendResetPasswordEmailAsync(user.Email!, encodedToken, CancellationToken.None)
+    );
   }
 
   public async Task ResetPasswordAsync(string email, string token, string newPassword, CancellationToken ct) {

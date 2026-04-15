@@ -1,5 +1,4 @@
 ﻿using L1.Core.Domain.Transaction.Enums;
-using L2.Application.Constants;
 using L2.Application.Ports.Gateway;
 using L2.Application.Ports.Search;
 using L3.Infrastructure.Adapters.Gateway;
@@ -21,7 +20,7 @@ public static class ExternalServiceExtensions {
     services.AddScoped<IImageTracker, ImageTracker>();
     services.AddScoped<ISearchService, PostgresSearchService>();
 
-    services.AddHttpClient(HttpClientNames.Paypal)
+    services.AddHttpClient(nameof(PaypalGateway))
       .AddStandardResilienceHandler(ConfigureExternalServicesResilience());
 
     // Transactions

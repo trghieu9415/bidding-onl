@@ -9,6 +9,7 @@ public class AuctionConfiguration : BaseConfiguration<Auction> {
     base.Configure(builder);
 
     builder.Property(x => x.CatalogItemId).IsRequired();
+    builder.Property(x => x.SessionId).IsRequired();
     builder.Property(x => x.CurrentPrice).HasPrecision(18, 2);
     builder.Property(x => x.WinningBidId).IsRequired(false);
     builder.Property(x => x.WinningAt).IsRequired(false);

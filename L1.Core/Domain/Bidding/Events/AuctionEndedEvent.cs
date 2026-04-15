@@ -6,7 +6,7 @@ public record AuctionEndedEvent(
   Guid AuctionId,
   Guid? WinnerId,
   decimal FinalPrice,
-  Guid OwerId,
+  Guid OwnerId,
   bool IsSold
 ) : DomainEvent {
   public override Guid AggregateId => AuctionId;

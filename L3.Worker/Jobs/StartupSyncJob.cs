@@ -6,7 +6,7 @@ using L2.Application.UseCases.System.EndSession;
 using L2.Application.UseCases.System.StartSession;
 using MediatR;
 
-namespace L3.Worker.BackgroundJobs;
+namespace L3.Worker.Jobs;
 
 [DisableConcurrentExecution(300)]
 public class StartupSyncJob(
@@ -15,10 +15,9 @@ public class StartupSyncJob(
 ) {
   public async Task Execute(CancellationToken ct) {
     var missedStartSessions = await sessionRepo.GetAsync(
-      s =>
-        s.Status == SessionStatus.Published
-        && s.TimeFrame.StartTime <= DateTime.UtcNow,
-      ct: ct);
+      s => s.Status == SessionStatus.Published && s.TimeFrame.StartTime <= DateTime.UtcNow,
+      ct: ct
+    );
 
     foreach (var session in missedStartSessions) {
       await mediator.Send(new StartSessionCommand(session.Id), ct);
@@ -26,7 +25,8 @@ public class StartupSyncJob(
 
     var missedEndSessions = await sessionRepo.GetAsync(
       s => s.Status == SessionStatus.Live && s.TimeFrame.EndTime <= DateTime.UtcNow,
-      ct: ct);
+      ct: ct
+    );
 
     foreach (var session in missedEndSessions) {
       await mediator.Send(new EndSessionCommand(session.Id), ct);

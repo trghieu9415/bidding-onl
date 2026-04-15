@@ -5,7 +5,7 @@ using L1.Core.Domain.Catalog.Entities;
 using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace L3.Worker.BackgroundJobs;
+namespace L3.Worker.Jobs;
 
 [DisableConcurrentExecution(300)]
 public class UnpaidWinnerTimeoutJob(AppDbContext dbContext) {
