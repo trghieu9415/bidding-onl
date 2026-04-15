@@ -9,7 +9,6 @@ public class HangfireBootstrapper(
   IBackgroundJobClient backgroundJobs,
   IRecurringJobManager recurringJobs
 ) : IHostedService {
-  // Cache múi giờ lại để không phải tính toán nhiều lần
   private readonly TimeZoneInfo _vnTimeZone = GetVnTimeZone();
 
   public Task StartAsync(CancellationToken ct) {

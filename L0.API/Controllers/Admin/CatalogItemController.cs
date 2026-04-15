@@ -1,8 +1,8 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Catalog.ApproveItem;
-using L2.Application.UseCases.Catalog.GetItem;
-using L2.Application.UseCases.Catalog.GetItems;
-using L2.Application.UseCases.Catalog.RejectItem;
+using L2.Application.UseCases.Items.Commands.ApproveItem;
+using L2.Application.UseCases.Items.Commands.RejectItem;
+using L2.Application.UseCases.Items.Queries.GetItem;
+using L2.Application.UseCases.Items.Queries.GetItems;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 

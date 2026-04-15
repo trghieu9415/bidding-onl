@@ -1,9 +1,9 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Bidder.GetBidder;
-using L2.Application.UseCases.Bidder.GetBidders;
-using L2.Application.UseCases.Bidder.GetLockedBidders;
-using L2.Application.UseCases.Bidder.LockBidder;
-using L2.Application.UseCases.Bidder.UnlockBidder;
+using L2.Application.UseCases.Bidders.Commands.LockBidder;
+using L2.Application.UseCases.Bidders.Commands.UnlockBidder;
+using L2.Application.UseCases.Bidders.Queries.GetBidder;
+using L2.Application.UseCases.Bidders.Queries.GetBidders;
+using L2.Application.UseCases.Bidders.Queries.GetLockedBidders;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 

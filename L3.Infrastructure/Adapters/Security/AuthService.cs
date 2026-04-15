@@ -5,7 +5,7 @@ using L2.Application.Exceptions;
 using L2.Application.Models;
 using L2.Application.Ports.Background;
 using L2.Application.Ports.Security;
-using L3.Infrastructure.Identity;
+using L3.Infrastructure.Persistence.Identity;
 using L3.Infrastructure.Services.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
@@ -145,7 +145,7 @@ public class AuthService(
 
     var token = await userManager.GeneratePasswordResetTokenAsync(user);
     var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-    queue.Queue<IEmailService>(e => e
+    queue.Enqueue<IEmailService>(e => e
       .SendResetPasswordEmailAsync(user.Email!, encodedToken, CancellationToken.None)
     );
   }

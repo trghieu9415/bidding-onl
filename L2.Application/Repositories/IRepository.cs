@@ -12,6 +12,11 @@ public interface IRepository<T> where T : AggregateRoot {
     CancellationToken ct = default
   );
 
+  Task<T?> GetFirstAsync(
+    Expression<Func<T, bool>>? criteria = null,
+    CancellationToken ct = default
+  );
+
   Task<List<T>> GetByKeysAsync(
     ICollection<Guid> ids,
     ICollection<Expression<Func<T, object>>>? includes = null,

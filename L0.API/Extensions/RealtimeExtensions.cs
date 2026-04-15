@@ -15,6 +15,7 @@ public static class RealtimeExtensions {
       });
     services.AddTransient<IAuctionNotifier, SignalRAuctionNotifier>();
     services.AddTransient<IBidderNotifier, SignalRBidderNotifier>();
+    services.AddTransient<ISellerNotifier, SignalRSellerNotifier>();
 
     return services;
   }

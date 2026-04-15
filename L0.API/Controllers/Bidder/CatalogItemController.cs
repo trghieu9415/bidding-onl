@@ -1,8 +1,8 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Catalog.GetRegisteredItems;
-using L2.Application.UseCases.Catalog.RegisterItem;
-using L2.Application.UseCases.Catalog.SearchItem;
-using L2.Application.UseCases.Catalog.UpdateRegisteredItem;
+using L2.Application.UseCases.Items.Commands.RegisterItem;
+using L2.Application.UseCases.Items.Commands.SearchItem;
+using L2.Application.UseCases.Items.Commands.UpdateRegisteredItem;
+using L2.Application.UseCases.Items.Queries.GetRegisteredItems;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 
@@ -22,8 +22,10 @@ public class CatalogItemController : UserController {
   }
 
   [HttpPut("{id:guid}")]
-  public async Task<IActionResult> UpdateItem(Guid id, [FromBody] UpdateRegisteredItemCommand command,
-    CancellationToken ct) {
+  public async Task<IActionResult> UpdateItem(
+    Guid id, [FromBody] UpdateRegisteredItemCommand command,
+    CancellationToken ct
+  ) {
     command = command with { Id = id };
     await Mediator.Send(command, ct);
     return AppResponse.Success("Cập nhật thông tin sản phẩm thành công");

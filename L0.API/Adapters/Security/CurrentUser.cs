@@ -12,7 +12,11 @@ public class CurrentUser : ICurrentUser {
     if (id != null) {
       Id = Guid.Parse(id);
       FullName = user?.Identity?.Name ?? "Guest";
-      Role = user?.FindFirstValue(ClaimTypes.Role) == nameof(UserRole.Admin) ? UserRole.Admin : UserRole.Bidder;
+      Role =
+        user?.FindFirstValue(ClaimTypes.Role) ==
+        nameof(UserRole.Admin)
+          ? UserRole.Admin
+          : UserRole.Bidder;
     } else {
       Id = Guid.Empty;
     }
@@ -20,5 +24,6 @@ public class CurrentUser : ICurrentUser {
 
   public Guid Id { get; init; }
   public string FullName { get; init; } = "Guest";
-  public UserRole Role { get; init; }
+  public UserRole? Role { get; init; }
+  public bool IsLoggedIn => Id != Guid.Empty;
 }

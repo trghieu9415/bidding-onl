@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using L2.Application.Abstractions;
 using L2.Application.Exceptions;
-using L3.Infrastructure.Identity;
+using L3.Infrastructure.Persistence.Identity;
 using MassTransit;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

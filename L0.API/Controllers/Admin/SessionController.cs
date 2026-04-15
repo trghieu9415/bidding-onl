@@ -1,12 +1,12 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Bidding.AddSession;
-using L2.Application.UseCases.Bidding.GetRemovedSessions;
-using L2.Application.UseCases.Bidding.GetSessions;
-using L2.Application.UseCases.Bidding.PublishSession;
-using L2.Application.UseCases.Bidding.RemoveSession;
-using L2.Application.UseCases.Bidding.RestoreSession;
-using L2.Application.UseCases.Bidding.SyncAuctions;
-using L2.Application.UseCases.Bidding.UpdateSession;
+using L2.Application.UseCases.Auctions.Commands.SyncAuctions;
+using L2.Application.UseCases.Sessions.Commands.AddSession;
+using L2.Application.UseCases.Sessions.Commands.PublishSession;
+using L2.Application.UseCases.Sessions.Commands.RemoveSession;
+using L2.Application.UseCases.Sessions.Commands.RestoreSession;
+using L2.Application.UseCases.Sessions.Commands.UpdateSession;
+using L2.Application.UseCases.Sessions.Queries.GetRemovedSessions;
+using L2.Application.UseCases.Sessions.Queries.GetSessions;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 

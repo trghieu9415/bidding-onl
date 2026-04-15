@@ -11,7 +11,4 @@ public record User {
   public string? SecurityStamp { get; init; }
 }
 
-public enum UserRole {
-  Admin,
-  Bidder
-}
+public enum UserRole { Admin, Bidder }

@@ -1,6 +1,6 @@
 ﻿using L1.Core.Domain.Catalog.Entities;
-using L3.Infrastructure.Identity;
 using L3.Infrastructure.Persistence;
+using L3.Infrastructure.Persistence.Identity;
 using L3.Infrastructure.Services.Abstractions;
 using Microsoft.EntityFrameworkCore;
 

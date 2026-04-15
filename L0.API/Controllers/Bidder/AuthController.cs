@@ -1,13 +1,15 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Auth.ChangePassword;
-using L2.Application.UseCases.Auth.GetProfile;
-using L2.Application.UseCases.Auth.Login;
-using L2.Application.UseCases.Auth.Logout;
-using L2.Application.UseCases.Auth.RefreshAccess;
-using L2.Application.UseCases.Auth.Register;
-using L2.Application.UseCases.Auth.RequestPassword;
-using L2.Application.UseCases.Auth.ResetPassword;
-using L2.Application.UseCases.Auth.UpdateProfile;
+using L2.Application.Models;
+using L2.Application.UseCases.Auth.Commands.ChangePassword;
+using L2.Application.UseCases.Auth.Commands.Login;
+using L2.Application.UseCases.Auth.Commands.Logout;
+using L2.Application.UseCases.Auth.Commands.RefreshAccess;
+using L2.Application.UseCases.Auth.Commands.Register;
+using L2.Application.UseCases.Auth.Commands.RequestPassword;
+using L2.Application.UseCases.Auth.Commands.ResetPassword;
+using L2.Application.UseCases.Auth.Commands.Test;
+using L2.Application.UseCases.Auth.Commands.UpdateProfile;
+using L2.Application.UseCases.Auth.Queries.GetProfile;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +25,8 @@ public class AuthController : UserController {
 
   [HttpPost("login")]
   [AllowAnonymous]
-  public async Task<IActionResult> Login([FromBody] LoginCommand command, CancellationToken ct) {
+  public async Task<IActionResult> Login([FromBody] LoginRequest data, CancellationToken ct) {
+    var command = new LoginCommand(data, UserRole.Bidder);
     var result = await Mediator.Send(command, ct);
     var tokens = result.Tokens;
 
@@ -88,5 +91,12 @@ public class AuthController : UserController {
   public async Task<IActionResult> Logout([FromBody] LogoutCommand command, CancellationToken ct) {
     await Mediator.Send(command, ct);
     return AppResponse.Success("Đăng xuất thành công");
+  }
+
+  [HttpPost("test")]
+  [AllowAnonymous]
+  public async Task<IActionResult> Test([FromBody] TestCommand command, CancellationToken ct) {
+    await Mediator.Send(command, ct);
+    return AppResponse.Success();
   }
 }

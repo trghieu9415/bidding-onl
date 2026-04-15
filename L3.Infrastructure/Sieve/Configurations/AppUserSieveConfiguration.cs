@@ -1,4 +1,4 @@
-﻿using L3.Infrastructure.Identity;
+﻿using L3.Infrastructure.Persistence.Identity;
 using Sieve.Services;
 
 namespace L3.Infrastructure.Sieve.Configurations;

@@ -23,8 +23,9 @@ public static class ExternalServiceExtensions {
     services.AddHttpClient(nameof(PaypalGateway))
       .AddStandardResilienceHandler(ConfigureExternalServicesResilience());
 
-    // Transactions
     services.AddScoped<IGatewayFactory, GatewayFactory>();
+
+    // Transactions
     services.AddKeyedScoped<IPaymentGateway, StripeGateway>(PaymentMethod.Stripe);
     services.AddKeyedScoped<IPaymentGateway, PaypalGateway>(PaymentMethod.Paypal);
 

@@ -1,11 +1,11 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Catalog.AddCategory;
-using L2.Application.UseCases.Catalog.GetCategories;
-using L2.Application.UseCases.Catalog.GetCategory;
-using L2.Application.UseCases.Catalog.GetRemovedCategories;
-using L2.Application.UseCases.Catalog.RemoveCategory;
-using L2.Application.UseCases.Catalog.RestoreCategory;
-using L2.Application.UseCases.Catalog.UpdateCategory;
+using L2.Application.UseCases.Categories.Commands.AddCategory;
+using L2.Application.UseCases.Categories.Commands.RemoveCategory;
+using L2.Application.UseCases.Categories.Commands.RestoreCategory;
+using L2.Application.UseCases.Categories.Commands.UpdateCategory;
+using L2.Application.UseCases.Categories.Queries.GetCategories;
+using L2.Application.UseCases.Categories.Queries.GetCategory;
+using L2.Application.UseCases.Categories.Queries.GetRemovedCategories;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 
@@ -38,8 +38,8 @@ public class CategoryController : DashboardController {
   }
 
   [HttpPut("{id:guid}")]
-  public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCategoryCommand command, CancellationToken ct) {
-    command = command with { Id = id };
+  public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCategoryRequest data, CancellationToken ct) {
+    var command = new UpdateCategoryCommand(id, data);
     await Mediator.Send(command, ct);
     return AppResponse.Success("Danh mục đã được cập nhật");
   }

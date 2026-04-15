@@ -1,0 +1,6 @@
+﻿using System.Text.Json;
+using MediatR;
+
+namespace L2.Application.UseCases.Transactions.Commands.VerifyPayment;
+
+public record VerifyPaymentCommand(Guid Id, JsonElement Payload) : IRequest<bool>;

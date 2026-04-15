@@ -1,15 +1,17 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Auth.ChangePassword;
-using L2.Application.UseCases.Auth.Login;
-using L2.Application.UseCases.Auth.Logout;
-using L2.Application.UseCases.Auth.RefreshAccess;
+using L2.Application.Models;
+using L2.Application.UseCases.Auth.Commands.ChangePassword;
+using L2.Application.UseCases.Auth.Commands.Login;
+using L2.Application.UseCases.Auth.Commands.Logout;
+using L2.Application.UseCases.Auth.Commands.RefreshAccess;
 using Microsoft.AspNetCore.Mvc;
 
 namespace L0.API.Controllers.Admin;
 
 public class AuthController : DashboardController {
   [HttpPost("login")]
-  public async Task<IActionResult> Login([FromBody] LoginCommand command, CancellationToken ct) {
+  public async Task<IActionResult> Login([FromBody] LoginRequest data, CancellationToken ct) {
+    var command = new LoginCommand(data, UserRole.Admin);
     var result = await Mediator.Send(command, ct);
     var tokens = result.Tokens;
 

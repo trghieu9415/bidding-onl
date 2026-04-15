@@ -3,5 +3,8 @@
 namespace L2.Application.Ports.Background;
 
 public interface ITaskQueue {
-  void Queue<T>(Expression<Func<T, Task>> workItem);
+  string Enqueue<T>(Expression<Func<T, Task>> workItem);
+  string Schedule<T>(Expression<Func<T, Task>> workItem, TimeSpan delay);
+  string Schedule<T>(Expression<Func<T, Task>> workItem, DateTimeOffset enqueueAt);
+  bool Delete(string jobId);
 }

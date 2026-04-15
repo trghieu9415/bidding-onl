@@ -1,5 +1,5 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Catalog.GetCategories;
+using L2.Application.UseCases.Categories.Queries.GetCategories;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 

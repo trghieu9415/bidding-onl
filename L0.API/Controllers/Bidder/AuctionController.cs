@@ -1,10 +1,9 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Bidding.GetAuction;
-using L2.Application.UseCases.Bidding.GetBiddingActivity;
-using L2.Application.UseCases.Bidding.GetBidHistory;
-using L2.Application.UseCases.Bidding.GetWonAuctions;
-using L2.Application.UseCases.Bidding.PlaceBid;
-using L2.Application.UseCases.Bidding.Test;
+using L2.Application.UseCases.Auctions.Queries.GetAuction;
+using L2.Application.UseCases.Auctions.Queries.GetWonAuctions;
+using L2.Application.UseCases.Bids.Commands.PlaceBid;
+using L2.Application.UseCases.Bids.Queries.GetBiddingActivity;
+using L2.Application.UseCases.Bids.Queries.GetBidHistory;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 
@@ -41,11 +40,5 @@ public class AuctionController : UserController {
   public async Task<IActionResult> GetMyWins([FromQuery] SieveModel sieveModel, CancellationToken ct) {
     var result = await Mediator.Send(new GetWonAuctionsQuery(sieveModel), ct);
     return AppResponse.Success(result.Auctions, result.Meta);
-  }
-
-  [HttpPost("test")]
-  public async Task<IActionResult> Test([FromBody] TestCommand command, CancellationToken ct) {
-    await Mediator.Send(command, ct);
-    return AppResponse.Success();
   }
 }

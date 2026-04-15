@@ -1,5 +1,5 @@
 ﻿using L0.API.Response;
-using L2.Application.UseCases.Bidding.GetSessions;
+using L2.Application.UseCases.Sessions.Queries.GetSessions;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 

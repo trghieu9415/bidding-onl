@@ -15,8 +15,7 @@ public static class HangfireExtensions {
       .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
       .UseSimpleAssemblyNameTypeSerializer()
       .UseRecommendedSerializerSettings()
-      .UsePostgreSqlStorage(options =>
-        options.UseNpgsqlConnection(connectionString)));
+      .UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString)));
 
     services.AddHangfireServer();
     return services;

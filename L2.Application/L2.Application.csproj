@@ -17,8 +17,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Constants\"/>
+    <Folder Include="UseCases\Auth\Commands\"/>
+    <Folder Include="UseCases\Auth\Queries\"/>
+    <Folder Include="UseCases\Bidders\Commands\"/>
+    <Folder Include="UseCases\Bidders\Queries\"/>
     <Folder Include="UseCases\System\"/>
+    <Folder Include="UseCases\Transactions\Commands\"/>
+    <Folder Include="UseCases\Transactions\Queries\"/>
   </ItemGroup>
 
 </Project>

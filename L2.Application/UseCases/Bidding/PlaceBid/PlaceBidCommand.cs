@@ -1,8 +1,0 @@
-using L2.Application.Abstractions;
-
-namespace L2.Application.UseCases.Bidding.PlaceBid;
-
-public record PlaceBidCommand(Guid AuctionId, decimal Amount) : ICommand<Guid>, ILockable {
-  public string LockKey => $"locks:auction:{AuctionId}";
-  public TimeSpan WaitTime => TimeSpan.FromSeconds(5);
-}

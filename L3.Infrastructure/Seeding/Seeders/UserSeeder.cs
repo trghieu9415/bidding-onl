@@ -1,6 +1,6 @@
 ﻿using Bogus;
 using L2.Application.Models;
-using L3.Infrastructure.Identity;
+using L3.Infrastructure.Persistence.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
