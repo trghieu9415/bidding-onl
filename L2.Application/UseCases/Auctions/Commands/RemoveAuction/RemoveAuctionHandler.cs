@@ -5,9 +5,9 @@ using MediatR;
 namespace L2.Application.UseCases.Auctions.Commands.RemoveAuction;
 
 public class RemoveAuctionHandler(IRepository<Auction> repository)
-  : IRequestHandler<RemoveAuctionCommand, Unit> {
-  public async Task<Unit> Handle(RemoveAuctionCommand request, CancellationToken ct) {
+  : IRequestHandler<RemoveAuctionCommand, bool> {
+  public async Task<bool> Handle(RemoveAuctionCommand request, CancellationToken ct) {
     await repository.DeleteAsync(request.Id, true, ct);
-    return Unit.Value;
+    return true;
   }
 }

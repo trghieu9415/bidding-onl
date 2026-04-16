@@ -5,9 +5,9 @@ namespace L2.Application.UseCases.Auth.Commands.Logout;
 
 public class LogoutHandler(
   IAuthService authService
-) : IRequestHandler<LogoutCommand, Unit> {
-  public async Task<Unit> Handle(LogoutCommand request, CancellationToken ct) {
+) : IRequestHandler<LogoutCommand, bool> {
+  public async Task<bool> Handle(LogoutCommand request, CancellationToken ct) {
     await authService.LogoutAsync(request.RefreshToken, request.AllDevices, ct);
-    return Unit.Value;
+    return true;
   }
 }

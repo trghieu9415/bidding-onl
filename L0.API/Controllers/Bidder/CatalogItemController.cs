@@ -1,6 +1,6 @@
 ﻿using L0.API.Response;
+using L2.Application.DTOs;
 using L2.Application.UseCases.Items.Commands.RegisterItem;
-using L2.Application.UseCases.Items.Commands.SearchItem;
 using L2.Application.UseCases.Items.Commands.UpdateRegisteredItem;
 using L2.Application.UseCases.Items.Queries.GetRegisteredItems;
 using Microsoft.AspNetCore.Mvc;
@@ -10,30 +10,27 @@ namespace L0.API.Controllers.Bidder;
 
 public class CatalogItemController : UserController {
   [HttpGet("my-items")]
+  [ProducesSuccess<List<CatalogItemDto>>]
   public async Task<IActionResult> GetMyItems([FromQuery] SieveModel sieveModel, CancellationToken ct) {
     var result = await Mediator.Send(new GetRegisteredItemsQuery(sieveModel), ct);
-    return AppResponse.Success(result.Items, result.Meta);
+    return ApiResponse.Success(result.Items, result.Meta);
   }
 
   [HttpPost("register")]
+  [ProducesSuccess<IdData>]
   public async Task<IActionResult> RegisterItem([FromBody] RegisterItemCommand command, CancellationToken ct) {
     var id = await Mediator.Send(command, ct);
-    return AppResponse.Success(id, "Sản phẩm đã được gửi, vui lòng chờ Admin phê duyệt");
+    return ApiResponse.Success(id, "Sản phẩm đã được gửi, vui lòng chờ Admin phê duyệt");
   }
 
   [HttpPut("{id:guid}")]
+  [ProducesSuccess<bool>]
   public async Task<IActionResult> UpdateItem(
-    Guid id, [FromBody] UpdateRegisteredItemCommand command,
+    Guid id, [FromBody] UpdateRegisteredItemRequest req,
     CancellationToken ct
   ) {
-    command = command with { Id = id };
+    var command = new UpdateRegisteredItemCommand(id, req);
     await Mediator.Send(command, ct);
-    return AppResponse.Success("Cập nhật thông tin sản phẩm thành công");
-  }
-
-  [HttpGet("search")]
-  public async Task<IActionResult> Search([FromQuery] SearchItemQuery query, CancellationToken ct) {
-    var result = await Mediator.Send(query, ct);
-    return AppResponse.Success(result.Items, result.Meta);
+    return ApiResponse.Success("Cập nhật thông tin sản phẩm thành công");
   }
 }

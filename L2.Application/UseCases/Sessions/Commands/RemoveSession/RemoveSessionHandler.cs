@@ -5,9 +5,9 @@ using MediatR;
 namespace L2.Application.UseCases.Sessions.Commands.RemoveSession;
 
 public class RemoveSessionHandler(IRepository<AuctionSession> repository)
-  : IRequestHandler<RemoveSessionCommand, Unit> {
-  public async Task<Unit> Handle(RemoveSessionCommand request, CancellationToken ct) {
+  : IRequestHandler<RemoveSessionCommand, bool> {
+  public async Task<bool> Handle(RemoveSessionCommand request, CancellationToken ct) {
     await repository.DeleteAsync(request.Id, true, ct);
-    return Unit.Value;
+    return true;
   }
 }

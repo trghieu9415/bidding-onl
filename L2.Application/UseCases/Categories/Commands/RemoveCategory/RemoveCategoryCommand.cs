@@ -3,4 +3,4 @@ using MediatR;
 
 namespace L2.Application.UseCases.Categories.Commands.RemoveCategory;
 
-public record RemoveCategoryCommand(Guid Id) : IRequest<Unit>, ITransactional;
+public record RemoveCategoryCommand(Guid Id) : IRequest<bool>, ITransactional;

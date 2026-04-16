@@ -10,6 +10,7 @@ public class Order : AggregateRoot {
   private Order() {}
   public Guid BidderId { get; private set; }
   public string BidderName { get; private set; } = null!;
+  public string BidderEmail { get; private set; } = null!;
   public Guid AuctionId { get; private set; }
   public Guid CatalogId { get; private set; }
   public string CatalogName { get; private set; } = null!;
@@ -20,7 +21,7 @@ public class Order : AggregateRoot {
   public decimal Price { get; private set; }
 
   public static Order Create(
-    Guid customerId, string customerName,
+    Guid customerId, string customerName, string customerEmail,
     Guid auctionId, Guid catalogId,
     string catalogName, string catalogImage,
     Address shippingAddress
@@ -28,6 +29,7 @@ public class Order : AggregateRoot {
     var order = new Order {
       BidderId = customerId,
       BidderName = customerName,
+      BidderEmail = customerEmail,
       AuctionId = auctionId,
       CatalogId = catalogId,
       CatalogName = catalogName,

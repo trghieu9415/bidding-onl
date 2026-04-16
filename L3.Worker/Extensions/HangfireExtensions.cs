@@ -1,5 +1,7 @@
 ﻿using Hangfire;
 using Hangfire.PostgreSql;
+using L2.Application.Ports.Background;
+using L3.Worker.Adapters.Background;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +20,8 @@ public static class HangfireExtensions {
       .UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString)));
 
     services.AddHangfireServer();
+    services.AddHostedService<HangfireBootstrapper>();
+    services.AddSingleton<ITaskQueue, HangfireTaskQueue>();
     return services;
   }
 }

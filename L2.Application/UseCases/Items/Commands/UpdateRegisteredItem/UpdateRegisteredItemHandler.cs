@@ -10,8 +10,8 @@ namespace L2.Application.UseCases.Items.Commands.UpdateRegisteredItem;
 public class UpdateRegisteredItemHandler(
   IRepository<CatalogItem> repository,
   ICurrentUser currentUser
-) : IRequestHandler<UpdateRegisteredItemCommand, Unit> {
-  public async Task<Unit> Handle(UpdateRegisteredItemCommand request, CancellationToken ct) {
+) : IRequestHandler<UpdateRegisteredItemCommand, bool> {
+  public async Task<bool> Handle(UpdateRegisteredItemCommand request, CancellationToken ct) {
     var item = await repository.GetByIdAsync(request.Id, ct)
                ?? throw new WorkflowException("Sản phẩm không tồn tại", 404);
 
@@ -44,6 +44,6 @@ public class UpdateRegisteredItemHandler(
     }
 
     await repository.UpdateAsync(item, ct);
-    return Unit.Value;
+    return true;
   }
 }

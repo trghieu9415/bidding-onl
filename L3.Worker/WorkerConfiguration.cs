@@ -10,7 +10,6 @@ public static class WorkerConfiguration {
       .AddHangfireInfrastructure(config)
       .AddCustomMassTransit();
 
-    services.AddHostedService<HangfireBootstrapper>();
     return services;
   }
 }

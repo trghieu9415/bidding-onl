@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using L0.API.Adapters.Security;
+using L0.API.Response;
 using L2.Application.Ports.Security;
 using L3.Infrastructure.Options;
 using L3.Infrastructure.Services;
@@ -36,7 +37,8 @@ public static class SecurityExtensions {
         if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(tokenStamp) ||
             !Guid.TryParse(userId, out var userGuid) ||
             !await auth.ValidateSecurityStampAsync(userGuid, tokenStamp, context.HttpContext.RequestAborted)) {
-          context.Fail("Unauthorized");
+          var result = ApiResponse.Fail("Token không hợp lệ hoặc đã bị thu hồi do thay đổi mật khẩu.", 401);
+          await context.Response.WriteAsJsonAsync(result.Value);
         }
       },
       OnMessageReceived = context => {

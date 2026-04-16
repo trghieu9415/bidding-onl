@@ -15,6 +15,10 @@ builder.Services.AddInfrastructure(builder.Configuration);
 // --- Worker ---
 builder.Services.AddWorker(builder.Configuration);
 
+// --- Global Exception Handler ---
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 // --- Presentation Extension ---
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddWebApiDefaults();
@@ -44,9 +48,6 @@ if (args.Contains("--seeding")) {
   return;
 }
 
-// --- Global Exception Handler ---
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
 
 // --- Custom Middlewares ---
 app.UseHttpsRedirection();

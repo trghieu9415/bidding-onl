@@ -3,7 +3,7 @@
 namespace L0.API.Response;
 
 public record ResponseData<T> {
-  public int? Status { get; init; }
+  public int Status { get; init; }
   public string? Message { get; init; }
   public string? Error { get; init; }
   public T? Data { get; init; }

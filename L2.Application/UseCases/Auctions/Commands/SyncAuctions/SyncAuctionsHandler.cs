@@ -8,8 +8,8 @@ namespace L2.Application.UseCases.Auctions.Commands.SyncAuctions;
 public class SyncAuctionsHandler(
   IRepository<AuctionSession> sessionRepo,
   IRepository<Auction> auctionRepo
-) : IRequestHandler<SyncAuctionsCommand, Unit> {
-  public async Task<Unit> Handle(SyncAuctionsCommand request, CancellationToken ct) {
+) : IRequestHandler<SyncAuctionsCommand, bool> {
+  public async Task<bool> Handle(SyncAuctionsCommand request, CancellationToken ct) {
     var session = await sessionRepo.GetByIdAsync(request.Id, ct)
                   ?? throw new WorkflowException("Phiên không tồn tại", 404);
 
@@ -20,6 +20,6 @@ public class SyncAuctionsHandler(
 
     session.SyncAuctions(request.AuctionIds);
     await sessionRepo.UpdateAsync(session, ct);
-    return Unit.Value;
+    return true;
   }
 }

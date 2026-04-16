@@ -8,8 +8,8 @@ namespace L2.Application.UseCases.System.StartSession;
 public class StartSessionHandler(
   IRepository<AuctionSession> sessionRepo,
   IRepository<Auction> auctionRepo
-) : IRequestHandler<StartSessionCommand, Unit> {
-  public async Task<Unit> Handle(StartSessionCommand request, CancellationToken ct) {
+) : IRequestHandler<StartSessionCommand, bool> {
+  public async Task<bool> Handle(StartSessionCommand request, CancellationToken ct) {
     var session = await sessionRepo.GetByIdAsync(request.Id, ct)
                   ?? throw new WorkflowException("Không tìm thấy phiên đấu giá để bắt đầu", 404);
 
@@ -22,6 +22,6 @@ public class StartSessionHandler(
       await auctionRepo.UpdateAsync(auction, ct);
     }
 
-    return Unit.Value;
+    return true;
   }
 }

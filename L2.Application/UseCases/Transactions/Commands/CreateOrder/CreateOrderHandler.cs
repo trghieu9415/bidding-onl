@@ -43,6 +43,7 @@ public class CreateOrderHandler(
     var newOrder = Order.Create(
       currentUser.Id,
       currentUser.FullName,
+      currentUser.Email,
       auction.Id,
       auction.CatalogItemId,
       item.Name,

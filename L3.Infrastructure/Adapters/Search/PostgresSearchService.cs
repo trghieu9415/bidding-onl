@@ -25,10 +25,7 @@ public class PostgresSearchService(AppDbContext context) : ISearchService {
       .Join(context.Set<AuctionSession>(),
         aS => aS.auction.SessionId, s => s.Id,
         (temp, session) => new { temp.auction, temp.item, session })
-      .Where(x =>
-        !x.auction.IsDeleted && !x.item.IsDeleted &&
-        !x.session.IsDeleted && x.session.AuctionIds.Contains(x.auction.Id)
-      );
+      .Where(x => !x.auction.IsDeleted && !x.item.IsDeleted && !x.session.IsDeleted);
 
     // Query Filter
     query = query
@@ -42,7 +39,6 @@ public class PostgresSearchService(AppDbContext context) : ISearchService {
       .WhereIf(req.ToDate.HasValue, x => x.session.TimeFrame.EndTime <= req.ToDate);
 
     var total = await query.CountAsync(ct);
-
     var results = await query
       .OrderByDescending(x => x.session.TimeFrame.StartTime)
       .Skip((req.Page - 1) * req.PageSize)

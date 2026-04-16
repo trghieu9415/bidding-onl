@@ -8,8 +8,8 @@ namespace L2.Application.UseCases.System.EndSession;
 public class EndSessionHandler(
   IRepository<AuctionSession> sessionRepo,
   IRepository<Auction> auctionRepo
-) : IRequestHandler<EndSessionCommand, Unit> {
-  public async Task<Unit> Handle(EndSessionCommand request, CancellationToken ct) {
+) : IRequestHandler<EndSessionCommand, bool> {
+  public async Task<bool> Handle(EndSessionCommand request, CancellationToken ct) {
     var session = await sessionRepo.GetByIdAsync(request.Id, ct)
                   ?? throw new WorkflowException("Không tìm thấy phiên đấu giá để kết thúc", 404);
 
@@ -26,6 +26,6 @@ public class EndSessionHandler(
       await auctionRepo.UpdateAsync(auction, ct);
     }
 
-    return Unit.Value;
+    return true;
   }
 }

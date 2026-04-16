@@ -6,16 +6,17 @@ using MediatR;
 namespace L2.Application.UseCases.Auctions.Commands.UpdateAuction;
 
 public class UpdateAuctionHandler(IRepository<Auction> repository)
-  : IRequestHandler<UpdateAuctionCommand, Unit> {
-  public async Task<Unit> Handle(UpdateAuctionCommand request, CancellationToken ct) {
-    var auction = await repository.GetByIdAsync(request.Id, ct)
-                  ?? throw new WorkflowException("Không tìm thấy đấu giá", 404);
+  : IRequestHandler<UpdateAuctionCommand, bool> {
+  public async Task<bool> Handle(UpdateAuctionCommand request, CancellationToken ct) {
+    var auction =
+      await repository.GetByIdAsync(request.Id, ct)
+      ?? throw new WorkflowException("Không tìm thấy đấu giá", 404);
 
     var data = request.Data;
 
     auction.UpdateRules(data.StepPrice, data.ReservePrice);
 
     await repository.UpdateAsync(auction, ct);
-    return Unit.Value;
+    return true;
   }
 }

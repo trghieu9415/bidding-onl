@@ -10,6 +10,7 @@ namespace L0.API.Controllers.Admin;
 
 public class AuthController : DashboardController {
   [HttpPost("login")]
+  [ProducesSuccess<TokenModel>]
   public async Task<IActionResult> Login([FromBody] LoginRequest data, CancellationToken ct) {
     var command = new LoginCommand(data, UserRole.Admin);
     var result = await Mediator.Send(command, ct);
@@ -23,16 +24,18 @@ public class AuthController : DashboardController {
     };
 
     Response.Cookies.Append("Refresh", tokens.Refresh.Token, cookieOptions);
-    return AppResponse.Success(tokens.Access, "Đăng nhập thành công");
+    return ApiResponse.Success(tokens.Access, "Đăng nhập thành công");
   }
 
   [HttpPatch("change-password")]
+  [ProducesSuccess<bool>]
   public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command, CancellationToken ct) {
     await Mediator.Send(command, ct);
-    return AppResponse.Success("Đổi mật khẩu thành công");
+    return ApiResponse.Success("Đổi mật khẩu thành công");
   }
 
   [HttpPost("refresh")]
+  [ProducesSuccess<TokenModel>]
   public async Task<IActionResult> Refresh(CancellationToken ct) {
     var command = new RefreshAccessCommand(Request.Cookies["Refresh"] ?? string.Empty);
     var result = await Mediator.Send(command, ct);
@@ -46,12 +49,13 @@ public class AuthController : DashboardController {
     };
 
     Response.Cookies.Append("Refresh", tokens.Refresh.Token, cookieOptions);
-    return AppResponse.Success(tokens.Access, "Làm mới thành công");
+    return ApiResponse.Success(tokens.Access, "Làm mới thành công");
   }
 
   [HttpPost("logout")]
+  [ProducesSuccess<bool>]
   public async Task<IActionResult> Logout([FromBody] LogoutCommand command, CancellationToken ct) {
     await Mediator.Send(command, ct);
-    return AppResponse.Success("Đăng xuất thành công");
+    return ApiResponse.Success("Đăng xuất thành công");
   }
 }

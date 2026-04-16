@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using L0.API.Filters;
 
 namespace L0.API.Extensions;
 
@@ -7,7 +8,9 @@ public static class ApiBehaviorExtensions {
   public static IServiceCollection AddWebApiDefaults(this IServiceCollection services) {
     // --- Controller & JSON Config ---
     services
-      .AddControllers()
+      .AddControllers(options => {
+        options.Filters.Add<ExecutionTimeHeaderFilter>();
+      })
       .ConfigureApiBehaviorOptions(options => {
         options.SuppressModelStateInvalidFilter = true;
       })

@@ -6,8 +6,8 @@ namespace L2.Application.UseCases.Auth.Commands.ChangePassword;
 public class ChangePasswordHandler(
   IAuthService authService,
   ICurrentUser currentUser
-) : IRequestHandler<ChangePasswordCommand, Unit> {
-  public async Task<Unit> Handle(ChangePasswordCommand request, CancellationToken ct) {
+) : IRequestHandler<ChangePasswordCommand, bool> {
+  public async Task<bool> Handle(ChangePasswordCommand request, CancellationToken ct) {
     var userId = currentUser.Id;
 
     await authService.ChangePasswordAsync(
@@ -17,6 +17,6 @@ public class ChangePasswordHandler(
       ct
     );
 
-    return Unit.Value;
+    return true;
   }
 }

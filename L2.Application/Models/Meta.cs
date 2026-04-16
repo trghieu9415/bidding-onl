@@ -12,7 +12,7 @@ public record Meta(
   public static Meta Create(int page, int pageSize, int total) {
     page = page < 1 ? 1 : page;
     pageSize = pageSize < 1 ? 1 : pageSize;
-    total = total < 1 ? 1 : total;
+    total = total < 0 ? 0 : total;
 
     var totalPages = (total + pageSize - 1) / pageSize;
 

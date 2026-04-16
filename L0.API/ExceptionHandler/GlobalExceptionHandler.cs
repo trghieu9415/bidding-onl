@@ -41,14 +41,14 @@ public class GlobalExceptionHandler(
     return ex switch {
       InvalidInputException iIEx => (
         422,
-        AppResponse.Fail(
+        ApiResponse.Fail(
           iIEx.Errors,
           iIEx.Errors.FirstOrDefault() ?? "Dữ liệu không hợp lệ", 422).Value!
       ),
-      DomainException dEx => (400, AppResponse.Fail(dEx.Message, 400).Value!),
-      InfrastructureException iEx => (500, AppResponse.Fail(iEx.Message, 500).Value!),
-      WorkflowException wfEx => (wfEx.StatusCode, AppResponse.Fail(wfEx.Message, wfEx.StatusCode).Value!),
-      _ => (500, AppResponse.Fail("Lỗi hệ thống không xác định", 500).Value!)
+      DomainException dEx => (400, ApiResponse.Fail(dEx.Message, 400).Value!),
+      InfrastructureException iEx => (500, ApiResponse.Fail(iEx.Message, 500).Value!),
+      WorkflowException wfEx => (wfEx.StatusCode, ApiResponse.Fail(wfEx.Message, wfEx.StatusCode).Value!),
+      _ => (500, ApiResponse.Fail("Lỗi hệ thống không xác định", 500).Value!)
     };
   }
 }

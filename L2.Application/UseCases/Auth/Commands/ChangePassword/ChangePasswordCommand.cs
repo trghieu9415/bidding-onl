@@ -3,4 +3,4 @@ using MediatR;
 
 namespace L2.Application.UseCases.Auth.Commands.ChangePassword;
 
-public record ChangePasswordCommand(string OldPassword, string NewPassword) : IRequest<Unit>, ITransactional;
+public record ChangePasswordCommand(string OldPassword, string NewPassword) : IRequest<bool>, ITransactional;

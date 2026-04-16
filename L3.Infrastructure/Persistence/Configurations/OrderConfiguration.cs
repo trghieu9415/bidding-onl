@@ -11,6 +11,9 @@ public class OrderConfiguration : BaseConfiguration<Order> {
       .IsRequired()
       .HasMaxLength(200);
 
+    builder.Property(o => o.BidderEmail)
+      .IsRequired();
+
     builder.Property(o => o.CatalogName)
       .IsRequired()
       .HasMaxLength(500);

@@ -3,4 +3,4 @@ using MediatR;
 
 namespace L2.Application.UseCases.Auth.Commands.RequestPassword;
 
-public record RequestPasswordCommand(string Email) : IRequest<Unit>, ITransactional;
+public record RequestPasswordCommand(string Email) : IRequest<bool>, ITransactional;

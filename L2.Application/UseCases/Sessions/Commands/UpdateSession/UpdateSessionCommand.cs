@@ -5,7 +5,7 @@ namespace L2.Application.UseCases.Sessions.Commands.UpdateSession;
 
 public record UpdateSessionCommand(
   Guid Id,
-  string Title,
-  DateTime StartTime,
-  DateTime EndTime
-) : IRequest<Unit>, ITransactional;
+  UpdateSessionRequest Data
+) : IRequest<bool>, ITransactional;
+
+public record UpdateSessionRequest(string Title, DateTime StartTime, DateTime EndTime);

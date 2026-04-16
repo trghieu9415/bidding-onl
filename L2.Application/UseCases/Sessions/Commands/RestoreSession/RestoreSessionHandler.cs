@@ -5,9 +5,9 @@ using MediatR;
 namespace L2.Application.UseCases.Sessions.Commands.RestoreSession;
 
 public class RestoreSessionHandler(IRepository<AuctionSession> repository)
-  : IRequestHandler<RestoreSessionCommand, Unit> {
-  public async Task<Unit> Handle(RestoreSessionCommand request, CancellationToken ct) {
+  : IRequestHandler<RestoreSessionCommand, bool> {
+  public async Task<bool> Handle(RestoreSessionCommand request, CancellationToken ct) {
     await repository.RestoreAsync(request.Id, ct);
-    return Unit.Value;
+    return true;
   }
 }

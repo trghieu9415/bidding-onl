@@ -4,7 +4,7 @@ using MediatR;
 
 namespace L2.Application.UseCases.System.AssignWinner;
 
-public record AssignWinnerCommand(Guid CatalogItemId, bool IsSold) : IRequest<Unit>, ITransactional;
+public record AssignWinnerCommand(Guid CatalogItemId, bool IsSold) : IRequest<bool>, ITransactional;
 
 public class AssignWinnerValidator : AbstractValidator<AssignWinnerCommand> {
   public AssignWinnerValidator() {

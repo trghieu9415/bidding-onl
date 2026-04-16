@@ -3,4 +3,4 @@ using MediatR;
 
 namespace L2.Application.UseCases.System.EndSession;
 
-public record EndSessionCommand(Guid Id) : IRequest<Unit>, ITransactional;
+public record EndSessionCommand(Guid Id) : IRequest<bool>, ITransactional;

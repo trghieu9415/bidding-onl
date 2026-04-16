@@ -4,9 +4,9 @@ using MediatR;
 
 namespace L2.Application.UseCases.Categories.Commands.RestoreCategory;
 
-public class RestoreCategoryHandler(IRepository<Category> repository) : IRequestHandler<RestoreCategoryCommand, Unit> {
-  public async Task<Unit> Handle(RestoreCategoryCommand request, CancellationToken ct) {
+public class RestoreCategoryHandler(IRepository<Category> repository) : IRequestHandler<RestoreCategoryCommand, bool> {
+  public async Task<bool> Handle(RestoreCategoryCommand request, CancellationToken ct) {
     await repository.RestoreAsync(request.Id, ct);
-    return Unit.Value;
+    return true;
   }
 }

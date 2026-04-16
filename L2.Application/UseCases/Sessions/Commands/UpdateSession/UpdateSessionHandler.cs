@@ -6,15 +6,17 @@ using MediatR;
 namespace L2.Application.UseCases.Sessions.Commands.UpdateSession;
 
 public class UpdateSessionHandler(IRepository<AuctionSession> repository)
-  : IRequestHandler<UpdateSessionCommand, Unit> {
-  public async Task<Unit> Handle(UpdateSessionCommand request, CancellationToken ct) {
+  : IRequestHandler<UpdateSessionCommand, bool> {
+  public async Task<bool> Handle(UpdateSessionCommand request, CancellationToken ct) {
     var session = await repository.GetByIdAsync(request.Id, ct)
                   ?? throw new WorkflowException("Không tìm thấy phiên đấu giá", 404);
 
-    session.Update(request.Title)
-      .SetTimeFrame(request.StartTime, request.EndTime);
+    var data = request.Data;
+
+    session.Update(data.Title)
+      .SetTimeFrame(data.StartTime, data.EndTime);
 
     await repository.UpdateAsync(session, ct);
-    return Unit.Value;
+    return true;
   }
 }

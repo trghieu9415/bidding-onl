@@ -7,8 +7,8 @@ namespace L2.Application.UseCases.Sessions.Commands.PublishSession;
 
 public class PublishSessionHandler(
   IRepository<AuctionSession> repository
-) : IRequestHandler<PublishSessionCommand, Unit> {
-  public async Task<Unit> Handle(PublishSessionCommand request, CancellationToken ct) {
+) : IRequestHandler<PublishSessionCommand, bool> {
+  public async Task<bool> Handle(PublishSessionCommand request, CancellationToken ct) {
     var session = await repository.GetByIdAsync(request.Id, ct)
                   ?? throw new WorkflowException("Không tìm thấy phiên", 404);
 
@@ -18,6 +18,6 @@ public class PublishSessionHandler(
 
     session.Publish();
     await repository.UpdateAsync(session, ct);
-    return Unit.Value;
+    return true;
   }
 }

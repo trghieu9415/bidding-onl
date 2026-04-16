@@ -6,13 +6,13 @@ using MediatR;
 namespace L2.Application.UseCases.Items.Commands.RejectItem;
 
 public class RejectItemHandler(IRepository<CatalogItem> repository)
-  : IRequestHandler<RejectItemCommand, Unit> {
-  public async Task<Unit> Handle(RejectItemCommand request, CancellationToken ct) {
+  : IRequestHandler<RejectItemCommand, bool> {
+  public async Task<bool> Handle(RejectItemCommand request, CancellationToken ct) {
     var item = await repository.GetByIdAsync(request.Id, ct)
                ?? throw new WorkflowException("Sản phẩm không tồn tại", 404);
 
-    item.Reject(request.Reason);
+    item.Reject(request.Data.Reason);
     await repository.UpdateAsync(item, ct);
-    return Unit.Value;
+    return true;
   }
 }

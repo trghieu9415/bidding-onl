@@ -6,7 +6,7 @@ namespace L2.Application.UseCases.Auctions.Commands.UpdateAuction;
 public record UpdateAuctionCommand(
   Guid Id,
   UpdateAuctionRequest Data
-) : IRequest<Unit>, ITransactional;
+) : IRequest<bool>, ITransactional;
 
 public record UpdateAuctionRequest(
   decimal StepPrice,

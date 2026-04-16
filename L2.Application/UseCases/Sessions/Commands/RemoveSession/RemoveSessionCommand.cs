@@ -3,4 +3,4 @@ using MediatR;
 
 namespace L2.Application.UseCases.Sessions.Commands.RemoveSession;
 
-public record RemoveSessionCommand(Guid Id) : IRequest<Unit>, ITransactional;
+public record RemoveSessionCommand(Guid Id) : IRequest<bool>, ITransactional;

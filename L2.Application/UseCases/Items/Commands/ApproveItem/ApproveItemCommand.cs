@@ -4,7 +4,7 @@ using MediatR;
 
 namespace L2.Application.UseCases.Items.Commands.ApproveItem;
 
-public record ApproveItemCommand(Guid Id) : IRequest<Unit>, ITransactional;
+public record ApproveItemCommand(Guid Id) : IRequest<bool>, ITransactional;
 
 public class ApproveItemValidator : AbstractValidator<ApproveItemCommand> {
   public ApproveItemValidator() {

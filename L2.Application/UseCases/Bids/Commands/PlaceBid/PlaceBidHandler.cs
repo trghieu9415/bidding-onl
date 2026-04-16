@@ -15,7 +15,7 @@ public class PlaceBidHandler(
       await repository.GetByIdAsync(request.AuctionId, ct)
       ?? throw new WorkflowException("Cuộc đấu giá không tồn tại", 404);
 
-    auction.PlaceBid(currentUser.Id, currentUser.FullName, request.Amount);
+    auction.PlaceBid(currentUser.Id, currentUser.FullName, request.Data.Amount);
 
     await repository.UpdateAsync(auction, ct);
     return auction.Bids.Last().Id;

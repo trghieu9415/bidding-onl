@@ -3,4 +3,4 @@ using MediatR;
 
 namespace L2.Application.UseCases.Categories.Commands.RestoreCategory;
 
-public record RestoreCategoryCommand(Guid Id) : IRequest<Unit>, ITransactional;
+public record RestoreCategoryCommand(Guid Id) : IRequest<bool>, ITransactional;
