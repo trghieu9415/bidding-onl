@@ -3,7 +3,7 @@ using L2.Application.Ports.Configs;
 
 namespace L3.Infrastructure.Options;
 
-public class JwtOptions : IOptionSection {
+public class JwtSettings : IOptionSection {
   [Required(ErrorMessage = "Secret Key là bắt buộc!")]
   [MinLength(32, ErrorMessage = "Secret Key quá ngắn, không an toàn!")]
   public string Secret { get; set; } = string.Empty;

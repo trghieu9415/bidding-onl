@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace L3.Infrastructure.Services;
 
-public class JwtService(JwtOptions jwtOptions) : IJwtService {
+public class JwtService(JwtSettings jwtSettings) : IJwtService {
   public ClaimsPrincipal? ValidateToken(string token) {
     if (string.IsNullOrEmpty(token)) {
       return null;
@@ -16,7 +16,7 @@ public class JwtService(JwtOptions jwtOptions) : IJwtService {
 
     var tokenHandler = new JwtSecurityTokenHandler();
     try {
-      return tokenHandler.ValidateToken(token, GetValidationParameters(jwtOptions), out _);
+      return tokenHandler.ValidateToken(token, GetValidationParameters(jwtSettings), out _);
     } catch {
       return null;
     }
@@ -32,7 +32,7 @@ public class JwtService(JwtOptions jwtOptions) : IJwtService {
       new("token_type", "access"),
       new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
-    return GenerateToken(claims, jwtOptions.AccessExpiration);
+    return GenerateToken(claims, jwtSettings.AccessExpiration);
   }
 
   public TokenModel GenerateRefreshToken(User user) {
@@ -42,15 +42,15 @@ public class JwtService(JwtOptions jwtOptions) : IJwtService {
       new("token_type", "refresh"),
       new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
-    return GenerateToken(claims, jwtOptions.RefreshExpiration);
+    return GenerateToken(claims, jwtSettings.RefreshExpiration);
   }
 
   private TokenModel GenerateToken(IEnumerable<Claim> claims, int expirationMinutes) {
-    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret));
+    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret));
     var expiry = DateTime.UtcNow.AddMinutes(expirationMinutes);
     var token = new JwtSecurityToken(
-      jwtOptions.Issuer,
-      jwtOptions.Audience,
+      jwtSettings.Issuer,
+      jwtSettings.Audience,
       claims,
       expires: expiry,
       signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
@@ -61,14 +61,14 @@ public class JwtService(JwtOptions jwtOptions) : IJwtService {
     };
   }
 
-  public static TokenValidationParameters GetValidationParameters(JwtOptions jwtOptions) {
+  public static TokenValidationParameters GetValidationParameters(JwtSettings jwtSettings) {
     return new TokenValidationParameters {
       ValidateIssuerSigningKey = true,
-      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret)),
+      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
       ValidateIssuer = true,
-      ValidIssuer = jwtOptions.Issuer,
+      ValidIssuer = jwtSettings.Issuer,
       ValidateAudience = true,
-      ValidAudience = jwtOptions.Audience,
+      ValidAudience = jwtSettings.Audience,
       ValidateLifetime = true,
       ClockSkew = TimeSpan.Zero
     };

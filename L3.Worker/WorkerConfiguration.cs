@@ -8,7 +8,7 @@ public static class WorkerConfiguration {
   public static IServiceCollection AddWorker(this IServiceCollection services, IConfiguration config) {
     services
       .AddHangfireInfrastructure(config)
-      .AddCustomMassTransit();
+      .AddCustomMassTransit(config);
 
     return services;
   }

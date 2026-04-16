@@ -3,13 +3,15 @@ using L3.Infrastructure.Options;
 using L3.Infrastructure.Persistence;
 using L3.Worker.Adapters.Notification;
 using MassTransit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace L3.Worker.Extensions;
 
 public static class MassTransitExtensions {
-  public static IServiceCollection AddCustomMassTransit(this IServiceCollection services) {
+  public static IServiceCollection AddCustomMassTransit(this IServiceCollection services, IConfiguration config) {
+    var rabbitMqSettings = config.GetSection(RabbitMqSettings.SectionName).Get<RabbitMqSettings>()!;
+
     services.AddMassTransit(x => {
       x.AddConsumers(typeof(WorkerConfiguration).Assembly);
 
@@ -23,11 +25,9 @@ public static class MassTransitExtensions {
       });
 
       x.UsingRabbitMq((context, cfg) => {
-        var options = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
-
-        cfg.Host(options.Host, options.VirtualHost, h => {
-          h.Username(options.Username);
-          h.Password(options.Password);
+        cfg.Host(rabbitMqSettings.Host, rabbitMqSettings.VirtualHost, h => {
+          h.Username(rabbitMqSettings.Username);
+          h.Password(rabbitMqSettings.Password);
         });
 
         cfg.UsePublishMessageScheduler();

@@ -10,10 +10,9 @@ public static class InfrastructureConfiguration {
       .AddConfigurationOptions(config)
       .AddPostgresPersistence(config)
       .AddIdentityInfrastructure()
-      .AddDistributedInfrastructure()
+      .AddDistributedInfrastructure(config)
       .AddMediatorPipeline()
       .AddExternalServices();
-
 
     return services;
   }

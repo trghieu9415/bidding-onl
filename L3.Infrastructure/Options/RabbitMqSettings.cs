@@ -2,7 +2,7 @@
 
 namespace L3.Infrastructure.Options;
 
-public class RabbitMqOptions : IOptionSection {
+public class RabbitMqSettings : IOptionSection {
   public string Host { get; set; } = "localhost";
   public string VirtualHost { get; set; } = "/";
   public string Username { get; set; } = "guest";

@@ -7,15 +7,20 @@ namespace L0.API.Extensions;
 
 public static class RealtimeExtensions {
   public static IServiceCollection AddSignalRAdapters(this IServiceCollection services, IConfiguration config) {
-    var redisOptions = config.GetSection(RedisOptions.SectionName).Get<RedisOptions>();
+    var redisSettings = config.GetSection(RedisSettings.SectionName).Get<RedisSettings>()!;
 
-    services.AddSignalR()
-      .AddStackExchangeRedis(redisOptions!.Configuration, options => {
-        options.Configuration.ChannelPrefix = RedisChannel.Literal("Realtime_");
+    services
+      .AddSignalR()
+      .AddStackExchangeRedis(options => {
+        var signalRConfig = ConfigurationOptions.Parse(redisSettings.Configuration);
+        signalRConfig.AbortOnConnectFail = false;
+        signalRConfig.ClientName = redisSettings.InstanceRealtimeName;
+        options.Configuration = signalRConfig;
       });
-    services.AddTransient<IAuctionNotifier, SignalRAuctionNotifier>();
-    services.AddTransient<IBidderNotifier, SignalRBidderNotifier>();
-    services.AddTransient<ISellerNotifier, SignalRSellerNotifier>();
+
+    services.AddSingleton<IAuctionNotifier, SignalRAuctionNotifier>();
+    services.AddSingleton<IBidderNotifier, SignalRBidderNotifier>();
+    services.AddSingleton<ISellerNotifier, SignalRSellerNotifier>();
 
     return services;
   }

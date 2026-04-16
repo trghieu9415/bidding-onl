@@ -7,40 +7,45 @@ using L3.Infrastructure.Services;
 using L3.Infrastructure.Services.Abstractions;
 using Medallion.Threading;
 using Medallion.Threading.Redis;
-using Microsoft.Extensions.Caching.StackExchangeRedis;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
 namespace L3.Infrastructure.Extensions;
 
 public static class DistributedExtensions {
-  public static IServiceCollection
-    AddDistributedInfrastructure(this IServiceCollection services) {
-    // Redis Cache
-    services.AddOptions<RedisCacheOptions>()
-      .Configure<IOptions<RedisOptions>>((cacheOptions, redisOptionsRef) => {
-        var redisOptions = redisOptionsRef.Value;
-        cacheOptions.Configuration = redisOptions.Configuration;
-        cacheOptions.InstanceName = redisOptions.InstanceName;
-      });
-    services.AddStackExchangeRedisCache(_ => {});
-    services.AddScoped<ICacheService, RedisCacheService>();
+  public static IServiceCollection AddDistributedInfrastructure(
+    this IServiceCollection services,
+    IConfiguration config
+  ) {
+    var redisSettings = config.GetSection(RedisSettings.SectionName).Get<RedisSettings>()!;
+    var baseConfig = ConfigurationOptions.Parse(redisSettings.Configuration);
+    baseConfig.AbortOnConnectFail = false;
+
+    var lazyCacheConnection = CreateLazyConnection(redisSettings.InstanceName);
+    var lazyLockConnection = CreateLazyConnection(redisSettings.InstanceLockName);
+
+    services.AddStackExchangeRedisCache(cacheOptions => {
+      cacheOptions.InstanceName = redisSettings.InstanceName;
+      cacheOptions.ConnectionMultiplexerFactory = () => Task.FromResult(lazyCacheConnection.Value);
+    });
+
+    services.AddSingleton<IDistributedLockProvider>(_ =>
+      new RedisDistributedSynchronizationProvider(lazyLockConnection.Value.GetDatabase())
+    );
+
+    services.AddSingleton<ICacheService, RedisCacheService>();
+    services.AddSingleton<IDistributedLockService, RedisLockService>();
     services.AddScoped<IBusinessCache, BusinessCache>();
 
-    // Redis Connection (Multiplexer for Locking)
-    services.AddSingleton<IConnectionMultiplexer>(serviceProvider => {
-      var redisOptions = serviceProvider.GetRequiredService<IOptions<RedisOptions>>().Value;
-      return ConnectionMultiplexer.Connect(redisOptions.Configuration);
-    });
-
-    // Distributed Lock (Medallion)
-    services.AddSingleton<IDistributedLockProvider>(serviceProvider => {
-      var connection = serviceProvider.GetRequiredService<IConnectionMultiplexer>();
-      return new RedisDistributedSynchronizationProvider(connection.GetDatabase());
-    });
-    services.AddScoped<IDistributedLockService, RedisLockService>();
-
     return services;
+
+    Lazy<IConnectionMultiplexer> CreateLazyConnection(string clientName) {
+      return new Lazy<IConnectionMultiplexer>(() => {
+        var clonedConfig = baseConfig.Clone();
+        clonedConfig.ClientName = clientName;
+        return ConnectionMultiplexer.Connect(clonedConfig);
+      });
+    }
   }
 }

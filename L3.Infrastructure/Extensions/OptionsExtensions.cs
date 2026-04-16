@@ -12,13 +12,13 @@ public static class OptionsExtensions {
     IConfiguration config
   ) {
     // NOTE: ========== [Options Hạ Tầng] ==========
-    services.RegisterOption<JwtOptions>(config);
-    services.RegisterOption<RedisOptions>(config);
-    services.RegisterOption<EmailOptions>(config);
-    services.RegisterOption<RabbitMqOptions>(config);
-    services.RegisterOption<S3Options>(config);
-    services.RegisterOption<StripeOptions>(config);
-    services.RegisterOption<PayPalOptions>(config);
+    services.RegisterOption<JwtSettings>(config);
+    services.RegisterOption<RedisSettings>(config);
+    services.RegisterOption<EmailSettings>(config);
+    services.RegisterOption<RabbitMqSettings>(config);
+    services.RegisterOption<S3Settings>(config);
+    services.RegisterOption<StripeSettings>(config);
+    services.RegisterOption<PaypalSettings>(config);
 
     return services;
   }

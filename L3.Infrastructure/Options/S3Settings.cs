@@ -2,7 +2,7 @@
 
 namespace L3.Infrastructure.Options;
 
-public class S3Options : IOptionSection {
+public class S3Settings : IOptionSection {
   public string AccessKey { get; set; } = "minioadmin";
   public string SecretKey { get; set; } = "minioadmin";
   public string ServiceUrl { get; set; } = "http://localhost:9000";

@@ -9,16 +9,16 @@ public class S3StorageService : IStorageService {
   private readonly string _bucketName;
   private readonly IAmazonS3 _s3Client;
 
-  public S3StorageService(S3Options s3Options) {
+  public S3StorageService(S3Settings s3Settings) {
     var s3Config = new AmazonS3Config {
-      ServiceURL = s3Options.ServiceUrl,
-      ForcePathStyle = s3Options.ForcePathStyle,
-      MaxErrorRetry = s3Options.Retry,
-      Timeout = TimeSpan.FromSeconds(s3Options.TimeOut)
+      ServiceURL = s3Settings.ServiceUrl,
+      ForcePathStyle = s3Settings.ForcePathStyle,
+      MaxErrorRetry = s3Settings.Retry,
+      Timeout = TimeSpan.FromSeconds(s3Settings.TimeOut)
     };
 
-    _bucketName = s3Options.BucketName;
-    _s3Client = new AmazonS3Client(s3Options.AccessKey, s3Options.SecretKey, s3Config);
+    _bucketName = s3Settings.BucketName;
+    _s3Client = new AmazonS3Client(s3Settings.AccessKey, s3Settings.SecretKey, s3Config);
   }
 
 

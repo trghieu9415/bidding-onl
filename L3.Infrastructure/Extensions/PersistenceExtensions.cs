@@ -6,8 +6,6 @@ using L3.Infrastructure.Persistence.Repositories;
 using L3.Infrastructure.Persistence.Repositories.Read;
 using L3.Infrastructure.Seeding;
 using L3.Infrastructure.Seeding.Seeders;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -22,15 +20,7 @@ public static class PersistenceExtensions {
     dataSourceBuilder.EnableDynamicJson();
 
     services.AddSingleton(dataSourceBuilder.Build());
-    services.AddDbContext<AppDbContext>((serviceProvider, options) => {
-      var dataSource = serviceProvider.GetRequiredService<NpgsqlDataSource>();
-      options.UseNpgsql(dataSource, builder =>
-        builder.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)
-      );
-      options.ConfigureWarnings(warning =>
-        warning.Ignore(RelationalEventId.PendingModelChangesWarning)
-      );
-    });
+    services.AddDbContext<AppDbContext>();
 
     services.AddScoped<IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<AppDbContext>());
 

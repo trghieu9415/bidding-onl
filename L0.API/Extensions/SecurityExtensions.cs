@@ -17,7 +17,7 @@ public static class SecurityExtensions {
 
     services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
       .AddJwtBearer(options => {
-        var jwtOptions = config.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
+        var jwtOptions = config.GetSection(JwtSettings.SectionName).Get<JwtSettings>();
         options.TokenValidationParameters = JwtService.GetValidationParameters(jwtOptions!);
         options.Events = GetEvents();
       });

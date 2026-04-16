@@ -11,9 +11,9 @@ namespace L3.Infrastructure.Adapters.Gateway.Transaction;
 
 public class PaypalGateway : IPaymentGateway {
   private readonly HttpClient _client;
-  private readonly PayPalOptions _options;
+  private readonly PaypalSettings _options;
 
-  public PaypalGateway(PayPalOptions options, IHttpClientFactory clientFactory) {
+  public PaypalGateway(PaypalSettings options, IHttpClientFactory clientFactory) {
     _options = options;
     _client = clientFactory.CreateClient(nameof(PaypalGateway));
 

@@ -6,8 +6,13 @@ namespace L3.Infrastructure.Services;
 
 public class RedisCacheService(IDistributedCache cache) : ICacheService {
   public async Task<T?> GetAsync<T>(string key, CancellationToken ct = default) {
-    var cachedData = await cache.GetStringAsync(key, ct);
-    return string.IsNullOrEmpty(cachedData) ? default : JsonSerializer.Deserialize<T>(cachedData);
+    var cachedBytes = await cache.GetAsync(key, ct);
+
+    if (cachedBytes == null || cachedBytes.Length == 0) {
+      return default;
+    }
+
+    return JsonSerializer.Deserialize<T>(cachedBytes);
   }
 
   public async Task SetAsync<T>(string key, T value, TimeSpan? expiration = null, CancellationToken ct = default) {
@@ -15,8 +20,8 @@ public class RedisCacheService(IDistributedCache cache) : ICacheService {
       AbsoluteExpirationRelativeToNow = expiration ?? TimeSpan.FromMinutes(60)
     };
 
-    var jsonData = JsonSerializer.Serialize(value);
-    await cache.SetStringAsync(key, jsonData, options, ct);
+    var jsonBytes = JsonSerializer.SerializeToUtf8Bytes(value);
+    await cache.SetAsync(key, jsonBytes, options, ct);
   }
 
   public async Task BlacklistAsync(string jti, TimeSpan duration, CancellationToken ct = default) {

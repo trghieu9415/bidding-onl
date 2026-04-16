@@ -2,7 +2,7 @@
 
 namespace L3.Infrastructure.Options;
 
-public class StripeOptions : IOptionSection {
+public class StripeSettings : IOptionSection {
   public string SecretKey { get; set; } = string.Empty;
   public string PublishableKey { get; set; } = string.Empty;
   public int Retry { get; set; } = 3;

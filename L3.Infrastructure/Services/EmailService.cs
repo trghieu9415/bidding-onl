@@ -8,7 +8,7 @@ using MimeKit;
 namespace L3.Infrastructure.Services;
 
 public class EmailService(
-  EmailOptions options,
+  EmailSettings settings,
   ILogger<EmailService> logger
 ) : IEmailService {
   public async Task SendOrderConfirmationEmailAsync(string email, string orderId, CancellationToken ct = default) {
@@ -25,7 +25,7 @@ public class EmailService(
   public async Task SendResetPasswordEmailAsync(string email, string token, CancellationToken ct = default) {
     const string subject = "[Movie Online] Khôi phục mật khẩu của bạn";
 
-    var resetLink = $"{options.FrontEndUrl}?token={token}&email={email}";
+    var resetLink = $"{settings.FrontEndUrl}?token={token}&email={email}";
 
     var placeholders = new Dictionary<string, string> {
       { "ResetLink", resetLink }
@@ -50,7 +50,7 @@ public class EmailService(
   private async Task SendEmailAsync(string email, string subject, string htmlBody, CancellationToken ct = default) {
     try {
       var message = new MimeMessage();
-      message.From.Add(new MailboxAddress(options.FromName, options.FromAddress));
+      message.From.Add(new MailboxAddress(settings.FromName, settings.FromAddress));
       message.To.Add(MailboxAddress.Parse(email));
       message.Subject = subject;
 
@@ -59,11 +59,11 @@ public class EmailService(
       using var client = new SmtpClient();
       client.ServerCertificateValidationCallback = (_, _, _, _) => true;
 
-      await client.ConnectAsync(options.Host, options.Port,
-        options.EnableSsl ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.Auto, ct);
+      await client.ConnectAsync(settings.Host, settings.Port,
+        settings.EnableSsl ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.Auto, ct);
 
-      if (!string.IsNullOrEmpty(options.Username)) {
-        await client.AuthenticateAsync(options.Username, options.Password, ct);
+      if (!string.IsNullOrEmpty(settings.Username)) {
+        await client.AuthenticateAsync(settings.Username, settings.Password, ct);
       }
 
       await client.SendAsync(message, ct);
