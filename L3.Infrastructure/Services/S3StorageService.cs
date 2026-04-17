@@ -40,7 +40,7 @@ public class S3StorageService : IStorageService {
     return publicUrl;
   }
 
-  public async Task DeleteAsync(string fileName, string folder, CancellationToken ct) {
+  public async Task<bool> DeleteAsync(string fileName, string folder, CancellationToken ct) {
     var key = string.IsNullOrEmpty(folder) ? fileName : $"{folder}/{fileName}";
 
     var deleteRequest = new DeleteObjectRequest {
@@ -49,6 +49,7 @@ public class S3StorageService : IStorageService {
     };
 
     await _s3Client.DeleteObjectAsync(deleteRequest, ct);
+    return true;
   }
 
   public async Task<List<string>> ListFilesAsync(string folder, CancellationToken ct = default) {

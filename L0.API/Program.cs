@@ -20,11 +20,13 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 // --- Presentation Extension ---
-builder.Services.AddJwtAuthentication(builder.Configuration);
-builder.Services.AddWebApiDefaults();
-builder.Services.AddSwaggerDocument();
-builder.Services.AddSignalRAdapters(builder.Configuration);
 builder.AddSerilogCustom();
+builder.Services
+  .AddJwtAuthentication(builder.Configuration)
+  .AddWebApiDefaults()
+  .AddSwaggerDocument()
+  .AddSignalRAdapters(builder.Configuration)
+  .AddAppRateLimiter(builder.Configuration);
 
 // --- Http Context ---
 builder.Services.AddHttpContextAccessor();
@@ -48,7 +50,6 @@ if (args.Contains("--seeding")) {
   return;
 }
 
-
 // --- Custom Middlewares ---
 app.UseHttpsRedirection();
 
@@ -69,6 +70,9 @@ app.UseExceptionHandler();
 // --- Allow Static Files ---
 app.UseStaticFiles();
 
+// --- Routing ---
+app.UseRouting();
+
 // --- CORS ---
 // TODO: In production, restrict CORS to known frontend domains using .WithOrigins(...).
 app.UseCors(options => options
@@ -77,7 +81,10 @@ app.UseCors(options => options
   .SetIsOriginAllowed(_ => true)
   .AllowCredentials());
 
-// --- Authentication & Authorization ---
+// --- Rate Limit ---
+app.UseRateLimiter();
+
+// --- Auth ---
 app.UseAuthentication();
 app.UseAuthorization();
 

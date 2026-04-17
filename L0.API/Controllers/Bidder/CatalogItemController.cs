@@ -4,6 +4,7 @@ using L2.Application.UseCases.Items.Commands.RegisterItem;
 using L2.Application.UseCases.Items.Commands.UpdateRegisteredItem;
 using L2.Application.UseCases.Items.Queries.GetRegisteredItems;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Sieve.Models;
 
 namespace L0.API.Controllers.Bidder;
@@ -25,12 +26,13 @@ public class CatalogItemController : UserController {
 
   [HttpPut("{id:guid}")]
   [ProducesSuccess<bool>]
+  [EnableRateLimiting("CheckoutPolicy")]
   public async Task<IActionResult> UpdateItem(
     Guid id, [FromBody] UpdateRegisteredItemRequest req,
     CancellationToken ct
   ) {
     var command = new UpdateRegisteredItemCommand(id, req);
-    await Mediator.Send(command, ct);
-    return ApiResponse.Success("Cập nhật thông tin sản phẩm thành công");
+    var result = await Mediator.Send(command, ct);
+    return ApiResponse.Success(result, "Cập nhật thông tin sản phẩm thành công");
   }
 }

@@ -55,8 +55,7 @@ public class PaypalGateway : IPaymentGateway {
 
     var content = new StringContent(
       JsonSerializer.Serialize(orderRequest),
-      Encoding.UTF8,
-      "application/json"
+      Encoding.UTF8, "application/json"
     );
     var response = await _client.PostAsync("/v2/checkout/orders", content, ct);
 
@@ -88,8 +87,7 @@ public class PaypalGateway : IPaymentGateway {
       var content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
       var response = await _client.PostAsync(
         $"/v2/checkout/orders/{paypalPayload.Token}/capture",
-        content,
-        ct
+        content, ct
       );
 
       if (!response.IsSuccessStatusCode) {

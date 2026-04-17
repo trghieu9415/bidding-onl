@@ -27,20 +27,6 @@ public static class SecurityExtensions {
 
   private static JwtBearerEvents GetEvents() {
     return new JwtBearerEvents {
-      OnTokenValidated = async context => {
-        var auth = context.HttpContext.RequestServices.GetRequiredService<IAuthService>();
-        var claims = context.Principal;
-
-        var userId = claims?.FindFirstValue(ClaimTypes.NameIdentifier);
-        var tokenStamp = claims?.FindFirstValue("security_stamp");
-
-        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(tokenStamp) ||
-            !Guid.TryParse(userId, out var userGuid) ||
-            !await auth.ValidateSecurityStampAsync(userGuid, tokenStamp, context.HttpContext.RequestAborted)) {
-          var result = ApiResponse.Fail("Token không hợp lệ hoặc đã bị thu hồi do thay đổi mật khẩu.", 401);
-          await context.Response.WriteAsJsonAsync(result.Value);
-        }
-      },
       OnMessageReceived = context => {
         var accessToken = context.Request.Query["access_token"];
         if (
@@ -51,6 +37,31 @@ public static class SecurityExtensions {
         }
 
         return Task.CompletedTask;
+      },
+      OnTokenValidated = async context => {
+        var auth = context.HttpContext.RequestServices.GetRequiredService<IAuthService>();
+        var claims = context.Principal;
+
+        var userId = claims?.FindFirstValue(ClaimTypes.NameIdentifier);
+        var tokenStamp = claims?.FindFirstValue("security_stamp");
+
+        if (
+          string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(tokenStamp) ||
+          !Guid.TryParse(userId, out var userGuid) ||
+          !await auth.ValidateSecurityStampAsync(userGuid, tokenStamp, context.HttpContext.RequestAborted)
+        ) {
+          context.Fail("Token không hợp lệ hoặc đã bị thu hồi do thay đổi mật khẩu.");
+        }
+      },
+      OnChallenge = async context => {
+        context.HandleResponse();
+        context.Response.StatusCode = 401;
+        context.Response.ContentType = "application/json";
+
+        var errorMsg = context.ErrorDescription ?? "Bạn không có quyền truy cập.";
+        var result = ApiResponse.Fail(errorMsg, 401);
+
+        await context.Response.WriteAsJsonAsync(result.Value);
       }
     };
   }

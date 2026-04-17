@@ -1,0 +1,21 @@
+﻿services:
+  mail_local:
+    image: axllent/mailpit:v1.29
+    container_name: bid_mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    restart: unless-stopped
+    environment:
+      - MP_DATA_FILE=/data/mailpit.db
+    volumes:
+      - ./.volumes/mailpit_data:/data
+
+  stripe_listener:
+    image: stripe/stripe-cli:latest
+    container_name: bid_stripe_listener
+    command: >
+      listen --api-key ${STRIPE_SECRET_KEY}
+      --forward-to http://host.docker.internal:5202/api/webhooks/stripe
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

@@ -38,15 +38,15 @@ public class AuctionController : DashboardController {
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Update(Guid id, [FromBody] UpdateAuctionCommand command, CancellationToken ct) {
     command = command with { Id = id };
-    await Mediator.Send(command, ct);
-    return ApiResponse.Success("Cập nhật thông tin đấu giá thành công");
+    var result = await Mediator.Send(command, ct);
+    return ApiResponse.Success(result, "Cập nhật thông tin đấu giá thành công");
   }
 
   [HttpDelete("{id:guid}")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Delete(Guid id, CancellationToken ct) {
-    await Mediator.Send(new RemoveAuctionCommand(id), ct);
-    return ApiResponse.Success("Đã xóa cuộc đấu giá");
+    var result = await Mediator.Send(new RemoveAuctionCommand(id), ct);
+    return ApiResponse.Success(result, "Đã xóa cuộc đấu giá");
   }
 
   [HttpGet("removed")]
@@ -59,7 +59,7 @@ public class AuctionController : DashboardController {
   [HttpPatch("{id:guid}/restore")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Restore(Guid id, CancellationToken ct) {
-    await Mediator.Send(new RestoreAuctionCommand(id), ct);
-    return ApiResponse.Success("Cuộc đấu giá đã được khôi phục");
+    var result = await Mediator.Send(new RestoreAuctionCommand(id), ct);
+    return ApiResponse.Success(result, "Cuộc đấu giá đã được khôi phục");
   }
 }

@@ -30,8 +30,8 @@ public class AuthController : DashboardController {
   [HttpPatch("change-password")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command, CancellationToken ct) {
-    await Mediator.Send(command, ct);
-    return ApiResponse.Success("Đổi mật khẩu thành công");
+    var result = await Mediator.Send(command, ct);
+    return ApiResponse.Success(result, "Đổi mật khẩu thành công");
   }
 
   [HttpPost("refresh")]
@@ -55,7 +55,7 @@ public class AuthController : DashboardController {
   [HttpPost("logout")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Logout([FromBody] LogoutCommand command, CancellationToken ct) {
-    await Mediator.Send(command, ct);
-    return ApiResponse.Success("Đăng xuất thành công");
+    var result = await Mediator.Send(command, ct);
+    return ApiResponse.Success(result, "Đăng xuất thành công");
   }
 }

@@ -19,6 +19,7 @@ public static class OptionsExtensions {
     services.RegisterOption<S3Settings>(config);
     services.RegisterOption<StripeSettings>(config);
     services.RegisterOption<PaypalSettings>(config);
+    services.RegisterOption<RateLimitSettings>(config);
 
     return services;
   }

@@ -15,7 +15,7 @@ namespace L3.Infrastructure.Adapters.Security;
 public class AuthService(
   UserManager<AppUser> userManager,
   IJwtService jwtService,
-  ICacheService cache,
+  ISecurityService securityService,
   ITaskQueue queue
 ) : IAuthService {
   public async Task<AuthTokens> LoginAsync(string email, string password, UserRole role, CancellationToken ct) {
@@ -34,7 +34,7 @@ public class AuthService(
       throw new WorkflowException("Tài khoản đang bị khóa. Vui lòng liên hệ Admin.", 403);
     }
 
-    await cache.SyncSecurityStampAsync(user.Id, user.SecurityStamp!, ct);
+    await securityService.SyncSecurityStampAsync(user.Id, user.SecurityStamp!, ct);
     return CreateAuthTokens(user);
   }
 
@@ -58,7 +58,7 @@ public class AuthService(
       throw new WorkflowException(result.Errors.First().Description);
     }
 
-    await cache.SyncSecurityStampAsync(appUser.Id, appUser.SecurityStamp!, ct);
+    await securityService.SyncSecurityStampAsync(appUser.Id, appUser.SecurityStamp!, ct);
     return CreateAuthTokens(appUser);
   }
 
@@ -72,7 +72,7 @@ public class AuthService(
     var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
     var tokenStamp = principal.FindFirstValue("security_stamp");
 
-    if (await cache.IsBlacklistedAsync(jti!, ct)) {
+    if (await securityService.IsBlacklistedAsync(jti!, ct)) {
       throw new WorkflowException("Phiên đăng nhập đã bị vô hiệu hóa", 401);
     }
 
@@ -93,7 +93,7 @@ public class AuthService(
     var expiresAt = DateTimeOffset.FromUnixTimeSeconds(expUnix).UtcDateTime;
     var remainingTime = expiresAt - DateTime.UtcNow;
     if (remainingTime.TotalSeconds > 0) {
-      await cache.BlacklistAsync(jti!, remainingTime, ct);
+      await securityService.BlacklistAsync(jti!, remainingTime, ct);
     }
 
     return CreateAuthTokens(user);
@@ -104,7 +104,7 @@ public class AuthService(
     string tokenSecurityStamp,
     CancellationToken ct
   ) {
-    var cachedStamp = await cache.GetSecurityStampAsync(userId, ct);
+    var cachedStamp = await securityService.GetSecurityStampAsync(userId, ct);
     if (cachedStamp != null) {
       return tokenSecurityStamp == cachedStamp;
     }
@@ -114,7 +114,7 @@ public class AuthService(
       return false;
     }
 
-    await cache.SyncSecurityStampAsync(userId, user.SecurityStamp!, ct);
+    await securityService.SyncSecurityStampAsync(userId, user.SecurityStamp!, ct);
     return tokenSecurityStamp == user.SecurityStamp;
   }
 
@@ -187,7 +187,7 @@ public class AuthService(
       } else {
         var remainingTime = jwtToken.ValidTo - DateTime.UtcNow;
         if (remainingTime.TotalSeconds > 0) {
-          await cache.BlacklistAsync(jwtToken.Id, remainingTime, ct);
+          await securityService.BlacklistAsync(jwtToken.Id, remainingTime, ct);
         }
       }
     } catch {
@@ -200,7 +200,7 @@ public class AuthService(
   private async Task UpdateSecurityStampInternal(AppUser user, CancellationToken ct) {
     var result = await userManager.UpdateSecurityStampAsync(user);
     if (result.Succeeded) {
-      await cache.SyncSecurityStampAsync(user.Id, user.SecurityStamp!, ct);
+      await securityService.SyncSecurityStampAsync(user.Id, user.SecurityStamp!, ct);
     }
   }
 

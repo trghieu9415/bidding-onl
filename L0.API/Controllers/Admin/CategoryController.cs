@@ -46,21 +46,21 @@ public class CategoryController : DashboardController {
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCategoryRequest data, CancellationToken ct) {
     var command = new UpdateCategoryCommand(id, data);
-    await Mediator.Send(command, ct);
-    return ApiResponse.Success("Danh mục đã được cập nhật");
+    var result = await Mediator.Send(command, ct);
+    return ApiResponse.Success(result, "Danh mục đã được cập nhật");
   }
 
   [HttpDelete("{id:guid}")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Remove(Guid id, CancellationToken ct) {
-    await Mediator.Send(new RemoveCategoryCommand(id), ct);
-    return ApiResponse.Success("Danh mục đã được xóa");
+    var result = await Mediator.Send(new RemoveCategoryCommand(id), ct);
+    return ApiResponse.Success(result, "Danh mục đã được xóa");
   }
 
   [HttpPatch("{id:guid}/restore")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Restore(Guid id, CancellationToken ct) {
-    await Mediator.Send(new RestoreCategoryCommand(id), ct);
-    return ApiResponse.Success("Danh mục đã được khôi phục");
+    var result = await Mediator.Send(new RestoreCategoryCommand(id), ct);
+    return ApiResponse.Success(result, "Danh mục đã được khôi phục");
   }
 }

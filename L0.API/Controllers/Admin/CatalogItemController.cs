@@ -27,15 +27,15 @@ public class CatalogItemController : DashboardController {
   [HttpPatch("{id:guid}/approve")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Approve(Guid id, CancellationToken ct) {
-    await Mediator.Send(new ApproveItemCommand(id), ct);
-    return ApiResponse.Success("Sản phẩm đã được phê duyệt");
+    var result = await Mediator.Send(new ApproveItemCommand(id), ct);
+    return ApiResponse.Success(result, "Sản phẩm đã được phê duyệt");
   }
 
   [HttpPatch("{id:guid}/reject")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Reject(Guid id, [FromBody] RejectItemRequest req, CancellationToken ct) {
     var command = new RejectItemCommand(id, req);
-    await Mediator.Send(command, ct);
-    return ApiResponse.Success("Sản phẩm đã bị từ chối");
+    var result = await Mediator.Send(command, ct);
+    return ApiResponse.Success(result, "Sản phẩm đã bị từ chối");
   }
 }

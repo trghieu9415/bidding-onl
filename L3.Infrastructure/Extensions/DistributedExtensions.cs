@@ -7,6 +7,7 @@ using L3.Infrastructure.Services;
 using L3.Infrastructure.Services.Abstractions;
 using Medallion.Threading;
 using Medallion.Threading.Redis;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
@@ -18,34 +19,52 @@ public static class DistributedExtensions {
     this IServiceCollection services,
     IConfiguration config
   ) {
-    var redisSettings = config.GetSection(RedisSettings.SectionName).Get<RedisSettings>()!;
-    var baseConfig = ConfigurationOptions.Parse(redisSettings.Configuration);
-    baseConfig.AbortOnConnectFail = false;
+    var settings = config.GetSection(RedisSettings.SectionName).Get<RedisSettings>()!;
 
-    var lazyCacheConnection = CreateLazyConnection(redisSettings.InstanceName);
-    var lazyLockConnection = CreateLazyConnection(redisSettings.InstanceLockName);
+    services
+      .AddConnectionMultiplexer(RedisSettings.MutexKeys.Cache, settings.CacheConnection)
+      .AddConnectionMultiplexer(RedisSettings.MutexKeys.Critical, settings.CriticalConnection)
+      .AddConnectionMultiplexer(RedisSettings.MutexKeys.Backplane, settings.BackplaneConnection);
 
-    services.AddStackExchangeRedisCache(cacheOptions => {
-      cacheOptions.InstanceName = redisSettings.InstanceName;
-      cacheOptions.ConnectionMultiplexerFactory = () => Task.FromResult(lazyCacheConnection.Value);
-    });
-
-    services.AddSingleton<IDistributedLockProvider>(_ =>
-      new RedisDistributedSynchronizationProvider(lazyLockConnection.Value.GetDatabase())
-    );
-
+    // NOTE: ========== [REDIS_CACHE] ==========
+    services.AddOptions<RedisCacheOptions>()
+      .Configure<IServiceProvider>((opt, sp) => {
+        opt.InstanceName = settings.Keys.Cache;
+        opt.ConnectionMultiplexerFactory = () => {
+          var mux = sp.GetRequiredKeyedService<IConnectionMultiplexer>(RedisSettings.MutexKeys.Cache);
+          return Task.FromResult(mux);
+        };
+      });
+    services.AddStackExchangeRedisCache(_ => {});
     services.AddSingleton<ICacheService, RedisCacheService>();
-    services.AddSingleton<IDistributedLockService, RedisLockService>();
     services.AddScoped<IBusinessCache, BusinessCache>();
 
-    return services;
+    // NOTE: ========== [REDIS_LOCK] ==========
+    services.AddSingleton<IDistributedLockProvider>(sp => {
+      var mux = sp.GetRequiredKeyedService<IConnectionMultiplexer>(RedisSettings.MutexKeys.Critical);
+      return new RedisDistributedSynchronizationProvider(mux.GetDatabase());
+    });
+    services.AddSingleton<IDistributedLockService, RedisLockService>();
 
-    Lazy<IConnectionMultiplexer> CreateLazyConnection(string clientName) {
-      return new Lazy<IConnectionMultiplexer>(() => {
-        var clonedConfig = baseConfig.Clone();
-        clonedConfig.ClientName = clientName;
-        return ConnectionMultiplexer.Connect(clonedConfig);
-      });
-    }
+    // NOTE: ========== [REDIS_SECURITY] ==========
+    services.AddSingleton<ISecurityService>(sp => {
+      var mux = sp.GetRequiredKeyedService<IConnectionMultiplexer>(RedisSettings.MutexKeys.Critical);
+      return new SecurityService(mux);
+    });
+
+    return services;
+  }
+
+  private static IServiceCollection AddConnectionMultiplexer(
+    this IServiceCollection services,
+    string mutexKey,
+    string connection
+  ) {
+    var opt = ConfigurationOptions.Parse(connection);
+    opt.AbortOnConnectFail = false;
+    opt.ClientName = $"Bidding:{mutexKey}";
+    var mux = ConnectionMultiplexer.Connect(opt);
+    services.AddKeyedSingleton(mutexKey, (_, _) => mux);
+    return services;
   }
 }

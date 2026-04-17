@@ -32,29 +32,29 @@ public class SessionController : DashboardController {
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSessionRequest req, CancellationToken ct) {
     var command = new UpdateSessionCommand(id, req);
-    await Mediator.Send(command, ct);
-    return ApiResponse.Success("Cập nhật phiên đấu giá thành công");
+    var result = await Mediator.Send(command, ct);
+    return ApiResponse.Success(result, "Cập nhật phiên đấu giá thành công");
   }
 
   [HttpPost("{id:guid}/sync")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> SyncAuctions(Guid id, [FromBody] List<Guid> auctionIds, CancellationToken ct) {
-    await Mediator.Send(new SyncAuctionsCommand(id, auctionIds), ct);
-    return ApiResponse.Success("Đã cập nhật danh sách đấu giá vào phiên");
+    var result = await Mediator.Send(new SyncAuctionsCommand(id, auctionIds), ct);
+    return ApiResponse.Success(result, "Đã cập nhật danh sách đấu giá vào phiên");
   }
 
   [HttpPatch("{id:guid}/publish")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Publish(Guid id, CancellationToken ct) {
-    await Mediator.Send(new PublishSessionCommand(id), ct);
-    return ApiResponse.Success("Phiên đấu giá đã được công khai");
+    var result = await Mediator.Send(new PublishSessionCommand(id), ct);
+    return ApiResponse.Success(result, "Phiên đấu giá đã được công khai");
   }
 
   [HttpDelete("{id:guid}")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Delete(Guid id, CancellationToken ct) {
-    await Mediator.Send(new RemoveSessionCommand(id), ct);
-    return ApiResponse.Success("Đã xóa phiên đấu giá");
+    var result = await Mediator.Send(new RemoveSessionCommand(id), ct);
+    return ApiResponse.Success(result, "Đã xóa phiên đấu giá");
   }
 
   [HttpGet("removed")]
@@ -67,7 +67,7 @@ public class SessionController : DashboardController {
   [HttpPatch("{id:guid}/restore")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Restore(Guid id, CancellationToken ct) {
-    await Mediator.Send(new RestoreSessionCommand(id), ct);
-    return ApiResponse.Success("Phiên đấu giá đã được khôi phục");
+    var result = await Mediator.Send(new RestoreSessionCommand(id), ct);
+    return ApiResponse.Success(result, "Phiên đấu giá đã được khôi phục");
   }
 }

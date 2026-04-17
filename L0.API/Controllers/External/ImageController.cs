@@ -53,8 +53,8 @@ public class ImageController(IStorageService storage) : ExternalController {
     }
 
     try {
-      await storage.DeleteAsync(fileName, "catalog", ct);
-      return ApiResponse.Success("Đã xóa ảnh thành công");
+      var result = await storage.DeleteAsync(fileName, "catalog", ct);
+      return ApiResponse.Success(result, "Đã xóa ảnh thành công");
     } catch (Exception) {
       return ApiResponse.Fail("Không thể xóa ảnh", 400);
     }

@@ -1,0 +1,28 @@
+﻿services:
+  redis_cache:
+    image: redis:alpine
+    container_name: bid_redis_cache
+    restart: always
+  command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --save 60 1
+  ports:
+      - "6379:6379"
+    volumes:
+      - ./.volumes/redis_cache_data:/data
+
+  redis_lock_ratelimit:
+    image: redis:alpine
+    container_name: bid_redis_lock
+    restart: always
+  command: redis-server --maxmemory 256mb --maxmemory-policy noeviction --appendonly yes
+  ports:
+      - "6380:6379"
+    volumes:
+      - ./.volumes/redis_lock_data:/data
+
+  redis_backplane:
+    image: redis:alpine
+    container_name: bid_redis_backplane
+    restart: always
+    command: redis-server --appendonly no --save ""
+    ports:
+      - "6381:6379"

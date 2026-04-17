@@ -12,6 +12,7 @@ using L2.Application.UseCases.Auth.Commands.UpdateProfile;
 using L2.Application.UseCases.Auth.Queries.GetProfile;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace L0.API.Controllers.Bidder;
 
@@ -19,6 +20,7 @@ public class AuthController : UserController {
   [HttpPost("register")]
   [ProducesSuccess<TokenModel>]
   [AllowAnonymous]
+  [EnableRateLimiting("AuthPolicy")]
   public async Task<IActionResult> Register([FromBody] RegisterCommand command, CancellationToken ct) {
     var result = await Mediator.Send(command, ct);
     return ApiResponse.Success(result.Tokens, "Đăng ký tài khoản thành công");
@@ -27,6 +29,7 @@ public class AuthController : UserController {
   [HttpPost("login")]
   [ProducesSuccess<TokenModel>]
   [AllowAnonymous]
+  [EnableRateLimiting("AuthPolicy")]
   public async Task<IActionResult> Login([FromBody] LoginRequest data, CancellationToken ct) {
     var command = new LoginCommand(data, UserRole.Bidder);
     var result = await Mediator.Send(command, ct);
@@ -53,30 +56,33 @@ public class AuthController : UserController {
   [HttpPut("profile")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileCommand command, CancellationToken ct) {
-    await Mediator.Send(command, ct);
-    return ApiResponse.Success("Cập nhật thông tin cá nhân thành công");
+    var result = await Mediator.Send(command, ct);
+    return ApiResponse.Success(result, "Cập nhật thông tin cá nhân thành công");
   }
 
   [HttpPost("change-password")]
   [ProducesSuccess<bool>]
+  [EnableRateLimiting("AuthPolicy")]
   public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command, CancellationToken ct) {
-    await Mediator.Send(command, ct);
-    return ApiResponse.Success("Đổi mật khẩu thành công");
+    var result = await Mediator.Send(command, ct);
+    return ApiResponse.Success(result, "Đổi mật khẩu thành công");
   }
 
   [HttpPost("forgot-password")]
   [ProducesSuccess<bool>]
   [AllowAnonymous]
+  [EnableRateLimiting("AuthPolicy")]
   public async Task<IActionResult> ForgotPassword([FromBody] RequestPasswordCommand command, CancellationToken ct) {
-    await Mediator.Send(command, ct);
-    return ApiResponse.Success("Yêu cầu khôi phục mật khẩu đã được gửi đến Email");
+    var result = await Mediator.Send(command, ct);
+    return ApiResponse.Success(result, "Yêu cầu khôi phục mật khẩu đã được gửi đến Email");
   }
 
   [HttpPost("reset-password")]
   [ProducesSuccess<bool>]
+  [EnableRateLimiting("AuthPolicy")]
   public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command, CancellationToken ct) {
-    await Mediator.Send(command, ct);
-    return ApiResponse.Success("Mật khẩu đã được đặt lại thành công");
+    var result = await Mediator.Send(command, ct);
+    return ApiResponse.Success(result, "Mật khẩu đã được đặt lại thành công");
   }
 
   [HttpPost("refresh")]
@@ -100,14 +106,14 @@ public class AuthController : UserController {
   [HttpPost("logout")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Logout([FromBody] LogoutCommand command, CancellationToken ct) {
-    await Mediator.Send(command, ct);
-    return ApiResponse.Success("Đăng xuất thành công");
+    var result = await Mediator.Send(command, ct);
+    return ApiResponse.Success(result, "Đăng xuất thành công");
   }
 
   [HttpPost("test")]
   [AllowAnonymous]
   public async Task<IActionResult> Test([FromBody] TestCommand command, CancellationToken ct) {
-    await Mediator.Send(command, ct);
+    var result = await Mediator.Send(command, ct);
     return ApiResponse.Success();
   }
 }

@@ -9,6 +9,7 @@ using L2.Application.UseCases.Bids.Queries.GetBiddingActivity;
 using L2.Application.UseCases.Bids.Queries.GetBidHistory;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Sieve.Models;
 
 namespace L0.API.Controllers.Bidder;
@@ -24,6 +25,7 @@ public class AuctionController : UserController {
 
   [HttpPost("{id:guid}/bid")]
   [ProducesSuccess<IdData>]
+  [EnableRateLimiting("BiddingWarPolicy")]
   public async Task<IActionResult> PlaceBid(Guid id, [FromBody] PlaceBidRequest req, CancellationToken ct) {
     var command = new PlaceBidCommand(id, req);
     var bidId = await Mediator.Send(command, ct);

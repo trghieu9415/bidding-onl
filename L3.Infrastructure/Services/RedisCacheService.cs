@@ -24,31 +24,6 @@ public class RedisCacheService(IDistributedCache cache) : ICacheService {
     await cache.SetAsync(key, jsonBytes, options, ct);
   }
 
-  public async Task BlacklistAsync(string jti, TimeSpan duration, CancellationToken ct = default) {
-    var options = new DistributedCacheEntryOptions {
-      AbsoluteExpirationRelativeToNow = duration
-    };
-    await cache.SetStringAsync(CacheKeys.BlackList(jti), "true", options, ct);
-  }
-
-  public async Task<bool> IsBlacklistedAsync(string jti, CancellationToken ct = default) {
-    var value = await cache.GetStringAsync(CacheKeys.BlackList(jti), ct);
-    return !string.IsNullOrEmpty(value);
-  }
-
-  public async Task SyncSecurityStampAsync(Guid userId, string securityStamp, CancellationToken ct) {
-    var options = new DistributedCacheEntryOptions {
-      AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1)
-    };
-
-    await cache.SetStringAsync(CacheKeys.UserStamp(userId), securityStamp, options, ct);
-  }
-
-  public async Task<string?> GetSecurityStampAsync(Guid userId, CancellationToken ct) {
-    var value = await cache.GetStringAsync(CacheKeys.UserStamp(userId), ct);
-    return value;
-  }
-
   public async Task RemoveAsync(string key, CancellationToken ct = default) {
     await cache.RemoveAsync(key, ct);
   }

@@ -17,17 +17,16 @@ public static class ExternalServiceExtensions {
   public static IServiceCollection AddExternalServices(this IServiceCollection services) {
     services.AddScoped<IEmailService, EmailService>();
     services.AddScoped<IStorageService, S3StorageService>();
-    services.AddScoped<IImageTracker, ImageTracker>();
     services.AddScoped<ISearchService, PostgresSearchService>();
-
-    services.AddHttpClient(nameof(PaypalGateway))
-      .AddStandardResilienceHandler(ConfigureExternalServicesResilience());
 
     services.AddScoped<IGatewayFactory, GatewayFactory>();
 
     // Transactions
     services.AddKeyedScoped<IPaymentGateway, StripeGateway>(PaymentMethod.Stripe);
     services.AddKeyedScoped<IPaymentGateway, PaypalGateway>(PaymentMethod.Paypal);
+
+    services.AddHttpClient(nameof(PaypalGateway))
+      .AddStandardResilienceHandler(ConfigureExternalServicesResilience());
 
     services.AddAutoMapper(_ => {}, typeof(InfrastructureConfiguration).Assembly);
     services.AddScoped<ISieveProcessor, SieveProcessor>();

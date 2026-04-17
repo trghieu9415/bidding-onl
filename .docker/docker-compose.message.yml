@@ -1,0 +1,13 @@
+﻿services:
+  rabbitmq:
+    image: rabbitmq:4.2.4-management-alpine
+    container_name: bid_rabbitmq
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABITTMQ_ADMIN}
+      - RABBITMQ_DEFAULT_PASS=${RABITTMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./.volumes/rabbitmq_data:/var/lib/rabbitmq

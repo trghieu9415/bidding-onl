@@ -35,14 +35,14 @@ public class BidderController : DashboardController {
   [HttpPost("{id:guid}/lock")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Lock(Guid id, CancellationToken ct) {
-    await Mediator.Send(new LockBidderCommand(id), ct);
-    return ApiResponse.Success("Đã khóa tài khoản người dùng");
+    var result = await Mediator.Send(new LockBidderCommand(id), ct);
+    return ApiResponse.Success(result, "Đã khóa tài khoản người dùng");
   }
 
   [HttpPost("{id:guid}/unlock")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Unlock(Guid id, CancellationToken ct) {
-    await Mediator.Send(new UnlockBidderCommand(id), ct);
-    return ApiResponse.Success("Đã mở khóa tài khoản người dùng");
+    var result = await Mediator.Send(new UnlockBidderCommand(id), ct);
+    return ApiResponse.Success(result, "Đã mở khóa tài khoản người dùng");
   }
 }
