@@ -1,8 +1,8 @@
 ﻿using L1.Core.Domain.Bidding.Enums;
 
-namespace L2.Application.Models;
+namespace L2.Application.Filters;
 
-public record AuctionSearchModel(
+public record AuctionSearchFilter(
   string? Keyword = null,
   List<Guid>? CategoryIds = null,
   decimal? MinPrice = null,
@@ -11,5 +11,5 @@ public record AuctionSearchModel(
   DateTime? FromDate = null,
   DateTime? ToDate = null,
   int Page = 1,
-  int PageSize = 10
+  int PerPage = 10
 );

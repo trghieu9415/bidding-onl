@@ -1,7 +1,6 @@
 ﻿using L0.API.Response;
 using L2.Application.DTOs;
 using L2.Application.Filters;
-using L2.Application.Models;
 using L2.Application.UseCases.Auctions.Commands.SearchItem;
 using L2.Application.UseCases.Auctions.Queries.GetAuction;
 using L2.Application.UseCases.Auctions.Queries.GetWonAuctions;
@@ -37,17 +36,17 @@ public class AuctionController : UserController {
   [HttpGet("search")]
   [ProducesSuccess<List<AuctionSearchDto>>]
   [AllowAnonymous]
-  public async Task<IActionResult> Search([FromQuery] AuctionSearchModel searchModel, CancellationToken ct) {
-    var query = new SearchItemQuery(searchModel);
+  public async Task<IActionResult> Search([FromQuery] AuctionSearchFilter searchFilter, CancellationToken ct) {
+    var query = new SearchItemQuery(searchFilter);
     var result = await Mediator.Send(query, ct);
     return ApiResponse.Success(result.Items, result.Meta);
   }
 
   [HttpGet("{id:guid}/history")]
   [ProducesSuccess<List<BidDto>>]
-  public async Task<IActionResult> GetHistory(Guid id, [FromQuery] int page, [FromQuery] int pageSize,
+  public async Task<IActionResult> GetHistory(Guid id, [FromQuery] int page, [FromQuery] int perPage,
     CancellationToken ct) {
-    var result = await Mediator.Send(new GetBidHistoryQuery(id, page, pageSize), ct);
+    var result = await Mediator.Send(new GetBidHistoryQuery(id, page, perPage), ct);
     return ApiResponse.Success(result.Bids, result.Meta);
   }
 

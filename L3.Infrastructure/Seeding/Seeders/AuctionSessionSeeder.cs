@@ -20,10 +20,11 @@ public class AuctionSessionSeeder(AppDbContext context) : ISeeder {
     var approvedItems = await context.Set<CatalogItem>().Where(x => x.Status == ItemStatus.Approval).ToListAsync();
     var bidders = await context.Users.Where(u => u.Role == UserRole.Bidder).ToListAsync();
 
-    var liveSession = AuctionSession.Create("Đại tiệc Đấu giá Cuối tuần", DateTime.UtcNow.AddHours(-2),
-      DateTime.UtcNow.AddDays(1));
-    context.Set<AuctionSession>().Add(liveSession);
-    await context.SaveChangesAsync();
+    var liveSession = AuctionSession.Create(
+      "Đại tiệc Đấu giá Cuối tuần",
+      DateTime.UtcNow.AddHours(-2),
+      DateTime.UtcNow.AddDays(1)
+    );
 
     var auctionIds = new List<Guid>();
     foreach (var item in approvedItems.Take(15)) {
@@ -46,6 +47,7 @@ public class AuctionSessionSeeder(AppDbContext context) : ISeeder {
       auctionIds.Add(auction.Id);
     }
 
+    context.Set<AuctionSession>().Add(liveSession);
     liveSession.SyncAuctions(auctionIds);
     liveSession.Start();
 

@@ -4,6 +4,6 @@ using MediatR;
 
 namespace L2.Application.UseCases.Bids.Queries.GetBidHistory;
 
-public record GetBidHistoryQuery(Guid AuctionId, int Page, int PageSize) : IRequest<GetBidHistoryResult>;
+public record GetBidHistoryQuery(Guid AuctionId, int Page, int PerPage) : IRequest<GetBidHistoryResult>;
 
 public record GetBidHistoryResult(List<BidDto> Bids, Meta Meta);

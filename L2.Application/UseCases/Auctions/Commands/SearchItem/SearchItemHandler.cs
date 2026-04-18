@@ -7,9 +7,9 @@ namespace L2.Application.UseCases.Auctions.Commands.SearchItem;
 public class SearchItemHandler(ISearchService searchService)
   : IRequestHandler<SearchItemQuery, SearchItemResult> {
   public async Task<SearchItemResult> Handle(SearchItemQuery request, CancellationToken ct) {
-    var searchModel = request.SearchModel;
-    var (total, items) = await searchService.SearchAsync(searchModel, ct);
+    var searchFilter = request.SearchFilter;
+    var (total, items) = await searchService.SearchAsync(searchFilter, ct);
 
-    return new SearchItemResult(items, Meta.Create(searchModel.Page, searchModel.PageSize, total));
+    return new SearchItemResult(items, Meta.Create(searchFilter.Page, searchFilter.PerPage, total));
   }
 }

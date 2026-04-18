@@ -2,7 +2,7 @@
 using L1.Core.Domain.Bidding.Entities;
 using L1.Core.Domain.Catalog.Entities;
 using L2.Application.DTOs;
-using L2.Application.Models;
+using L2.Application.Filters;
 using L2.Application.Ports.Search;
 using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +13,7 @@ namespace L3.Infrastructure.Adapters.Search;
 
 public class PostgresSearchService(AppDbContext context) : ISearchService {
   public async Task<(int total, List<AuctionSearchDto> items)> SearchAsync(
-    AuctionSearchModel req,
+    AuctionSearchFilter req,
     CancellationToken ct
   ) {
     // Query Join
@@ -41,8 +41,8 @@ public class PostgresSearchService(AppDbContext context) : ISearchService {
     var total = await query.CountAsync(ct);
     var results = await query
       .OrderByDescending(x => x.session.TimeFrame.StartTime)
-      .Skip((req.Page - 1) * req.PageSize)
-      .Take(req.PageSize)
+      .Skip((req.Page - 1) * req.PerPage)
+      .Take(req.PerPage)
       .Select(x => new AuctionSearchDto {
         AuctionId = x.auction.Id,
         CatalogItemId = x.item.Id,

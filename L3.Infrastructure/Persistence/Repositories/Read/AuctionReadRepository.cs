@@ -14,7 +14,7 @@ public class AuctionReadRepository(
   private readonly IMapper _mapper = mapper;
 
   public async Task<(int total, List<BidDto> bids)> GetBidsAsync(
-    Guid auctionId, int page = 1, int pageSize = 10,
+    Guid auctionId, int page = 1, int perPage = 10,
     CancellationToken ct = default
   ) {
     var query = DbSet.AsNoTracking()
@@ -24,8 +24,8 @@ public class AuctionReadRepository(
 
     var items = await query
       .OrderByDescending(x => x.CreatedAt)
-      .Skip((page - 1) * pageSize)
-      .Take(pageSize)
+      .Skip((page - 1) * perPage)
+      .Take(perPage)
       .ProjectTo<BidDto>(_mapper.ConfigurationProvider)
       .ToListAsync(ct);
 

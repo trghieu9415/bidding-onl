@@ -10,11 +10,11 @@ public class GetBidHistoryHandler(
   : IRequestHandler<GetBidHistoryQuery, GetBidHistoryResult> {
   public async Task<GetBidHistoryResult> Handle(GetBidHistoryQuery request, CancellationToken ct) {
     var (total, entities) = await auctionReadRepo.GetBidsAsync(
-      request.AuctionId, request.Page, request.PageSize, ct
+      request.AuctionId, request.Page, request.PerPage, ct
     );
 
 
-    var meta = Meta.Create(request.Page, request.PageSize, total);
+    var meta = Meta.Create(request.Page, request.PerPage, total);
     return new GetBidHistoryResult(entities, meta);
   }
 }
