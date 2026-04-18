@@ -1,19 +1,17 @@
 using L1.Core.Domain.Catalog.Entities;
 using L2.Application.DTOs;
 using L2.Application.Models;
-using L2.Application.Ports.Security;
 using L2.Application.Repositories;
 using MediatR;
 
 namespace L2.Application.UseCases.Items.Queries.GetRegisteredItems;
 
 public class GetRegisteredItemsHandler(
-  IReadRepository<CatalogItem, CatalogItemDto> readRepository,
-  ICurrentUser currentUser
+  IReadRepository<CatalogItem, CatalogItemDto> readRepository
 ) : IRequestHandler<GetRegisteredItemsQuery, GetRegisteredItemsResult> {
   public async Task<GetRegisteredItemsResult> Handle(GetRegisteredItemsQuery request, CancellationToken ct) {
     var (total, entities) = await readRepository.GetAsync(
-      x => x.OwnerId == currentUser.Id,
+      x => x.OwnerId == request.UserId,
       request.SieveModel,
       ct: ct
     );

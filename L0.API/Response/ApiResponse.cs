@@ -11,8 +11,7 @@ public static class ApiResponse {
     var response = new ResponseData<T> {
       Status = status,
       Message = message ?? DefaultSuccess,
-      Data = data,
-      Meta = meta
+      Data = data, Meta = meta
     };
     return new ObjectResult(response) { StatusCode = status };
   }

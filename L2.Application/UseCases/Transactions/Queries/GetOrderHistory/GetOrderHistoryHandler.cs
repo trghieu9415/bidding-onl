@@ -1,19 +1,17 @@
 ﻿using L1.Core.Domain.Transaction.Entities;
 using L2.Application.DTOs;
 using L2.Application.Models;
-using L2.Application.Ports.Security;
 using L2.Application.Repositories;
 using MediatR;
 
 namespace L2.Application.UseCases.Transactions.Queries.GetOrderHistory;
 
 public class GetOrderHistoryHandler(
-  IReadRepository<Order, OrderDto> readRepository,
-  ICurrentUser currentUser
+  IReadRepository<Order, OrderDto> readRepository
 ) : IRequestHandler<GetOrderHistoryQuery, GetOrderHistoryResult> {
   public async Task<GetOrderHistoryResult> Handle(GetOrderHistoryQuery request, CancellationToken ct) {
     var (total, entities) = await readRepository.GetAsync(
-      x => x.BidderId == currentUser.Id,
+      x => x.BidderId == request.UserId,
       request.SieveModel,
       ct: ct
     );

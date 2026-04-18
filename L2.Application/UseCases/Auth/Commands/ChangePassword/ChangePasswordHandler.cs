@@ -4,19 +4,13 @@ using MediatR;
 namespace L2.Application.UseCases.Auth.Commands.ChangePassword;
 
 public class ChangePasswordHandler(
-  IAuthService authService,
-  ICurrentUser currentUser
+  IAuthService authService
 ) : IRequestHandler<ChangePasswordCommand, bool> {
   public async Task<bool> Handle(ChangePasswordCommand request, CancellationToken ct) {
-    var userId = currentUser.Id;
+    var userId = request.UserId;
+    var data = request.Data;
 
-    await authService.ChangePasswordAsync(
-      userId,
-      request.OldPassword,
-      request.NewPassword,
-      ct
-    );
-
+    await authService.ChangePasswordAsync(userId, data.OldPassword, data.NewPassword, ct);
     return true;
   }
 }

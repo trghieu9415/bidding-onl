@@ -5,7 +5,8 @@ using MediatR;
 
 namespace L2.Application.UseCases.Transactions.Commands.CreatePayment;
 
-public record CreatePaymentCommand(Guid OrderId, PaymentMethod Method) : IRequest<CreatePaymentResult>, ITransactional;
+public record CreatePaymentCommand(Guid OrderId, Guid UserId, PaymentMethod Method)
+  : IRequest<CreatePaymentResult>, ITransactional;
 
 public record CreatePaymentResult(string PaymentUrl);
 

@@ -5,6 +5,6 @@ using Sieve.Models;
 
 namespace L2.Application.UseCases.Auctions.Queries.GetWonAuctions;
 
-public record GetWonAuctionsQuery(SieveModel SieveModel) : IRequest<GetWonAuctionsResult>;
+public record GetWonAuctionsQuery(Guid UserId, SieveModel SieveModel) : IRequest<GetWonAuctionsResult>;
 
 public record GetWonAuctionsResult(List<AuctionDto> Auctions, Meta Meta);

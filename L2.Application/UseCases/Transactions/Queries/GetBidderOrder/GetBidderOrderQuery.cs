@@ -3,6 +3,6 @@ using MediatR;
 
 namespace L2.Application.UseCases.Transactions.Queries.GetBidderOrder;
 
-public record GetBidderOrderQuery(Guid Id) : IRequest<GetOrderResult>;
+public record GetBidderOrderQuery(Guid Id, Guid UserId) : IRequest<GetBidderOrderResult>;
 
-public record GetOrderResult(OrderDto Order);
+public record GetBidderOrderResult(OrderDto Order, List<PaymentDto>? Payments);

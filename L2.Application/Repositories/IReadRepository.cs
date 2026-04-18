@@ -10,7 +10,7 @@ public interface IReadRepository<TEntity, TDto>
   where TDto : IdDto {
   Task<TDto?> GetByIdAsync(
     Guid id,
-    CancellationToken ct
+    CancellationToken ct = default
   );
 
   Task<(int total, List<TDto> entities)> GetAsync(

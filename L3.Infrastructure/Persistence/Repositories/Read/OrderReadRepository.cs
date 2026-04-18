@@ -22,4 +22,25 @@ public class OrderReadRepository(
       .ProjectTo<OrderDto>(_mapper.ConfigurationProvider)
       .FirstOrDefaultAsync(ct);
   }
+
+  public async Task<(OrderDto? order, List<PaymentDto> payments)> GetOrderPaymentByIdAsync(Guid orderId,
+    CancellationToken ct = default) {
+    var orderDto = await DbSet
+      .AsNoTracking()
+      .Where(x => x.Id == orderId && !x.IsDeleted)
+      .ProjectTo<OrderDto>(_mapper.ConfigurationProvider)
+      .FirstOrDefaultAsync(ct);
+
+    if (orderDto == null) {
+      return (null, []);
+    }
+
+    var paymentDtos = await dbContext.Set<Payment>()
+      .AsNoTracking()
+      .Where(x => x.OrderId == orderId && !x.IsDeleted)
+      .ProjectTo<PaymentDto>(_mapper.ConfigurationProvider)
+      .ToListAsync(ct);
+
+    return (orderDto, paymentDtos);
+  }
 }

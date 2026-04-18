@@ -1,21 +1,19 @@
 using L1.Core.Domain.Catalog.Entities;
 using L1.Core.Domain.Catalog.Enums;
 using L2.Application.Exceptions;
-using L2.Application.Ports.Security;
 using L2.Application.Repositories;
 using MediatR;
 
 namespace L2.Application.UseCases.Items.Commands.UpdateRegisteredItem;
 
 public class UpdateRegisteredItemHandler(
-  IRepository<CatalogItem> repository,
-  ICurrentUser currentUser
+  IRepository<CatalogItem> repository
 ) : IRequestHandler<UpdateRegisteredItemCommand, bool> {
   public async Task<bool> Handle(UpdateRegisteredItemCommand request, CancellationToken ct) {
     var item = await repository.GetByIdAsync(request.Id, ct)
                ?? throw new WorkflowException("Sản phẩm không tồn tại", 404);
 
-    if (item.OwnerId != currentUser.Id) {
+    if (item.OwnerId != request.UserId) {
       throw new WorkflowException("Bạn không có quyền chỉnh sửa sản phẩm này", 403);
     }
 

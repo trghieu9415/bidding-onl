@@ -22,8 +22,6 @@
     <Folder Include="UseCases\Bidders\Commands\"/>
     <Folder Include="UseCases\Bidders\Queries\"/>
     <Folder Include="UseCases\System\"/>
-    <Folder Include="UseCases\Transactions\Commands\"/>
-    <Folder Include="UseCases\Transactions\Queries\"/>
   </ItemGroup>
 
 </Project>

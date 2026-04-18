@@ -26,8 +26,10 @@ public class AuctionController : UserController {
   [HttpPost("{id:guid}/bid")]
   [ProducesSuccess<IdData>]
   [EnableRateLimiting("BiddingWarPolicy")]
-  public async Task<IActionResult> PlaceBid(Guid id, [FromBody] PlaceBidRequest req, CancellationToken ct) {
-    var command = new PlaceBidCommand(id, req);
+  public async Task<IActionResult> PlaceBid(
+    Guid id, [FromBody] PlaceBidRequest req, CancellationToken ct
+  ) {
+    var command = new PlaceBidCommand(id, CurrentUser.Id, CurrentUser.FullName, req);
     var bidId = await Mediator.Send(command, ct);
     return ApiResponse.Success(bidId, "Đặt giá thành công");
   }
@@ -51,15 +53,18 @@ public class AuctionController : UserController {
 
   [HttpGet("my-activities")]
   [ProducesSuccess<List<AuctionDto>>]
-  public async Task<IActionResult> GetMyActivities([FromQuery] SieveModel sieveModel, CancellationToken ct) {
-    var result = await Mediator.Send(new GetBiddingActivityQuery(sieveModel), ct);
+  public async Task<IActionResult> GetMyActivities(
+    [FromQuery] SieveModel sieveModel,
+    CancellationToken ct
+  ) {
+    var result = await Mediator.Send(new GetBiddingActivityQuery(CurrentUser.Id, sieveModel), ct);
     return ApiResponse.Success(result.Auctions, result.Meta);
   }
 
   [HttpGet("my-wins")]
   [ProducesSuccess<List<AuctionDto>>]
   public async Task<IActionResult> GetMyWins([FromQuery] SieveModel sieveModel, CancellationToken ct) {
-    var result = await Mediator.Send(new GetWonAuctionsQuery(sieveModel), ct);
+    var result = await Mediator.Send(new GetWonAuctionsQuery(CurrentUser.Id, sieveModel), ct);
     return ApiResponse.Success(result.Auctions, result.Meta);
   }
 }

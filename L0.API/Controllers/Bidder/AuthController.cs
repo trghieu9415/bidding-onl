@@ -49,8 +49,9 @@ public class AuthController : UserController {
   [HttpGet("profile")]
   [ProducesSuccess<User>]
   public async Task<IActionResult> GetProfile(CancellationToken ct) {
-    var result = await Mediator.Send(new GetProfileQuery(), ct);
-    return ApiResponse.Success(result.Profile);
+    var query = new GetProfileQuery(CurrentUser.Id, UserRole.Bidder);
+    var result = await Mediator.Send(query, ct);
+    return ApiResponse.Success(result.User);
   }
 
   [HttpPut("profile")]
@@ -60,10 +61,13 @@ public class AuthController : UserController {
     return ApiResponse.Success(result, "Cập nhật thông tin cá nhân thành công");
   }
 
-  [HttpPost("change-password")]
+  [HttpPatch("change-password")]
   [ProducesSuccess<bool>]
-  [EnableRateLimiting("AuthPolicy")]
-  public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command, CancellationToken ct) {
+  public async Task<IActionResult> ChangePassword(
+    [FromBody] ChangePasswordRequest req,
+    CancellationToken ct
+  ) {
+    var command = new ChangePasswordCommand(CurrentUser.Id, req);
     var result = await Mediator.Send(command, ct);
     return ApiResponse.Success(result, "Đổi mật khẩu thành công");
   }
@@ -105,15 +109,23 @@ public class AuthController : UserController {
 
   [HttpPost("logout")]
   [ProducesSuccess<bool>]
-  public async Task<IActionResult> Logout([FromBody] LogoutCommand command, CancellationToken ct) {
+  public async Task<IActionResult> Logout([FromQuery] bool allDevices, CancellationToken ct) {
+    var refreshToken = Request.Cookies["Refresh"] ?? string.Empty;
+    var command = new LogoutCommand(refreshToken, allDevices);
     var result = await Mediator.Send(command, ct);
+    Response.Cookies.Delete("Refresh", new CookieOptions {
+      HttpOnly = true,
+      Secure = true,
+      SameSite = SameSiteMode.None
+    });
     return ApiResponse.Success(result, "Đăng xuất thành công");
   }
 
   [HttpPost("test")]
   [AllowAnonymous]
+  [ProducesSuccess<bool>]
   public async Task<IActionResult> Test([FromBody] TestCommand command, CancellationToken ct) {
     var result = await Mediator.Send(command, ct);
-    return ApiResponse.Success();
+    return ApiResponse.Success(result);
   }
 }

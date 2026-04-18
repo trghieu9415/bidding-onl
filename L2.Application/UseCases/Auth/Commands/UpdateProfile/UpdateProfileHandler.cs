@@ -4,17 +4,18 @@ using MediatR;
 
 namespace L2.Application.UseCases.Auth.Commands.UpdateProfile;
 
-public class UpdateProfileHandler(IUserService userService, ICurrentUser currentUser)
+public class UpdateProfileHandler(IUserService userService)
   : IRequestHandler<UpdateProfileCommand, bool> {
   public async Task<bool> Handle(UpdateProfileCommand request, CancellationToken ct) {
     var user =
-      await userService.GetByIdAsync(currentUser.Id, currentUser.Role, ct)
-      ?? throw new WorkflowException($"Không tìm thấy người dùng - Id:{currentUser.Id}");
+      await userService.GetByIdAsync(request.UserId, request.Role, ct)
+      ?? throw new WorkflowException($"Không tìm thấy người dùng - Id:{request.UserId}");
 
+    var data = request.Data;
     user = user with {
-      FullName = request.FullName,
-      PhoneNumber = request.PhoneNumber,
-      Url = request.Url
+      FullName = data.FullName,
+      PhoneNumber = data.PhoneNumber,
+      Url = data.Url
     };
 
     await userService.UpdateAsync(user, ct);

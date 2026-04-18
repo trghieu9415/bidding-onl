@@ -12,14 +12,21 @@ namespace L0.API.Controllers.Bidder;
 public class CatalogItemController : UserController {
   [HttpGet("my-items")]
   [ProducesSuccess<List<CatalogItemDto>>]
-  public async Task<IActionResult> GetMyItems([FromQuery] SieveModel sieveModel, CancellationToken ct) {
-    var result = await Mediator.Send(new GetRegisteredItemsQuery(sieveModel), ct);
+  public async Task<IActionResult> GetMyItems(
+    [FromQuery] SieveModel sieveModel,
+    CancellationToken ct
+  ) {
+    var result = await Mediator.Send(new GetRegisteredItemsQuery(CurrentUser.Id, sieveModel), ct);
     return ApiResponse.Success(result.Items, result.Meta);
   }
 
   [HttpPost("register")]
   [ProducesSuccess<IdData>]
-  public async Task<IActionResult> RegisterItem([FromBody] RegisterItemCommand command, CancellationToken ct) {
+  public async Task<IActionResult> RegisterItem(
+    [FromBody] RegisterItemRequest req,
+    CancellationToken ct
+  ) {
+    var command = new RegisterItemCommand(CurrentUser.Id, req);
     var id = await Mediator.Send(command, ct);
     return ApiResponse.Success(id, "Sản phẩm đã được gửi, vui lòng chờ Admin phê duyệt");
   }
@@ -31,7 +38,7 @@ public class CatalogItemController : UserController {
     Guid id, [FromBody] UpdateRegisteredItemRequest req,
     CancellationToken ct
   ) {
-    var command = new UpdateRegisteredItemCommand(id, req);
+    var command = new UpdateRegisteredItemCommand(id, CurrentUser.Id, req);
     var result = await Mediator.Send(command, ct);
     return ApiResponse.Success(result, "Cập nhật thông tin sản phẩm thành công");
   }

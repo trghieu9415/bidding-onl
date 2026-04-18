@@ -28,7 +28,11 @@ public class Payment : AggregateRoot {
     PaymentUrl = paymentUrl;
   }
 
-  public void MarkAsSucceeded(Guid userId, string transactionId) {
+  public void MarkAsCompleted(Guid userId, string transactionId) {
+    if (Status == PaymentStatus.Succeeded) {
+      return;
+    }
+
     if (Status != PaymentStatus.Pending) {
       throw new DomainException("Chỉ có thể hoàn tất thanh toán khi thanh toán ở trạng thái chờ");
     }

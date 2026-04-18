@@ -7,6 +7,7 @@ namespace L2.Application.UseCases.Items.Commands.UpdateRegisteredItem;
 
 public record UpdateRegisteredItemCommand(
   Guid Id,
+  Guid UserId,
   UpdateRegisteredItemRequest Data
 ) : IRequest<bool>, ITransactional;
 

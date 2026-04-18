@@ -2,18 +2,16 @@
 using L1.Core.Domain.Bidding.Enums;
 using L2.Application.DTOs;
 using L2.Application.Models;
-using L2.Application.Ports.Security;
 using L2.Application.Repositories;
 using MediatR;
 
 namespace L2.Application.UseCases.Auctions.Queries.GetWonAuctions;
 
 public class GetWonAuctionsHandler(
-  IReadRepository<Auction, AuctionDto> auctionReadRepo,
-  ICurrentUser currentUser
+  IReadRepository<Auction, AuctionDto> auctionReadRepo
 ) : IRequestHandler<GetWonAuctionsQuery, GetWonAuctionsResult> {
   public async Task<GetWonAuctionsResult> Handle(GetWonAuctionsQuery request, CancellationToken ct) {
-    var userId = currentUser.Id;
+    var userId = request.UserId;
 
     var (total, entities) = await auctionReadRepo.GetAsync(
       x => x.Status == AuctionStatus.EndedSold &&

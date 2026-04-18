@@ -5,4 +5,4 @@ namespace L2.Application.UseCases.Transactions.Queries.GetOrder;
 
 public record GetOrderQuery(Guid Id) : IRequest<GetOrderResult>;
 
-public record GetOrderResult(OrderDto Order, PaymentDto? Payment);
+public record GetOrderResult(OrderDto Order, List<PaymentDto>? Payments);
