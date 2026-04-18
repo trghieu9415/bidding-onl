@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoFilterer" Version="3.2.1"/>
     <PackageReference Include="FluentValidation" Version="12.1.1"/>
     <PackageReference Include="MediatR" Version="14.0.0"/>
-    <PackageReference Include="Sieve" Version="2.5.5"/>
   </ItemGroup>
 
   <ItemGroup>

@@ -10,8 +10,8 @@ public class GetRemovedCategoriesHandler(
   IReadRepository<Category, CategoryDto> readRepository
 ) : IRequestHandler<GetRemovedCategoriesQuery, GetRemovedCategoriesResult> {
   public async Task<GetRemovedCategoriesResult> Handle(GetRemovedCategoriesQuery request, CancellationToken ct) {
-    var (total, entities) = await readRepository.GetDeletedAsync(sieveModel: request.SieveModel, ct: ct);
-    var meta = Meta.Create(request.SieveModel.Page ?? 1, request.SieveModel.PageSize ?? 10, total);
+    var (total, entities) = await readRepository.GetDeletedAsync(filter: request.Filter, ct: ct);
+    var meta = Meta.Create(request.Filter.Page, request.Filter.PerPage, total);
     return new GetRemovedCategoriesResult(entities, meta);
   }
 }

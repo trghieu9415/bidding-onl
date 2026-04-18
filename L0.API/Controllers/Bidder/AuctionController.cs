@@ -1,5 +1,6 @@
 ﻿using L0.API.Response;
 using L2.Application.DTOs;
+using L2.Application.Filters;
 using L2.Application.Models;
 using L2.Application.UseCases.Auctions.Commands.SearchItem;
 using L2.Application.UseCases.Auctions.Queries.GetAuction;
@@ -10,7 +11,6 @@ using L2.Application.UseCases.Bids.Queries.GetBidHistory;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Sieve.Models;
 
 namespace L0.API.Controllers.Bidder;
 
@@ -54,17 +54,17 @@ public class AuctionController : UserController {
   [HttpGet("my-activities")]
   [ProducesSuccess<List<AuctionDto>>]
   public async Task<IActionResult> GetMyActivities(
-    [FromQuery] SieveModel sieveModel,
+    [FromQuery] AuctionFilter filter,
     CancellationToken ct
   ) {
-    var result = await Mediator.Send(new GetBiddingActivityQuery(CurrentUser.Id, sieveModel), ct);
+    var result = await Mediator.Send(new GetBiddingActivityQuery(CurrentUser.Id, filter), ct);
     return ApiResponse.Success(result.Auctions, result.Meta);
   }
 
   [HttpGet("my-wins")]
   [ProducesSuccess<List<AuctionDto>>]
-  public async Task<IActionResult> GetMyWins([FromQuery] SieveModel sieveModel, CancellationToken ct) {
-    var result = await Mediator.Send(new GetWonAuctionsQuery(CurrentUser.Id, sieveModel), ct);
+  public async Task<IActionResult> GetMyWins([FromQuery] AuctionFilter filter, CancellationToken ct) {
+    var result = await Mediator.Send(new GetWonAuctionsQuery(CurrentUser.Id, filter), ct);
     return ApiResponse.Success(result.Auctions, result.Meta);
   }
 }

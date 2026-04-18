@@ -12,11 +12,11 @@ public class GetSessionsHandler(IReadRepository<AuctionSession, AuctionSessionDt
   public async Task<GetSessionsResult> Handle(GetSessionsQuery request, CancellationToken ct) {
     var (total, entities) = await readRepository.GetAsync(
       x => x.Status == SessionStatus.Published || x.Status == SessionStatus.Live,
-      request.SieveModel,
+      request.Filter,
       ct: ct
     );
 
-    var meta = Meta.Create(request.SieveModel.Page ?? 1, request.SieveModel.PageSize ?? 10, total);
+    var meta = Meta.Create(request.Filter.Page, request.Filter.PerPage, total);
     return new GetSessionsResult(entities, meta);
   }
 }

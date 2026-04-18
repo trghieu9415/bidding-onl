@@ -1,10 +1,10 @@
 using L2.Application.DTOs;
+using L2.Application.Filters;
 using L2.Application.Models;
 using MediatR;
-using Sieve.Models;
 
 namespace L2.Application.UseCases.Items.Queries.GetItems;
 
-public record GetItemsQuery(SieveModel SieveModel) : IRequest<GetItemsResult>;
+public record GetItemsQuery(CatalogItemFilter Filter) : IRequest<GetItemsResult>;
 
 public record GetItemsResult(List<CatalogItemDto> Items, Meta Meta);

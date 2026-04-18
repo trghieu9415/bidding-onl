@@ -13,11 +13,11 @@ public static class RealtimeExtensions {
   ) {
     var redisSettings = config.GetSection(RedisSettings.SectionName).Get<RedisSettings>()!;
 
-    // NOTE: ========== [REDIS_BACKPLANE] ==========
     services
       .AddSignalR()
       .AddStackExchangeRedis();
 
+    // NOTE: ========== [REDIS_BACKPLANE] ==========
     services
       .AddOptions<RedisOptions>()
       .Configure<IServiceProvider>((opt, sp) => {
@@ -27,7 +27,6 @@ public static class RealtimeExtensions {
             sp.GetRequiredKeyedService<IConnectionMultiplexer>(RedisSettings.MutexKeys.Backplane)
           );
       });
-
 
     services.AddSingleton<IAuctionNotifier, SignalRAuctionNotifier>();
     services.AddSingleton<IBidderNotifier, SignalRBidderNotifier>();

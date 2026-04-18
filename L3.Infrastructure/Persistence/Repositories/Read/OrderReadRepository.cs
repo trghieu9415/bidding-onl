@@ -4,15 +4,14 @@ using L1.Core.Domain.Transaction.Entities;
 using L2.Application.DTOs;
 using L2.Application.Repositories.Read;
 using Microsoft.EntityFrameworkCore;
-using Sieve.Services;
 
 namespace L3.Infrastructure.Persistence.Repositories.Read;
 
 public class OrderReadRepository(
   AppDbContext dbContext,
-  IMapper mapper,
-  ISieveProcessor sieveProcessor
-) : EfReadRepository<Order, OrderDto>(dbContext, mapper, sieveProcessor), IOrderReadRepository {
+  IMapper mapper
+) : EfReadRepository<Order, OrderDto>(dbContext, mapper), IOrderReadRepository {
+  private readonly AppDbContext _dbContext = dbContext;
   private readonly IMapper _mapper = mapper;
 
   public virtual async Task<OrderDto?> GetByAuctionIdAsync(Guid auctionId, CancellationToken ct = default) {
@@ -35,7 +34,7 @@ public class OrderReadRepository(
       return (null, []);
     }
 
-    var paymentDtos = await dbContext.Set<Payment>()
+    var paymentDtos = await _dbContext.Set<Payment>()
       .AsNoTracking()
       .Where(x => x.OrderId == orderId && !x.IsDeleted)
       .ProjectTo<PaymentDto>(_mapper.ConfigurationProvider)

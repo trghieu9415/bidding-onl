@@ -9,7 +9,6 @@ using L3.Infrastructure.Services.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Resilience;
 using Polly;
-using Sieve.Services;
 
 namespace L3.Infrastructure.Extensions;
 
@@ -29,7 +28,6 @@ public static class ExternalServiceExtensions {
       .AddStandardResilienceHandler(ConfigureExternalServicesResilience());
 
     services.AddAutoMapper(_ => {}, typeof(InfrastructureConfiguration).Assembly);
-    services.AddScoped<ISieveProcessor, SieveProcessor>();
     return services;
   }
 

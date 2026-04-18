@@ -20,6 +20,7 @@ public static class RateLimitExtensions {
       options.RejectionStatusCode = 429;
 
       foreach (var (policyName, config) in rateLimitConfig.Policies) {
+        Console.WriteLine($"Rate limit policy: {policyName}");
         options.AddPolicy(policyName, context => {
           var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
           var clientIp = context.Connection.RemoteIpAddress?.ToString();

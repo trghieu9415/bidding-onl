@@ -11,8 +11,8 @@ public class GetCategoriesHandler(
 )
   : IRequestHandler<GetCategoriesQuery, GetCategoriesResult> {
   public async Task<GetCategoriesResult> Handle(GetCategoriesQuery request, CancellationToken ct) {
-    var (total, entities) = await readRepository.GetAsync(sieveModel: request.SieveModel, ct: ct);
-    var meta = Meta.Create(request.SieveModel.Page ?? 1, request.SieveModel.PageSize ?? 10, total);
+    var (total, entities) = await readRepository.GetAsync(filter: request.Filter, ct: ct);
+    var meta = Meta.Create(request.Filter.Page, request.Filter.PerPage, total);
     return new GetCategoriesResult(entities, meta);
   }
 }

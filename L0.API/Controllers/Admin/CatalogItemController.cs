@@ -1,19 +1,19 @@
 ﻿using L0.API.Response;
 using L2.Application.DTOs;
+using L2.Application.Filters;
 using L2.Application.UseCases.Items.Commands.ApproveItem;
 using L2.Application.UseCases.Items.Commands.RejectItem;
 using L2.Application.UseCases.Items.Queries.GetItem;
 using L2.Application.UseCases.Items.Queries.GetItems;
 using Microsoft.AspNetCore.Mvc;
-using Sieve.Models;
 
 namespace L0.API.Controllers.Admin;
 
 public class CatalogItemController : DashboardController {
   [HttpGet]
   [ProducesSuccess<List<CatalogItemDto>>]
-  public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel, CancellationToken ct) {
-    var result = await Mediator.Send(new GetItemsQuery(sieveModel), ct);
+  public async Task<IActionResult> Get([FromQuery] CatalogItemFilter filter, CancellationToken ct) {
+    var result = await Mediator.Send(new GetItemsQuery(filter), ct);
     return ApiResponse.Success(result.Items, result.Meta);
   }
 

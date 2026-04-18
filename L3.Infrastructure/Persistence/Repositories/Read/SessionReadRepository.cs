@@ -5,15 +5,13 @@ using L1.Core.Domain.Bidding.Enums;
 using L2.Application.DTOs;
 using L2.Application.Repositories.Read;
 using Microsoft.EntityFrameworkCore;
-using Sieve.Services;
 
 namespace L3.Infrastructure.Persistence.Repositories.Read;
 
 public class SessionReadRepository(
   AppDbContext dbContext,
-  IMapper mapper,
-  ISieveProcessor sieveProcessor
-) : EfReadRepository<AuctionSession, AuctionSessionDto>(dbContext, mapper, sieveProcessor), ISessionReadRepository {
+  IMapper mapper
+) : EfReadRepository<AuctionSession, AuctionSessionDto>(dbContext, mapper), ISessionReadRepository {
   private readonly IMapper _mapper = mapper;
 
   public async Task<List<AuctionSessionDto>> GetCurrentSessionsAsync(CancellationToken ct = default) {

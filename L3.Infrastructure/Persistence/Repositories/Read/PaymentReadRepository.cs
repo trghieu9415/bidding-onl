@@ -4,15 +4,13 @@ using L1.Core.Domain.Transaction.Entities;
 using L2.Application.DTOs;
 using L2.Application.Repositories.Read;
 using Microsoft.EntityFrameworkCore;
-using Sieve.Services;
 
 namespace L3.Infrastructure.Persistence.Repositories.Read;
 
 public class PaymentReadRepository(
   AppDbContext dbContext,
-  IMapper mapper,
-  ISieveProcessor sieveProcessor
-) : EfReadRepository<Payment, PaymentDto>(dbContext, mapper, sieveProcessor), IPaymentReadRepository {
+  IMapper mapper
+) : EfReadRepository<Payment, PaymentDto>(dbContext, mapper), IPaymentReadRepository {
   private readonly IMapper _mapper = mapper;
 
   public async Task<PaymentDto?> GetByTransactionIdAsync(string transactionId, CancellationToken ct = default) {

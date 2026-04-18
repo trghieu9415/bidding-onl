@@ -1,5 +1,6 @@
 ﻿using L0.API.Response;
 using L2.Application.DTOs;
+using L2.Application.Filters;
 using L2.Application.UseCases.Auctions.Commands.AddAuction;
 using L2.Application.UseCases.Auctions.Commands.RemoveAuction;
 using L2.Application.UseCases.Auctions.Commands.RestoreAuction;
@@ -8,15 +9,14 @@ using L2.Application.UseCases.Auctions.Queries.GetAuction;
 using L2.Application.UseCases.Auctions.Queries.GetAuctions;
 using L2.Application.UseCases.Auctions.Queries.GetRemovedAuctions;
 using Microsoft.AspNetCore.Mvc;
-using Sieve.Models;
 
 namespace L0.API.Controllers.Admin;
 
 public class AuctionController : DashboardController {
   [HttpGet]
   [ProducesSuccess<List<AuctionDto>>]
-  public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel, CancellationToken ct) {
-    var result = await Mediator.Send(new GetAuctionsQuery(sieveModel), ct);
+  public async Task<IActionResult> Get([FromQuery] AuctionFilter filter, CancellationToken ct) {
+    var result = await Mediator.Send(new GetAuctionsQuery(filter), ct);
     return ApiResponse.Success(result.Auctions, result.Meta);
   }
 
@@ -51,8 +51,8 @@ public class AuctionController : DashboardController {
 
   [HttpGet("removed")]
   [ProducesSuccess<List<AuctionDto>>]
-  public async Task<IActionResult> GetRemoved([FromQuery] SieveModel sieveModel, CancellationToken ct) {
-    var result = await Mediator.Send(new GetRemovedAuctionsQuery(sieveModel), ct);
+  public async Task<IActionResult> GetRemoved([FromQuery] AuctionFilter filter, CancellationToken ct) {
+    var result = await Mediator.Send(new GetRemovedAuctionsQuery(filter), ct);
     return ApiResponse.Success(result.Auctions, result.Meta);
   }
 

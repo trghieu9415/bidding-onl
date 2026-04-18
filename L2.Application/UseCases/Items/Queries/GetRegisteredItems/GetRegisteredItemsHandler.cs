@@ -12,11 +12,11 @@ public class GetRegisteredItemsHandler(
   public async Task<GetRegisteredItemsResult> Handle(GetRegisteredItemsQuery request, CancellationToken ct) {
     var (total, entities) = await readRepository.GetAsync(
       x => x.OwnerId == request.UserId,
-      request.SieveModel,
+      request.Filter,
       ct: ct
     );
 
-    var meta = Meta.Create(request.SieveModel.Page ?? 1, request.SieveModel.PageSize ?? 10, total);
+    var meta = Meta.Create(request.Filter.Page, request.Filter.PerPage, total);
     return new GetRegisteredItemsResult(entities, meta);
   }
 }

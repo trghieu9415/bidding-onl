@@ -1,4 +1,5 @@
 ﻿using L0.API.Response;
+using L2.Application.Filters;
 using L2.Application.Models;
 using L2.Application.UseCases.Bidders.Commands.LockBidder;
 using L2.Application.UseCases.Bidders.Commands.UnlockBidder;
@@ -6,15 +7,14 @@ using L2.Application.UseCases.Bidders.Queries.GetBidder;
 using L2.Application.UseCases.Bidders.Queries.GetBidders;
 using L2.Application.UseCases.Bidders.Queries.GetLockedBidders;
 using Microsoft.AspNetCore.Mvc;
-using Sieve.Models;
 
 namespace L0.API.Controllers.Admin;
 
 public class BidderController : DashboardController {
   [HttpGet]
   [ProducesSuccess<List<User>>]
-  public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel, CancellationToken ct) {
-    var result = await Mediator.Send(new GetBiddersQuery(sieveModel), ct);
+  public async Task<IActionResult> Get([FromQuery] UserFilter filter, CancellationToken ct) {
+    var result = await Mediator.Send(new GetBiddersQuery(filter), ct);
     return ApiResponse.Success(result.Bidders, result.Meta);
   }
 
@@ -27,8 +27,8 @@ public class BidderController : DashboardController {
 
   [HttpGet("locked")]
   [ProducesSuccess<List<User>>]
-  public async Task<IActionResult> GetLocked([FromQuery] SieveModel sieveModel, CancellationToken ct) {
-    var result = await Mediator.Send(new GetLockedBiddersQuery(sieveModel), ct);
+  public async Task<IActionResult> GetLocked([FromQuery] UserFilter filter, CancellationToken ct) {
+    var result = await Mediator.Send(new GetLockedBiddersQuery(filter), ct);
     return ApiResponse.Success(result.Bidders, result.Meta);
   }
 

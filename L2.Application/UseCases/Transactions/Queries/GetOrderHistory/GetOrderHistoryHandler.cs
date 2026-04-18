@@ -12,11 +12,11 @@ public class GetOrderHistoryHandler(
   public async Task<GetOrderHistoryResult> Handle(GetOrderHistoryQuery request, CancellationToken ct) {
     var (total, entities) = await readRepository.GetAsync(
       x => x.BidderId == request.UserId,
-      request.SieveModel,
+      request.Filter,
       ct: ct
     );
 
-    var meta = Meta.Create(request.SieveModel.Page ?? 1, request.SieveModel.PageSize ?? 10, total);
+    var meta = Meta.Create(request.Filter.Page, request.Filter.PerPage, total);
     return new GetOrderHistoryResult(entities, meta);
   }
 }

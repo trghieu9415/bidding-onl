@@ -64,7 +64,7 @@ public static class DistributedExtensions {
     opt.AbortOnConnectFail = false;
     opt.ClientName = $"Bidding:{mutexKey}";
     var mux = ConnectionMultiplexer.Connect(opt);
-    services.AddKeyedSingleton(mutexKey, (_, _) => mux);
+    services.AddKeyedSingleton<IConnectionMultiplexer>(mutexKey, (_, _) => mux);
     return services;
   }
 }

@@ -9,8 +9,8 @@ namespace L2.Application.UseCases.Transactions.Queries.GetOrders;
 public class GetOrdersHandler(IReadRepository<Order, OrderDto> readRepository)
   : IRequestHandler<GetOrdersQuery, GetOrdersResult> {
   public async Task<GetOrdersResult> Handle(GetOrdersQuery request, CancellationToken ct) {
-    var (total, entities) = await readRepository.GetAsync(sieveModel: request.SieveModel, ct: ct);
-    var meta = Meta.Create(request.SieveModel.Page ?? 1, request.SieveModel.PageSize ?? 10, total);
+    var (total, entities) = await readRepository.GetAsync(filter: request.Filter, ct: ct);
+    var meta = Meta.Create(request.Filter.Page, request.Filter.PerPage, total);
     return new GetOrdersResult(entities, meta);
   }
 }

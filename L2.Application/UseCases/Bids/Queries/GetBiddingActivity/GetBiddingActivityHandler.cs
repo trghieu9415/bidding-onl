@@ -14,11 +14,11 @@ public class GetBiddingActivityHandler(
 
     var (total, entities) = await auctionReadRepo.GetAsync(
       x => x.Bids.Any(b => b.BidderId == userId),
-      request.SieveModel,
+      request.Filter,
       ct: ct
     );
 
-    var meta = Meta.Create(request.SieveModel.Page ?? 1, request.SieveModel.PageSize ?? 10, total);
+    var meta = Meta.Create(request.Filter.Page, request.Filter.PerPage, total);
     return new GetBiddingActivityResult(entities, meta);
   }
 }

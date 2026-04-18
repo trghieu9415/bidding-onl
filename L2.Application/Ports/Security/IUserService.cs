@@ -1,5 +1,5 @@
-﻿using L2.Application.Models;
-using Sieve.Models;
+﻿using L2.Application.Filters;
+using L2.Application.Models;
 
 namespace L2.Application.Ports.Security;
 
@@ -7,13 +7,13 @@ public interface IUserService {
   Task<User?> GetByIdAsync(Guid id, UserRole? role, CancellationToken ct = default);
 
   Task<(int total, List<User> users)> GetAsync(
-    SieveModel? sieveModel = null,
+    UserFilter? filter = null,
     UserRole? role = UserRole.Bidder,
     CancellationToken ct = default
   );
 
   Task<(int total, List<User> users)> GetDeletedAsync(
-    SieveModel? sieveModel = null,
+    UserFilter? filter = null,
     UserRole? role = UserRole.Bidder,
     CancellationToken ct = default
   );

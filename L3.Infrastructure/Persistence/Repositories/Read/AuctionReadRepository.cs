@@ -4,15 +4,13 @@ using L1.Core.Domain.Bidding.Entities;
 using L2.Application.DTOs;
 using L2.Application.Repositories.Read;
 using Microsoft.EntityFrameworkCore;
-using Sieve.Services;
 
 namespace L3.Infrastructure.Persistence.Repositories.Read;
 
 public class AuctionReadRepository(
   AppDbContext dbContext,
-  IMapper mapper,
-  ISieveProcessor sieveProcessor
-) : EfReadRepository<Auction, AuctionDto>(dbContext, mapper, sieveProcessor), IAuctionReadRepository {
+  IMapper mapper
+) : EfReadRepository<Auction, AuctionDto>(dbContext, mapper), IAuctionReadRepository {
   private readonly IMapper _mapper = mapper;
 
   public async Task<(int total, List<BidDto> bids)> GetBidsAsync(

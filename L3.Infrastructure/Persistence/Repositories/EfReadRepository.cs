@@ -1,27 +1,28 @@
 ﻿using System.Collections;
 using System.Linq.Expressions;
+using AutoFilterer.Abstractions;
+using AutoFilterer.Extensions;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using L1.Core.Base.Entity;
 using L2.Application.DTOs.Base;
 using L2.Application.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Sieve.Models;
-using Sieve.Services;
 
 namespace L3.Infrastructure.Persistence.Repositories;
 
 public class EfReadRepository<TEntity, TDto>(
   AppDbContext dbContext,
-  IMapper mapper,
-  ISieveProcessor sieveProcessor
+  IMapper mapper
 ) : IReadRepository<TEntity, TDto>
   where TEntity : AggregateRoot
   where TDto : IdDto {
   private static readonly string[] AllExpandableProperties = typeof(TDto).GetProperties()
-    .Where(p =>
-      (p.PropertyType.IsClass && p.PropertyType != typeof(string)) ||
-      typeof(IEnumerable).IsAssignableFrom(p.PropertyType))
+    .Where(p => (
+        p.PropertyType.IsClass &&
+        p.PropertyType != typeof(string)
+      ) || typeof(IEnumerable).IsAssignableFrom(p.PropertyType)
+    )
     .Select(p => p.Name)
     .ToArray();
 
@@ -37,10 +38,11 @@ public class EfReadRepository<TEntity, TDto>(
 
   public virtual async Task<(int total, List<TDto> entities)> GetAsync(
     Expression<Func<TEntity, bool>>? criteria = null,
-    SieveModel? sieveModel = null,
+    IFilter? filter = null,
     List<Expression<Func<TEntity, object>>>? includes = null,
-    CancellationToken ct = default) {
-    var (total, query) = await GetBaseQueryAsync(false, criteria, sieveModel, includes, ct);
+    CancellationToken ct = default
+  ) {
+    var (total, query) = await GetBaseQueryAsync(false, criteria, filter, includes, ct);
 
     var entities = await query
       .ProjectTo<TDto>(mapper.ConfigurationProvider)
@@ -51,10 +53,11 @@ public class EfReadRepository<TEntity, TDto>(
 
   public virtual async Task<(int total, List<TDto> entities)> GetDeletedAsync(
     Expression<Func<TEntity, bool>>? criteria = null,
-    SieveModel? sieveModel = null,
+    IFilter? filter = null,
     List<Expression<Func<TEntity, object>>>? includes = null,
-    CancellationToken ct = default) {
-    var (total, query) = await GetBaseQueryAsync(true, criteria, sieveModel, includes, ct);
+    CancellationToken ct = default
+  ) {
+    var (total, query) = await GetBaseQueryAsync(true, criteria, filter, includes, ct);
 
     var entities = await query
       .ProjectTo<TDto>(mapper.ConfigurationProvider)
@@ -65,7 +68,8 @@ public class EfReadRepository<TEntity, TDto>(
 
   public virtual async Task<TDto?> GetFirstAsync(
     Expression<Func<TEntity, bool>>? criteria = null,
-    CancellationToken ct = default) {
+    CancellationToken ct = default
+  ) {
     var query = DbSet.AsNoTracking().Where(x => !x.IsDeleted);
 
     if (criteria != null) {
@@ -77,12 +81,11 @@ public class EfReadRepository<TEntity, TDto>(
       .FirstOrDefaultAsync(ct);
   }
 
-
   // NOTE: ========== [Helper Methods] ==========
   private async Task<(int total, IQueryable<TEntity> query)> GetBaseQueryAsync(
     bool isDeleted,
     Expression<Func<TEntity, bool>>? criteria = null,
-    SieveModel? sieveModel = null,
+    IFilter? filter = null,
     List<Expression<Func<TEntity, object>>>? includes = null,
     CancellationToken ct = default
   ) {
@@ -96,9 +99,11 @@ public class EfReadRepository<TEntity, TDto>(
       query = includes.Aggregate(query, (current, include) => current.Include(include));
     }
 
-    query = sieveProcessor.Apply(sieveModel, query, applyPagination: false);
+    if (filter != null) {
+      query = query.ApplyFilter(filter);
+    }
+
     var total = await query.CountAsync(ct);
-    query = sieveProcessor.Apply(sieveModel, query, applyFiltering: false, applySorting: false);
     return (total, query);
   }
 }

@@ -1,19 +1,40 @@
-﻿using L2.Application.Exceptions;
+﻿using AutoFilterer.Extensions;
+using L2.Application.Exceptions;
+using L2.Application.Filters;
 using L2.Application.Models;
 using L2.Application.Ports.Security;
 using L3.Infrastructure.Exceptions;
 using L3.Infrastructure.Persistence.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Sieve.Models;
-using Sieve.Services;
 
 namespace L3.Infrastructure.Adapters.Security;
 
 public class UserService(
-  UserManager<AppUser> userManager,
-  ISieveProcessor sieveProcessor
+  UserManager<AppUser> userManager
 ) : IUserService {
+  public async Task<(int total, List<User> users)> GetDeletedAsync(
+    UserFilter? filter = null,
+    UserRole? role = UserRole.Bidder,
+    CancellationToken ct = default
+  ) {
+    var query = userManager.Users.AsNoTracking()
+      .Where(u => u.Role == role && u.IsDeleted);
+
+    if (filter != null) {
+      query = query.ApplyFilterWithoutPagination(filter);
+    }
+
+    var total = await query.CountAsync(ct);
+
+    if (filter != null) {
+      query = query.ApplyFilter(filter);
+    }
+
+    var appUsers = await query.ToListAsync(ct);
+    return (total, appUsers.Select(ToUser).ToList());
+  }
+
   public async Task<Guid> CreateAsync(
     User user,
     string password,
@@ -81,35 +102,23 @@ public class UserService(
   }
 
   public async Task<(int total, List<User> users)> GetAsync(
-    SieveModel? sieveModel = null,
+    UserFilter? filter = null,
     UserRole? role = UserRole.Bidder,
     CancellationToken ct = default
   ) {
     var query = userManager.Users.AsNoTracking()
       .Where(u => u.Role == role && !u.IsDeleted);
 
-    var filteredQuery = sieveProcessor.Apply(sieveModel, query, applyPagination: false);
-    var total = await filteredQuery.CountAsync(ct);
+    if (filter != null) {
+      query = query.ApplyFilterWithoutPagination(filter);
+    }
 
-    var pagedQuery = sieveProcessor.Apply(sieveModel, filteredQuery);
+    var total = await query.CountAsync(ct);
+    if (filter != null) {
+      query = query.ApplyFilter(filter);
+    }
 
-    var appUsers = await pagedQuery.ToListAsync(ct);
-    return (total, appUsers.Select(ToUser).ToList());
-  }
-
-  public async Task<(int total, List<User> users)> GetDeletedAsync(
-    SieveModel? sieveModel = null,
-    UserRole? role = UserRole.Bidder, CancellationToken ct = default
-  ) {
-    var query = userManager.Users.AsNoTracking()
-      .Where(u => u.Role == role && u.IsDeleted);
-
-    var filteredQuery = sieveProcessor.Apply(sieveModel, query, applyPagination: false);
-    var total = await filteredQuery.CountAsync(ct);
-
-    var pagedQuery = sieveProcessor.Apply(sieveModel, filteredQuery);
-
-    var appUsers = await pagedQuery.ToListAsync(ct);
+    var appUsers = await query.ToListAsync(ct);
     return (total, appUsers.Select(ToUser).ToList());
   }
 

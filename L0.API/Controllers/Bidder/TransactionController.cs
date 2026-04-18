@@ -1,16 +1,15 @@
 ﻿using L0.API.Response;
 using L1.Core.Domain.Transaction.Enums;
 using L2.Application.DTOs;
+using L2.Application.Filters;
 using L2.Application.UseCases.Transactions.Commands.CreateOrder;
 using L2.Application.UseCases.Transactions.Commands.CreatePayment;
 using L2.Application.UseCases.Transactions.Commands.RefundPayment;
 using L2.Application.UseCases.Transactions.Commands.VerifyPayment;
 using L2.Application.UseCases.Transactions.Queries.GetBidderOrder;
 using L2.Application.UseCases.Transactions.Queries.GetOrderHistory;
-using L2.Application.UseCases.Transactions.Queries.GetOrders;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Sieve.Models;
 
 namespace L0.API.Controllers.Bidder;
 
@@ -63,8 +62,8 @@ public class TransactionController : UserController {
 
   [HttpGet("history")]
   [ProducesSuccess<List<OrderDto>>]
-  public async Task<IActionResult> GetOrders([FromBody] SieveModel sieveModel, CancellationToken ct) {
-    var query = new GetOrderHistoryQuery(CurrentUser.Id, sieveModel);
+  public async Task<IActionResult> GetOrders([FromQuery] OrderFilter filter, CancellationToken ct) {
+    var query = new GetOrderHistoryQuery(CurrentUser.Id, filter);
     var result = await Mediator.Send(query, ct);
     return ApiResponse.Success(result);
   }

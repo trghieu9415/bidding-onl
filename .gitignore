@@ -8,6 +8,7 @@ logs/
 
 .env
 .docker/.volumes/
+.docker_volumes/
 
 secrets.json
 
