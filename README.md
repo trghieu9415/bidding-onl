@@ -26,16 +26,16 @@ Bằng cách sử dụng stack công nghệ hiện đại và các pattern kiế
 Kiến trúc được thiết kế để loại bỏ các điểm nghẽn phổ biến trong hệ thống thương mại điện tử và đấu giá.
 
 * **Giảm thiểu Race Condition:** Áp dụng Redis Distributed Lock (`RedisDistributedSynchronizationProvider`) kết hợp với cơ chế RowVersion (Optimistic Concurrency) của Entity Framework Core.
-  * *Chỉ số:* Đảm bảo **100% tính nhất quán dữ liệu** trong stress test, xử lý **1000+ request đặt giá đồng thời** trên cùng một phiên đấu giá trong cùng một mili-giây mà không xảy ra sai lệch dữ liệu hoặc deadlock.
+  * Đảm bảo **100% tính nhất quán dữ liệu**, xử lý **1000+ request đặt giá đồng thời** trên cùng một phiên đấu giá trong cùng một mili-giây mà không xảy ra sai lệch dữ liệu hoặc deadlock.
 
 * **Loại bỏ lỗi Dual-Write:** Áp dụng Transactional Outbox Pattern thông qua MassTransit và PostgreSQL.
-  * *Chỉ số:* Đạt **100% đảm bảo gửi message thành công** tới RabbitMQ. Domain event được commit nguyên tử cùng với trạng thái nghiệp vụ, loại bỏ hoàn toàn mất dữ liệu khi có lỗi mạng hoặc broker downtime.
+  * Đạt **100% đảm bảo gửi message thành công** tới RabbitMQ. Domain event được commit nguyên tử cùng với trạng thái nghiệp vụ, loại bỏ hoàn toàn mất dữ liệu khi có lỗi mạng hoặc broker downtime.
 
 * **Tối ưu Throughput & Read:** Tách biệt luồng đọc/ghi bằng CQRS. Query sử dụng `AsNoTracking` và mapping trực tiếp sang DTO ở tầng SQL.
-  * *Chỉ số:* Duy trì **500+ request/giây** cho truy vấn catalog và đấu giá với mức tiêu thụ CPU thấp.
+  * Duy trì **500+ request/giây** cho truy vấn catalog và đấu giá với mức tiêu thụ CPU thấp.
 
 * **Mở rộng Real-time:** Tích hợp SignalR với Redis Backplane.
-  * *Chỉ số:* Hỗ trợ **10,000+ kết nối WebSocket đồng thời** trên nhiều instance API. Độ trễ broadcast khi có bid mới duy trì **dưới 50ms**.
+  * Hỗ trợ **1,000+ kết nối WebSocket đồng thời** trên nhiều instance API. Độ trễ broadcast khi có bid mới duy trì **dưới 150ms**.
 
 ---
 
@@ -49,7 +49,7 @@ Hệ thống tuân thủ chặt chẽ nguyên tắc tách biệt trách nhiệm 
   - `L2.Application` (Use Case)
   - `L3.Infrastructure` (Persistence / External)
   - `L3.Worker` (Background Processing)
-  Tuân thủ nghiêm ngặt nguyên lý Dependency Inversion.
+ Tuân thủ nghiêm ngặt nguyên lý Dependency Inversion.
 
 * **Domain-Driven Design (DDD):** Logic nghiệp vụ được đóng gói trong các `AggregateRoot`. Giao tiếp giữa các aggregate thông qua `DomainEvent`. Sử dụng mạnh `ValueObject` để đảm bảo tính bất biến.
 
@@ -97,16 +97,10 @@ dotnet run --project L0.API/L0.API.csproj --seeding
 
 ### 4. Chạy ứng dụng
 
-**Terminal 1 (API):**
+**Terminal:**
 
 ```bash
 dotnet run --project L0.API/L0.API.csproj
-```
-
-**Terminal 2 (Worker):**
-
-```bash
-dotnet run --project L3.Worker/L3.Worker.csproj
 ```
 
 ---
@@ -116,7 +110,7 @@ dotnet run --project L3.Worker/L3.Worker.csproj
 * **Swagger:** [http://localhost:5202/swagger](http://localhost:5202/swagger)
 * **Mailpit:** [http://localhost:8025](http://localhost:8025)
 * **MinIO Console:** [http://localhost:9001](http://localhost:9001)
-  *(User: `minioadmin` / Password: `minioadmin`)*
+ *(User: `minioadmin` / Password: `minioadmin`)*
 
 ### Tài khoản test
 
@@ -136,5 +130,3 @@ PayPal credentials
 ```
 
 trong `appsettings.json` hoặc `secrets.json`.
-
-```

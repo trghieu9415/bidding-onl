@@ -1,4 +1,4 @@
-# TÀI LIỆU KIẾN TRÚC VÀ LUỒNG DỮ LIỆU (ARCHITECTURE & DATA FLOW GUIDE)
+# TÀI LIỆU KIẾN TRÚC VÀ LUỒNG DỮ LIỆU
 
 Tài liệu này cung cấp cái nhìn tổng quan về kiến trúc phần mềm của dự án, cách phân tách các thành phần theo tiêu chuẩn Clean Architecture, nguyên lý Domain-Driven Design (DDD), pattern CQRS và hướng dẫn chi tiết cách phát triển một tính năng mới.
 
@@ -38,13 +38,13 @@ Dự án tuân thủ nghiêm ngặt nguyên lý Dependency Inversion. Các layer
 Dự án áp dụng thiết kế hướng Domain, tập trung việc bảo vệ tính toàn vẹn dữ liệu bên trong các Aggregate.
 
 *   **Aggregate Root (Căn nguyên kết tập):** Kế thừa từ `AggregateRoot.cs`. Đây là điểm duy nhất cho phép các layer khác tương tác để thay đổi trạng thái dữ liệu.
-  *   *Ví dụ:* `Auction`, `CatalogItem`, `Order`. Khi muốn thêm một `Bid` mới, bạn không thao tác trực tiếp trên repository của Bid, mà phải gọi hàm `auction.PlaceBid(...)`.
+    *   *Ví dụ:* `Auction`, `CatalogItem`, `Order`. Khi muốn thêm một `Bid` mới, bạn không thao tác trực tiếp trên repository của Bid, mà phải gọi hàm `auction.PlaceBid(...)`.
 *   **Entity (Thực thể):** Kế thừa từ `BaseEntity.cs`. Chứa định danh (`Id`) và lifecycle mặc định (`CreatedAt`, `IsDeleted`).
-  *   *Ví dụ:* `Bid` là một Entity nằm bên trong Aggregate `Auction`.
+    *   *Ví dụ:* `Bid` là một Entity nằm bên trong Aggregate `Auction`.
 *   **Value Object (Đối tượng giá trị):** Là các đối tượng bất biến (Immutable), không có định danh độc lập, được so sánh bằng giá trị của các thuộc tính. Trong dự án này, Value Object được tận dụng triệt để bằng kiểu `record` của C#.
-  *   *Ví dụ:* `AuctionRules`, `AuctionTimeFrame`, `Address`.
+    *   *Ví dụ:* `AuctionRules`, `AuctionTimeFrame`, `Address`.
 *   **Domain Event (Sự kiện miền):** Kế thừa từ `DomainEvent.cs`. Được sinh ra ngay bên trong Aggregate Root thông qua phương thức `AddDomainEvent()` khi có một thay đổi trạng thái quan trọng xảy ra.
-  *   *Ví dụ:* `BidPlacedEvent`, `AuctionStartedEvent`.
+    *   *Ví dụ:* `BidPlacedEvent`, `AuctionStartedEvent`.
 
 ---
 
@@ -58,9 +58,9 @@ Sử dụng `IRepository` để làm việc với Aggregate Root, đảm bảo m
 1.  **Controller:** Nhận HTTP Post/Put/Delete, khởi tạo `Command` (có thể implement marker interface `ITransactional` hoặc `ILockable`).
 2.  **Controller -> MediatR:** Gọi `Mediator.Send(command)`.
 3.  **MediatR Pipeline:**
-  *   `ValidationBehavior`: Tự động chạy Validator (FluentValidation) tương ứng. Nếu lỗi, ném `InvalidInputException` (Controller trả về 422).
-  *   `LockBehavior`: Nếu Command implement `ILockable`, tự động lấy Distributed Lock qua Redis để tránh Race Condition.
-  *   `TransactionBehavior`: Nếu Command implement `ITransactional`, mở DB Transaction.
+    *   `ValidationBehavior`: Tự động chạy Validator (FluentValidation) tương ứng. Nếu lỗi, ném `InvalidInputException` (Controller trả về 422).
+    *   `LockBehavior`: Nếu Command implement `ILockable`, tự động lấy Distributed Lock qua Redis để tránh Race Condition.
+    *   `TransactionBehavior`: Nếu Command implement `ITransactional`, mở DB Transaction.
 4.  **Handler:** Load Aggregate Root qua `IRepository`, gọi các phương thức thay đổi trạng thái bên trong Aggregate (ví dụ: `auction.PlaceBid()`), sau đó gọi `repository.UpdateAsync()`.
 5.  **Event Dispatching:** `TransactionBehavior` tự động quét các Aggregate đang thay đổi, lấy ra `DomainEvents` và đẩy vào Outbox/Message Broker thông qua `IEventDispatcher`.
 6.  **Transaction Commit:** Ghi dữ liệu xuống DB.
@@ -89,21 +89,21 @@ Dưới đây là các bước thao tác trên IDE (như JetBrains Rider) để 
 Di chuyển đến thư mục tính năng tương ứng (ví dụ: `L2.Application/UseCases/Categories/Commands/UpdateCategory`).
 
 1. **Tạo file Command:** Tạo file `UpdateCategoryCommand.cs`.
-  * Định nghĩa Request DTO (nếu payload lớn): `public record UpdateCategoryRequest(string Name, Guid? ParentId);`
-  * Định nghĩa Command: `public record UpdateCategoryCommand(Guid Id, UpdateCategoryRequest Data) : IRequest<bool>, ITransactional;`
+    * Định nghĩa Request DTO (nếu payload lớn): `public record UpdateCategoryRequest(string Name, Guid? ParentId);`
+    * Định nghĩa Command: `public record UpdateCategoryCommand(Guid Id, UpdateCategoryRequest Data) : IRequest<bool>, ITransactional;`
 
 2. **Tạo Validator (Cùng file Command hoặc file riêng):**
-  * Tạo class: `public class UpdateCategoryValidator : AbstractValidator<UpdateCategoryCommand>`
-  * Viết rule trong Constructor: `RuleFor(x => x.Data.Name).NotEmpty()...;`
+    * Tạo class: `public class UpdateCategoryValidator : AbstractValidator<UpdateCategoryCommand>`
+    * Viết rule trong Constructor: `RuleFor(x => x.Data.Name).NotEmpty()...;`
 
 3. **Tạo file Handler:** Tạo file `UpdateCategoryHandler.cs`.
-  * Implement interface: `public class UpdateCategoryHandler(IRepository<Category> repository) : IRequestHandler<UpdateCategoryCommand, bool>`
-  * Viết logic hàm `Handle`:
-    * Dùng `GetByIdAsync` để lấy dữ liệu.
-    * Ném `WorkflowException` kèm mã 404 nếu không tìm thấy.
-    * Gọi phương thức `Update` của entity đã tạo ở Bước 1.
-    * Gọi `repository.UpdateAsync(category, ct);`
-    * Trả về kết quả.
+    * Implement interface: `public class UpdateCategoryHandler(IRepository<Category> repository) : IRequestHandler<UpdateCategoryCommand, bool>`
+    * Viết logic hàm `Handle`:
+      * Dùng `GetByIdAsync` để lấy dữ liệu.
+      * Ném `WorkflowException` kèm mã 404 nếu không tìm thấy.
+      * Gọi phương thức `Update` của entity đã tạo ở Bước 1.
+      * Gọi `repository.UpdateAsync(category, ct);`
+      * Trả về kết quả.
 
 ### Bước 3: Đăng ký Endpoint (L0.API)
 1. Mở Controller tương ứng (ví dụ: `CategoryController.cs` trong thư mục `Admin`).

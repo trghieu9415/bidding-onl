@@ -6,13 +6,13 @@ Tài liệu này mô tả chi tiết giao thức giao tiếp thời gian thực 
 
 Hệ thống cung cấp 2 Endpoint (Hubs) chính:
 
-*   **Auction Hub:** `/hubs/auction` (Dành cho các sự kiện public trong phòng đấu giá và thông báo cá nhân cho Seller).
-*   **User Hub:** `/hubs/notification` (Dành cho các thông báo cá nhân bảo mật chuyên biệt cho Bidder).
+* **Auction Hub:** `/hubs/auction` (Dành cho các sự kiện public trong phòng đấu giá và thông báo cá nhân cho Seller).
+* **User Hub:** `/hubs/notification` (Dành cho các thông báo cá nhân bảo mật chuyên biệt cho Bidder).
 
 **Cơ chế xác thực Token:**
 SignalR không hỗ trợ truyền Authorization Header trong môi trường Browser Websockets thông thường. Do đó, hệ thống được cấu hình nhận JWT Access Token thông qua **Query Parameter**.
-*   Key: `access_token`
-*   URL Sample: `wss://<domain>/hubs/notification?access_token=eyJhbGciOiJIUzI1...`
+* Key: `access_token`
+* URL Sample: `wss://<domain>/hubs/notification?access_token=eyJhbGciOiJIUzI1...`
 
 ## 2. Client-to-Server Invocations (Lệnh gọi từ Client)
 
