@@ -45,6 +45,59 @@ public class ImageController(IStorageService storage) : ExternalController {
     }
   }
 
+  [HttpPost("upload-batch")]
+  [RequestSizeLimit(50 * 1024 * 1024)]
+  [ProducesSuccess<UrlsResponse>]
+  public async Task<IActionResult> UploadBatch(List<IFormFile>? files, CancellationToken ct) {
+    if (files == null || files.Count == 0) {
+      return ApiResponse.Fail("Vui lòng chọn ít nhất một ảnh để tải lên", 400);
+    }
+
+    if (files.Count > 10) {
+      return ApiResponse.Fail("Chỉ được phép tải lên tối đa 10 ảnh cùng lúc", 400);
+    }
+
+    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+    var validationErrors = new List<string>();
+    var fileRequests = new List<(string FileName, Stream Content, string Ext, string Folder)>();
+
+    foreach (var file in files) {
+      if (file.Length == 0) {
+        continue;
+      }
+
+      var extension = Path.GetExtension(file.FileName).ToLower();
+
+      if (!allowedExtensions.Contains(extension)) {
+        validationErrors.Add($"'{file.FileName}': Định dạng không hỗ trợ");
+        continue;
+      }
+
+      if (file.Length > 5 * 1024 * 1024) {
+        validationErrors.Add($"'{file.FileName}': Vượt quá 5MB");
+        continue;
+      }
+
+      fileRequests.Add((
+        Path.GetFileNameWithoutExtension(file.FileName),
+        file.OpenReadStream(), extension, "catalog"
+      ));
+    }
+
+    if (fileRequests.Count == 0) {
+      return ApiResponse.Fail(
+        "Không có tệp nào hợp lệ để tải lên. Chi tiết: " + string.Join(", ", validationErrors),
+        400
+      );
+    }
+
+    var (urls, uploadErrors) = await storage.UploadBatchAsync(fileRequests, ct);
+    var allErrors = validationErrors.Concat(uploadErrors).ToList();
+    return urls.Count == 0
+      ? ApiResponse.Fail("Tải lên thất bại toàn bộ. Chi tiết: " + string.Join(", ", allErrors), 500)
+      : ApiResponse.Success(new UrlsResponse(urls), "Tải ảnh lên hoàn tất");
+  }
+
   [HttpDelete("remove")]
   [ProducesSuccess<bool>]
   public async Task<IActionResult> Delete([FromQuery] string fileName, CancellationToken ct) {
@@ -62,3 +115,5 @@ public class ImageController(IStorageService storage) : ExternalController {
 }
 
 public record UrlResponse(string Url);
+
+public record UrlsResponse(IEnumerable<string> Urls);

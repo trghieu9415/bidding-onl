@@ -23,40 +23,38 @@ public record UpdateRegisteredItemRequest(
 
 public class UpdateRegisteredItemValidator : AbstractValidator<UpdateRegisteredItemCommand> {
   public UpdateRegisteredItemValidator() {
-    RuleFor(x => x.Id)
-      .NotEmpty().WithMessage("Id không được rỗng.");
+    RuleFor(x => x.Id).NotEmpty().WithMessage("Id không được để trống.");
+    RuleFor(x => x.UserId).NotEmpty().WithMessage("UserId không được để trống.");
+    RuleFor(x => x.Data).NotNull().ChildRules(data => {
+      data.RuleFor(x => x.Name)
+        .MaximumLength(200).WithMessage("Tên không quá 200 ký tự.");
 
-    RuleFor(x => x.Data)
-      .NotNull().WithMessage("Dữ liệu cập nhật không được null.");
+      data.RuleFor(x => x.Description)
+        .MaximumLength(2000).WithMessage("Mô tả không quá 2000 ký tự.");
 
-    RuleFor(x => x.Data.Name)
-      .MaximumLength(200).WithMessage("Tên không được vượt quá 200 ký tự.");
+      data.RuleFor(x => x.StartingPrice)
+        .GreaterThan(0).When(x => x.StartingPrice.HasValue)
+        .WithMessage("Giá khởi điểm phải lớn hơn 0.");
 
-    RuleFor(x => x.Data.Description)
-      .MaximumLength(2000).WithMessage("Mô tả không được vượt quá 2000 ký tự.");
+      data.RuleFor(x => x.Condition)
+        .IsInEnum().When(x => x.Condition.HasValue)
+        .WithMessage("Tình trạng không hợp lệ.");
 
-    RuleFor(x => x.Data.StartingPrice)
-      .GreaterThan(0).When(x => x.Data.StartingPrice.HasValue)
-      .WithMessage("Giá khởi điểm phải lớn hơn 0.");
+      data.RuleFor(x => x.CategoryIds)
+        .Must(ids => ids == null || ids.Count > 0)
+        .WithMessage("Danh mục không được rỗng.");
 
-    RuleFor(x => x.Data.Condition)
-      .IsInEnum().When(x => x.Data.Condition.HasValue)
-      .WithMessage("Tình trạng sản phẩm không hợp lệ.");
+      data.RuleForEach(x => x.CategoryIds)
+        .NotEmpty().WithMessage("CategoryId không hợp lệ.");
 
-    RuleFor(x => x.Data.CategoryIds)
-      .Must(ids => ids == null || ids.Count > 0)
-      .WithMessage("Danh mục không được là danh sách rỗng.");
+      data.RuleFor(x => x.MainImageUrl)
+        .Must(BeAValidUrl).When(x => !string.IsNullOrWhiteSpace(x.MainImageUrl))
+        .WithMessage("MainImageUrl không hợp lệ.");
 
-    RuleForEach(x => x.Data.CategoryIds!)
-      .NotEmpty().WithMessage("CategoryId không hợp lệ.");
-
-    RuleFor(x => x.Data.MainImageUrl)
-      .Must(BeAValidUrl).When(x => !string.IsNullOrWhiteSpace(x.Data.MainImageUrl))
-      .WithMessage("MainImageUrl không hợp lệ.");
-
-    RuleForEach(x => x.Data.SubImageUrls!)
-      .Must(BeAValidUrl).When(x => x.Data.SubImageUrls != null)
-      .WithMessage("Một trong các SubImageUrl không hợp lệ.");
+      data.RuleForEach(x => x.SubImageUrls)
+        .Must(BeAValidUrl).When(x => x.SubImageUrls != null)
+        .WithMessage("SubImageUrl không hợp lệ.");
+    });
   }
 
   private bool BeAValidUrl(string? url) {

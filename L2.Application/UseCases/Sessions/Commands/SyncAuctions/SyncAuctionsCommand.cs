@@ -1,6 +1,6 @@
 ﻿using L2.Application.Abstractions;
 using MediatR;
 
-namespace L2.Application.UseCases.Auctions.Commands.SyncAuctions;
+namespace L2.Application.UseCases.Sessions.Commands.SyncAuctions;
 
 public record SyncAuctionsCommand(Guid Id, List<Guid> AuctionIds) : IRequest<bool>, ITransactional;

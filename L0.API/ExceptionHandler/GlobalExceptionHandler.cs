@@ -43,7 +43,8 @@ public class GlobalExceptionHandler(
         422,
         ApiResponse.Fail(
           iIEx.Errors,
-          iIEx.Errors.FirstOrDefault() ?? "Dữ liệu không hợp lệ", 422).Value!
+          iIEx.Errors.FirstOrDefault() ?? "Dữ liệu không hợp lệ", 422
+        ).Value!
       ),
       DomainException dEx => (400, ApiResponse.Fail(dEx.Message, 400).Value!),
       InfrastructureException iEx => (500, ApiResponse.Fail(iEx.Message, 500).Value!),

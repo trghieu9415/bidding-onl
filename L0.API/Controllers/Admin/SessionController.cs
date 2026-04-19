@@ -1,13 +1,14 @@
 ﻿using L0.API.Response;
 using L2.Application.DTOs;
 using L2.Application.Filters;
-using L2.Application.UseCases.Auctions.Commands.SyncAuctions;
 using L2.Application.UseCases.Sessions.Commands.AddSession;
 using L2.Application.UseCases.Sessions.Commands.PublishSession;
 using L2.Application.UseCases.Sessions.Commands.RemoveSession;
 using L2.Application.UseCases.Sessions.Commands.RestoreSession;
+using L2.Application.UseCases.Sessions.Commands.SyncAuctions;
 using L2.Application.UseCases.Sessions.Commands.UpdateSession;
 using L2.Application.UseCases.Sessions.Queries.GetRemovedSessions;
+using L2.Application.UseCases.Sessions.Queries.GetSession;
 using L2.Application.UseCases.Sessions.Queries.GetSessions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,13 @@ public class SessionController : DashboardController {
   public async Task<IActionResult> Get([FromQuery] SessionFilter filter, CancellationToken ct) {
     var result = await Mediator.Send(new GetSessionsQuery(filter), ct);
     return ApiResponse.Success(result.Sessions, result.Meta);
+  }
+
+  [HttpGet("{id:guid}")]
+  [ProducesSuccess<List<GetSessionResult>>]
+  public async Task<IActionResult> GetDetail(Guid id, CancellationToken ct) {
+    var result = await Mediator.Send(new GetSessionQuery(id), ct);
+    return ApiResponse.Success(result);
   }
 
   [HttpPost]

@@ -69,6 +69,22 @@ public class CatalogItem : AggregateRoot {
     AddDomainEvent(new ItemRejectedEvent(Id, OwnerId, reason));
   }
 
+  public void Revoke() {
+    if (Status != ItemStatus.Pending) {
+      throw new DomainException("Chỉ có thể thu hồi sản phẩm đang chờ duyệt.");
+    }
+
+    Status = ItemStatus.Revoked;
+  }
+
+  public void Rejoin() {
+    if (Status != ItemStatus.Revoked) {
+      throw new DomainException("Chỉ có thể gửi duyệt sản phẩm đã thu hồi.");
+    }
+
+    Status = ItemStatus.Revoked;
+  }
+
 
   public void Approve() {
     if (Status != ItemStatus.Pending) {

@@ -11,12 +11,14 @@ public class BusinessCache(
   ISessionReadRepository auctionSessionRepository,
   IDistributedLockProvider lockProvider
 ) : IBusinessCache {
-  public async Task<List<AuctionSessionDto>?> GetCurrentSessionsAsync(CancellationToken ct) {
-    return await GetOrSetAsync(
+  public async Task<List<AuctionSessionDto>> GetCurrentSessionsAsync(CancellationToken ct) {
+    var sessions = await GetOrSetAsync(
       BusinessKeys.CurrentSession,
       async () => await auctionSessionRepository.GetCurrentSessionsAsync(ct),
       TimeSpan.FromDays(7), ct
     );
+
+    return sessions ?? [];
   }
 
   // NOTE: ========== [Helper] ==========

@@ -67,7 +67,9 @@ public class EfRepository<T>(AppDbContext context) : IRepository<T> where T : Ag
       .ToListAsync(ct);
   }
 
-  public async Task<IReadOnlyCollection<Guid>> GetMissingIdsAsync(ICollection<Guid>? ids,
+  public async Task<IReadOnlyCollection<Guid>> GetMissingIdsAsync(
+    ICollection<Guid>? ids,
+    Expression<Func<T, bool>>? criteria = null,
     CancellationToken ct = default) {
     if (ids == null || ids.Count == 0) {
       return new List<Guid>();
@@ -75,12 +77,14 @@ public class EfRepository<T>(AppDbContext context) : IRepository<T> where T : Ag
 
     var distinctInputIds = ids.Distinct().ToList();
 
-    var foundIds = await _dbSet
-      .AsNoTracking()
-      .Where(x => distinctInputIds.Contains(x.Id))
-      .Select(x => x.Id)
-      .ToListAsync(ct);
+    var query = _dbSet.AsNoTracking()
+      .Where(x => !x.IsDeleted && distinctInputIds.Contains(x.Id));
 
+    if (criteria != null) {
+      query = query.Where(criteria);
+    }
+
+    var foundIds = await query.Select(x => x.Id).ToListAsync(ct);
     var missingIds = distinctInputIds.Except(foundIds).ToList();
     return missingIds;
   }

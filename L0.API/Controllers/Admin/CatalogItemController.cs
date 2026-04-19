@@ -5,6 +5,7 @@ using L2.Application.UseCases.Items.Commands.ApproveItem;
 using L2.Application.UseCases.Items.Commands.RejectItem;
 using L2.Application.UseCases.Items.Queries.GetItem;
 using L2.Application.UseCases.Items.Queries.GetItems;
+using L2.Application.UseCases.Items.Queries.GetRemovedItems;
 using Microsoft.AspNetCore.Mvc;
 
 namespace L0.API.Controllers.Admin;
@@ -14,6 +15,13 @@ public class CatalogItemController : DashboardController {
   [ProducesSuccess<List<CatalogItemDto>>]
   public async Task<IActionResult> Get([FromQuery] CatalogItemFilter filter, CancellationToken ct) {
     var result = await Mediator.Send(new GetItemsQuery(filter), ct);
+    return ApiResponse.Success(result.Items, result.Meta);
+  }
+
+  [HttpGet("removed")]
+  [ProducesSuccess<List<CatalogItemDto>>]
+  public async Task<IActionResult> GetRemoved([FromQuery] CatalogItemFilter filter, CancellationToken ct) {
+    var result = await Mediator.Send(new GetRemovedItemsQuery(filter), ct);
     return ApiResponse.Success(result.Items, result.Meta);
   }
 

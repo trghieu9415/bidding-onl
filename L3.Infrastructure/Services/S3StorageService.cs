@@ -52,6 +52,28 @@ public class S3StorageService : IStorageService {
     return true;
   }
 
+  public async Task<(List<string> Urls, List<string> Errors)> UploadBatchAsync(
+    IEnumerable<(string FileName, Stream Content, string Ext, string Folder)> files,
+    CancellationToken ct = default) {
+    var urls = new List<string>();
+    var errors = new List<string>();
+
+    var uploadTasks = files.Select(async file => {
+      try {
+        var url = await UploadAsync(file.FileName, file.Content, file.Ext, file.Folder, ct);
+        return new { Success = true, Url = url, Error = string.Empty };
+      } catch (Exception ex) {
+        return new { Success = false, Url = string.Empty, Error = $"'{file.FileName}': {ex.Message}" };
+      }
+    });
+
+    var results = await Task.WhenAll(uploadTasks);
+
+    urls.AddRange(results.Where(r => r.Success).Select(r => r.Url));
+    errors.AddRange(results.Where(r => !r.Success).Select(r => r.Error));
+    return (urls, errors);
+  }
+
   public async Task<List<string>> ListFilesAsync(string folder, CancellationToken ct = default) {
     var request = new ListObjectsV2Request {
       BucketName = _bucketName,
