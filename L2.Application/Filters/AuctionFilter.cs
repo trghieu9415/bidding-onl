@@ -1,5 +1,6 @@
 ﻿using AutoFilterer.Attributes;
 using AutoFilterer.Enums;
+using FluentValidation;
 using L1.Core.Domain.Bidding.Entities;
 using L1.Core.Domain.Bidding.Enums;
 
@@ -26,4 +27,26 @@ public class AuctionFilter : BaseFilter {
   [CompareTo(nameof(Auction.WinningAt))]
   [OperatorComparison(OperatorType.LessThanOrEqual)]
   public DateTime? MaxWinningAt { get; set; }
+}
+
+public sealed class AuctionFilterValidator : BaseFilterValidator<AuctionFilter> {
+  public AuctionFilterValidator() {
+    RuleFor(x => x)
+      .Must(x => !x.MinPrice.HasValue || !x.MaxPrice.HasValue || x.MinPrice <= x.MaxPrice)
+      .WithMessage("Giá tối thiểu không được lớn hơn giá tối đa.");
+
+    RuleFor(x => x)
+      .Must(x => !x.MinWinningAt.HasValue || !x.MaxWinningAt.HasValue || x.MinWinningAt <= x.MaxWinningAt)
+      .WithMessage("Thời gian thắng tối thiểu không được lớn hơn thời gian thắng tối đa.");
+
+    RuleFor(x => x.MinPrice)
+      .GreaterThanOrEqualTo(0)
+      .WithMessage("Giá tối thiểu không được nhỏ hơn 0.")
+      .When(x => x.MinPrice.HasValue);
+
+    RuleFor(x => x.MaxPrice)
+      .GreaterThanOrEqualTo(0)
+      .WithMessage("Giá tối đa không được nhỏ hơn 0.")
+      .When(x => x.MaxPrice.HasValue);
+  }
 }

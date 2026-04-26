@@ -36,8 +36,8 @@ public class AuctionController : UserController {
   [HttpGet("search")]
   [ProducesSuccess<List<AuctionSearchDto>>]
   [AllowAnonymous]
-  public async Task<IActionResult> Search([FromQuery] AuctionSearchFilter searchFilter, CancellationToken ct) {
-    var query = new SearchItemQuery(searchFilter);
+  public async Task<IActionResult> Search([FromQuery] AuctionSearchRequest searchRequest, CancellationToken ct) {
+    var query = new SearchItemQuery(searchRequest);
     var result = await Mediator.Send(query, ct);
     return ApiResponse.Success(result.Items, result.Meta);
   }

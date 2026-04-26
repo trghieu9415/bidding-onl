@@ -2,18 +2,16 @@
 using L1.Core.Domain.Bidding.Entities;
 using L1.Core.Domain.Catalog.Entities;
 using L2.Application.DTOs;
-using L2.Application.Filters;
 using L2.Application.Ports.Search;
+using L2.Application.UseCases.Auctions.Commands.SearchItem;
 using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-
-// Add namespace chứa WhereIf
 
 namespace L3.Infrastructure.Adapters.Search;
 
 public class PostgresSearchService(AppDbContext context) : ISearchService {
   public async Task<(int total, List<AuctionSearchDto> items)> SearchAsync(
-    AuctionSearchFilter req,
+    AuctionSearchRequest req,
     CancellationToken ct
   ) {
     // Query Join
