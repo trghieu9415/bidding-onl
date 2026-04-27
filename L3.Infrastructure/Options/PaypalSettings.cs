@@ -8,6 +8,7 @@ public class PaypalSettings : IOptionSection {
   public string ClientSecret { get; set; } = string.Empty;
   public string Mode { get; set; } = "sandbox";
   public string Currency { get; set; } = "USD";
+  public string WebhookId { get; set; } = string.Empty;
 
   public string SuccessUrl { get; set; } = string.Empty;
   public string CancelUrl { get; set; } = string.Empty;

@@ -14,6 +14,16 @@ public record CreateOrderCommand(
 
 public record CreateOrderRequest(Guid AuctionId, Address Address);
 
-public record CreateOrderResult(Guid Id);
+public sealed class CreateOrderValidator : AbstractValidator<CreateOrderRequest> {
+  public CreateOrderValidator() {
+    RuleFor(x => x.AuctionId)
+      .NotEmpty()
+      .WithMessage("Id phiên đấu giá không được để trống.");
 
-public class CreateOrderValidator : AbstractValidator<CreateOrderCommand> {}
+    RuleFor(x => x.Address)
+      .NotNull()
+      .WithMessage("Địa chỉ giao hàng không được để trống.");
+  }
+}
+
+public record CreateOrderResult(Guid Id);

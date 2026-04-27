@@ -70,9 +70,9 @@ public class PaypalGateway : IPaymentGateway {
     return approveLink ?? string.Empty;
   }
 
-  public async Task<(bool isSucceed, string transactionId)> VerifyPayment(GatewayPayload payload,
+  public async Task<(bool isSucceed, string transactionId)> VerifyClientPayment(ClientPayload payload,
     CancellationToken ct = default) {
-    if (payload is not PaypalGatewayPayload paypalPayload || string.IsNullOrEmpty(paypalPayload.Token)) {
+    if (payload is not PaypalClientPayload paypalPayload || string.IsNullOrEmpty(paypalPayload.Token)) {
       return (false, string.Empty);
     }
 
@@ -105,6 +105,65 @@ public class PaypalGateway : IPaymentGateway {
       }
 
       return (false, string.Empty);
+    } catch {
+      return (false, string.Empty);
+    }
+  }
+
+  public async Task<(bool isSucceed, string transactionId)> VerifyWebhookPayment(WebhookPayload payload,
+    CancellationToken ct = default) {
+    if (payload is not PaypalWebhookPayload paypalPayload) {
+      return (false, string.Empty);
+    }
+
+    try {
+      var token = await GetAccessTokenAsync(ct);
+      if (string.IsNullOrEmpty(token)) {
+        return (false, string.Empty);
+      }
+
+      _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+      var verifyRequest = new {
+        auth_algo = paypalPayload.AuthAlgo,
+        cert_url = paypalPayload.CertUrl,
+        transmission_id = paypalPayload.TransmissionId,
+        transmission_sig = paypalPayload.TransmissionSig,
+        transmission_time = paypalPayload.TransmissionTime,
+        webhook_id = _options.WebhookId,
+        webhook_event = JsonNode.Parse(paypalPayload.RawBody)
+      };
+
+      var content = new StringContent(
+        JsonSerializer.Serialize(verifyRequest),
+        Encoding.UTF8,
+        "application/json"
+      );
+
+      var response = await _client.PostAsync("/v1/notifications/verify-webhook-signature", content, ct);
+
+      if (!response.IsSuccessStatusCode) {
+        return (false, string.Empty);
+      }
+
+      var jsonBody = await response.Content.ReadAsStringAsync(ct);
+      var json = JsonNode.Parse(jsonBody);
+      var verificationStatus = json?["verification_status"]?.ToString();
+
+      if (verificationStatus != "SUCCESS") {
+        return (false, string.Empty);
+      }
+
+      var webhookEvent = JsonNode.Parse(paypalPayload.RawBody);
+      var eventType = webhookEvent?["event_type"]?.ToString();
+
+      if (eventType != "PAYMENT.CAPTURE.COMPLETED") {
+        return (false, string.Empty);
+      }
+
+      var captureId = webhookEvent?["resource"]?["id"]?.ToString();
+
+      return !string.IsNullOrEmpty(captureId) ? (true, captureId) : (false, string.Empty);
     } catch {
       return (false, string.Empty);
     }
@@ -148,9 +207,25 @@ public class PaypalGateway : IPaymentGateway {
     }
   }
 
-  public GatewayPayload ToGatewayPayload(JsonElement data) {
+  public ClientPayload ToClientPayload(JsonElement data) {
     var props = data.ExtractProperties("token", "PayerID");
-    return new PaypalGatewayPayload(props["token"], props["PayerID"]);
+    return new PaypalClientPayload(props["token"], props["PayerID"]);
+  }
+
+  public WebhookPayload ToWebhookPayload(JsonElement payload) {
+    var props = payload.ExtractProperties(
+      "auth_algo", "cert_url", "raw_body",
+      "transmission_id", "transmission_sig", "transmission_time"
+    );
+
+    return new PaypalWebhookPayload(
+      props["auth_algo"],
+      props["cert_url"],
+      props["transmission_id"],
+      props["transmission_sig"],
+      props["transmission_time"],
+      props["raw_body"]
+    );
   }
 
   // NOTE: ========== [Private Helper] ==========
@@ -171,4 +246,13 @@ public class PaypalGateway : IPaymentGateway {
   }
 }
 
-public record PaypalGatewayPayload(string Token, string PayerId = "") : GatewayPayload;
+public record PaypalClientPayload(string Token, string PayerId) : ClientPayload;
+
+public record PaypalWebhookPayload(
+  string AuthAlgo,
+  string CertUrl,
+  string TransmissionId,
+  string TransmissionSig,
+  string TransmissionTime,
+  string RawBody
+) : WebhookPayload;

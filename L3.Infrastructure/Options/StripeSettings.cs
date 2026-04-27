@@ -5,6 +5,7 @@ namespace L3.Infrastructure.Options;
 public class StripeSettings : IOptionSection {
   public string SecretKey { get; set; } = string.Empty;
   public string PublishableKey { get; set; } = string.Empty;
+  public string EndpointSecret { get; set; } = string.Empty;
   public int Retry { get; set; } = 3;
 
   public string Currency { get; set; } = "vnd";

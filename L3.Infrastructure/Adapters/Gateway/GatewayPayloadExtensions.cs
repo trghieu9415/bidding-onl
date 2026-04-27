@@ -2,7 +2,7 @@
 
 namespace L3.Infrastructure.Adapters.Gateway;
 
-public static class GatewayPayloadExtensions {
+public static class ClientPayloadExtensions {
   public static Dictionary<string, string> ExtractProperties(this JsonElement payload, params string[] propertyNames) {
     var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     var missingProps = new List<string>();

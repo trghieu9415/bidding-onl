@@ -28,7 +28,7 @@ public class Payment : AggregateRoot {
     PaymentUrl = paymentUrl;
   }
 
-  public void MarkAsCompleted(Guid userId, string transactionId) {
+  public void MarkAsCompleted(string transactionId) {
     if (Status == PaymentStatus.Succeeded) {
       return;
     }
@@ -39,7 +39,7 @@ public class Payment : AggregateRoot {
 
     TransactionId = transactionId;
     Status = PaymentStatus.Succeeded;
-    AddDomainEvent(new PaymentCompletedEvent(Id, OrderId, userId, Amount, Method, TransactionId));
+    AddDomainEvent(new PaymentCompletedEvent(Id, OrderId, Amount, Method, TransactionId));
   }
 
   public void MarkAsFailed() {

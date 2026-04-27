@@ -77,7 +77,7 @@ public class S3StorageService : IStorageService {
   public async Task<List<string>> ListFilesAsync(string folder, CancellationToken ct = default) {
     var request = new ListObjectsV2Request {
       BucketName = _bucketName,
-      Prefix = string.IsNullOrEmpty(folder) ? "" : $"{folder}/"
+      Prefix = string.IsNullOrEmpty(folder) ? string.Empty : $"{folder}/"
     };
 
     var response = await _s3Client.ListObjectsV2Async(request, ct);

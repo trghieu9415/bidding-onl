@@ -40,11 +40,11 @@ public class TransactionController : UserController {
 
   [HttpPost("verify")]
   [ProducesSuccess<List<bool>>]
-  public async Task<IActionResult> VerifyPayment(
-    [FromBody] VerifyPaymentRequest req,
+  public async Task<IActionResult> VerifyClientPayment(
+    [FromBody] VerifyClientPaymentRequest req,
     CancellationToken ct
   ) {
-    var command = new VerifyPaymentCommand(CurrentUser.Id, req);
+    var command = new VerifyClientPaymentCommand(CurrentUser.Id, req);
     var result = await Mediator.Send(command, ct);
     return ApiResponse.Success(result);
   }

@@ -16,6 +16,17 @@
     container_name: bid_stripe_listener
     command: >
       listen --api-key ${STRIPE_SECRET_KEY}
-      --forward-to http://host.docker.internal:5202/api/webhooks/stripe
+      --forward-to http://host.docker.internal:5202/api/external/webhooks/stripe
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  ngrok:
+    image: ngrok/ngrok:3-alpine
+    container_name: bid_ngrok
+    ports:
+      - "4040:4040"
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_TOKEN}
+    command: http host.docker.internal:5202/api/externals/webhook
     extra_hosts:
       - "host.docker.internal:host-gateway"

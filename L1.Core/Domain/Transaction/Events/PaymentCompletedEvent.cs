@@ -6,7 +6,6 @@ namespace L1.Core.Domain.Transaction.Events;
 public record PaymentCompletedEvent(
   Guid PaymentId,
   Guid OrderId,
-  Guid BidderId,
   decimal Amount,
   PaymentMethod Method,
   string? TransactionId

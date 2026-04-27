@@ -4,8 +4,8 @@
     container_name: bid_rabbitmq
     restart: always
     environment:
-      - RABBITMQ_DEFAULT_USER=${RABITTMQ_ADMIN}
-      - RABBITMQ_DEFAULT_PASS=${RABITTMQ_PASSWORD}
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=password123
     ports:
       - "5672:5672"
       - "15672:15672"

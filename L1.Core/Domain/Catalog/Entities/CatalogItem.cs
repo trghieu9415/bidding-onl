@@ -60,7 +60,7 @@ public class CatalogItem : AggregateRoot {
     return this;
   }
 
-  public void Reject(string reason = "") {
+  public void Reject(string reason) {
     if (Status != ItemStatus.Pending) {
       throw new DomainException("Chỉ có thể từ chối sản phẩm đang chờ duyệt.");
     }

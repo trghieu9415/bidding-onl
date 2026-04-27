@@ -25,10 +25,10 @@ public class JwtService(JwtSettings jwtSettings) : IJwtService {
   public TokenModel GenerateAccessToken(User user) {
     var claims = new List<Claim> {
       new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-      new(ClaimTypes.Name, user.FullName ?? ""),
+      new(ClaimTypes.Name, user.FullName ?? string.Empty),
       new(ClaimTypes.Email, user.Email),
       new(ClaimTypes.Role, user.Role.ToString()),
-      new("security_stamp", user.SecurityStamp ?? ""),
+      new("security_stamp", user.SecurityStamp ?? string.Empty),
       new("token_type", "access"),
       new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
@@ -38,7 +38,7 @@ public class JwtService(JwtSettings jwtSettings) : IJwtService {
   public TokenModel GenerateRefreshToken(User user) {
     var claims = new List<Claim> {
       new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-      new("security_stamp", user.SecurityStamp ?? ""),
+      new("security_stamp", user.SecurityStamp ?? string.Empty),
       new("token_type", "refresh"),
       new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };

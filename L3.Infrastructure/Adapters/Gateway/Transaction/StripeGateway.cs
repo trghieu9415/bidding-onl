@@ -43,9 +43,9 @@ public class StripeGateway : IPaymentGateway {
     return session.Url;
   }
 
-  public async Task<(bool isSucceed, string transactionId)> VerifyPayment(GatewayPayload payload,
+  public async Task<(bool isSucceed, string transactionId)> VerifyClientPayment(ClientPayload payload,
     CancellationToken ct = default) {
-    if (payload is not StripeGatewayPayload stripePayload) {
+    if (payload is not StripeClientPayload stripePayload) {
       return (false, string.Empty);
     }
 
@@ -63,6 +63,37 @@ public class StripeGateway : IPaymentGateway {
     return (false, string.Empty);
   }
 
+  public Task<(bool isSucceed, string transactionId)> VerifyWebhookPayment(
+    WebhookPayload payload,
+    CancellationToken ct = default
+  ) {
+    if (payload is not StripeWebhookPayload stripePayload) {
+      return Task.FromResult((false, string.Empty));
+    }
+
+    try {
+      var stripeEvent = EventUtility.ConstructEvent(
+        stripePayload.RawBody,
+        stripePayload.StripeSignature,
+        _settings.EndpointSecret
+      );
+
+      if (stripeEvent.Type == EventTypes.CheckoutSessionCompleted) {
+        var session = stripeEvent.Data.Object as Session;
+
+        if (session?.PaymentStatus == "paid" && !string.IsNullOrEmpty(session.PaymentIntentId)) {
+          return Task.FromResult((true, session.PaymentIntentId));
+        }
+      }
+
+      return Task.FromResult((false, string.Empty));
+    } catch (StripeException) {
+      return Task.FromResult((false, string.Empty));
+    } catch {
+      return Task.FromResult((false, string.Empty));
+    }
+  }
+
   public async Task<bool> RefundPayment(Payment payment, CancellationToken ct = default) {
     var options = new RefundCreateOptions {
       PaymentIntent = payment.TransactionId
@@ -77,10 +108,17 @@ public class StripeGateway : IPaymentGateway {
     }
   }
 
-  public GatewayPayload ToGatewayPayload(JsonElement data) {
+  public ClientPayload ToClientPayload(JsonElement data) {
     var props = data.ExtractProperties("session_id");
-    return new StripeGatewayPayload(props["session_id"]);
+    return new StripeClientPayload(props["session_id"]);
+  }
+
+  public WebhookPayload ToWebhookPayload(JsonElement payload) {
+    var props = payload.ExtractProperties("raw_body", "stripe_signature");
+    return new StripeWebhookPayload(props["raw_body"], props["stripe_signature"]);
   }
 }
 
-public record StripeGatewayPayload(string SessionId) : GatewayPayload;
+public record StripeClientPayload(string SessionId) : ClientPayload;
+
+public record StripeWebhookPayload(string RawBody, string StripeSignature) : WebhookPayload;
