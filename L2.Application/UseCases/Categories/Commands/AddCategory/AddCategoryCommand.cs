@@ -6,8 +6,12 @@ namespace L2.Application.UseCases.Categories.Commands.AddCategory;
 
 public record AddCategoryCommand(string Name, Guid? ParentId) : IRequest<Guid>, ITransactional;
 
-public class AddCategoryValidator : AbstractValidator<AddCategoryCommand> {
+public sealed class AddCategoryValidator : AbstractValidator<AddCategoryCommand> {
   public AddCategoryValidator() {
-    RuleFor(x => x.Name).NotEmpty().MaximumLength(100).WithMessage("Tên danh mục không được để trống");
+    RuleFor(x => x.Name)
+      .NotEmpty()
+      .WithMessage("Tên danh mục không được để trống.")
+      .MaximumLength(200)
+      .WithMessage("Tên danh mục không được vượt quá 200 ký tự.");
   }
 }

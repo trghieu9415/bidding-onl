@@ -11,8 +11,8 @@ public record AddAuctionCommand(
   decimal ReservePrice
 ) : IRequest<Guid>, ITransactional;
 
-public sealed class AddAuctionCommandValidator : AbstractValidator<AddAuctionCommand> {
-  public AddAuctionCommandValidator() {
+public sealed class AddAuctionValidator : AbstractValidator<AddAuctionCommand> {
+  public AddAuctionValidator() {
     RuleFor(x => x.CatalogItemId)
       .NotEmpty()
       .WithMessage("Id sản phẩm không được để trống.");

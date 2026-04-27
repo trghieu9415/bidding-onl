@@ -9,8 +9,8 @@ public record UpdateAuctionCommand(
   UpdateAuctionRequest Data
 ) : IRequest<bool>, ITransactional;
 
-public sealed class UpdateAuctionRequestValidator : AbstractValidator<UpdateAuctionRequest> {
-  public UpdateAuctionRequestValidator() {
+public sealed class UpdateAuctionValidator : AbstractValidator<UpdateAuctionRequest> {
+  public UpdateAuctionValidator() {
     RuleFor(x => x.StepPrice).GreaterThan(0).WithMessage("Giá bước phải lớn hơn 0.");
     RuleFor(x => x.ReservePrice).GreaterThan(0).WithMessage("Giá khởi điểm phải lớn hơn 0.");
     RuleFor(x => x.ReservePrice).GreaterThanOrEqualTo(x => x.StepPrice)

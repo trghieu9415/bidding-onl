@@ -20,8 +20,8 @@ public record AuctionSearchRequest(
   int PerPage = 10
 );
 
-public sealed class AuctionSearchRequestValidator : AbstractValidator<AuctionSearchRequest> {
-  public AuctionSearchRequestValidator() {
+public sealed class AuctionSearchValidator : AbstractValidator<AuctionSearchRequest> {
+  public AuctionSearchValidator() {
     RuleFor(x => x.Keyword)
       .MaximumLength(200)
       .WithMessage("Từ khóa tìm kiếm không được vượt quá 200 ký tự.")
