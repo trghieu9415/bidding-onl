@@ -7,8 +7,34 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="L2.Application\"/>
-    <Folder Include="L1.Domain\"/>
+    <Folder Include="L1.Core\Catalog\"/>
+    <Folder Include="L1.Core\Transaction\"/>
+    <Folder Include="L2.Application\Auctions\"/>
+    <Folder Include="L2.Application\Auth\"/>
+    <Folder Include="L2.Application\Bidders\"/>
+    <Folder Include="L2.Application\Bids\"/>
+    <Folder Include="L2.Application\Categories\"/>
+    <Folder Include="L2.Application\Items\"/>
+    <Folder Include="L2.Application\Sessions\"/>
+    <Folder Include="L2.Application\System\"/>
+    <Folder Include="L2.Application\Transactions\"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\L1.Core\L1.Core.csproj"/>
+    <ProjectReference Include="..\..\src\L2.Application\L2.Application.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="more.xunit.runner.visualstudio" Version="2.3.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.v3" Version="3.2.2"/>
   </ItemGroup>
 
 </Project>

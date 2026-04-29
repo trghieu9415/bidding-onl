@@ -7,9 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="L3.Infrastructure\"/>
-    <Folder Include="L4.Presentation\" />
-    <Folder Include="L3.Worker\"/>
+    <Folder Include="L3.Infrastructure\Adapters\"/>
+    <Folder Include="L3.Infrastructure\Services\"/>
+    <Folder Include="L3.Worker\Consumers\"/>
+    <Folder Include="L3.Worker\Jobs\"/>
+    <Folder Include="L4.Presentation\Controllers\"/>
+    <Folder Include="L4.Presentation\Hubs\"/>
   </ItemGroup>
 
 </Project>
