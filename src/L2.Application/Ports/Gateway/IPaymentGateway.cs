@@ -11,7 +11,7 @@ public interface IPaymentGateway {
     CancellationToken ct = default
   );
 
-  Task<(bool isSucceed, string transactionId)> VerifyWebhookPayment(
+  Task<(bool isSucceed, Guid paymentId, string transactionId)> VerifyWebhookPayment(
     WebhookPayload payload,
     CancellationToken ct = default
   );

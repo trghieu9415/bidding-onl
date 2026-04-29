@@ -10,7 +10,10 @@ public record CreateOrderCommand(
   string UserFullName,
   string UserEmail,
   CreateOrderRequest Data
-) : IRequest<CreateOrderResult>, ITransactional;
+) : IRequest<CreateOrderResult>, ITransactional, ILockable {
+  public string LockKey => $"order:user:{UserId}";
+  public TimeSpan WaitTime => TimeSpan.FromSeconds(10);
+}
 
 public record CreateOrderRequest(Guid AuctionId, Address Address);
 

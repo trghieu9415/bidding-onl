@@ -15,13 +15,13 @@ public class ProcessPaymentHandler(
 
     var paymentGateway = gatewayFactory.CreatePaymentGateway(data.Method);
     var webhookPayload = paymentGateway.ToWebhookPayload(data.Payload);
-    var (isSucceed, transactionId) = await paymentGateway.VerifyWebhookPayment(webhookPayload, ct);
+    var (isSucceed, paymentId, transactionId) = await paymentGateway.VerifyWebhookPayment(webhookPayload, ct);
 
     if (!isSucceed || string.IsNullOrEmpty(transactionId)) {
       return false;
     }
 
-    var payment = await paymentRepository.GetFirstAsync(p => transactionId == p.TransactionId, ct);
+    var payment = await paymentRepository.GetByIdAsync(paymentId, ct);
     if (payment == null) {
       return true;
     }

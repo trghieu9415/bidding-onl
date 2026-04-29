@@ -19,6 +19,7 @@ public class StripeGateway : IPaymentGateway {
   public async Task<string> CreatePaymentUrl(Payment payment, Order order, CancellationToken ct = default) {
     var options = new SessionCreateOptions {
       PaymentMethodTypes = ["card"],
+      ClientReferenceId = payment.Id.ToString(),
       LineItems = [
         new SessionLineItemOptions {
           PriceData = new SessionLineItemPriceDataOptions {
@@ -43,57 +44,6 @@ public class StripeGateway : IPaymentGateway {
     return session.Url;
   }
 
-  public async Task<(bool isSucceed, string transactionId)> VerifyClientPayment(ClientPayload payload,
-    CancellationToken ct = default) {
-    if (payload is not StripeClientPayload stripePayload) {
-      return (false, string.Empty);
-    }
-
-    try {
-      var service = new SessionService();
-      var session = await service.GetAsync(stripePayload.SessionId, cancellationToken: ct);
-
-      if (session.PaymentStatus == "paid") {
-        return (true, session.PaymentIntentId);
-      }
-    } catch {
-      return (false, string.Empty);
-    }
-
-    return (false, string.Empty);
-  }
-
-  public Task<(bool isSucceed, string transactionId)> VerifyWebhookPayment(
-    WebhookPayload payload,
-    CancellationToken ct = default
-  ) {
-    if (payload is not StripeWebhookPayload stripePayload) {
-      return Task.FromResult((false, string.Empty));
-    }
-
-    try {
-      var stripeEvent = EventUtility.ConstructEvent(
-        stripePayload.RawBody,
-        stripePayload.StripeSignature,
-        _settings.EndpointSecret
-      );
-
-      if (stripeEvent.Type == EventTypes.CheckoutSessionCompleted) {
-        var session = stripeEvent.Data.Object as Session;
-
-        if (session?.PaymentStatus == "paid" && !string.IsNullOrEmpty(session.PaymentIntentId)) {
-          return Task.FromResult((true, session.PaymentIntentId));
-        }
-      }
-
-      return Task.FromResult((false, string.Empty));
-    } catch (StripeException) {
-      return Task.FromResult((false, string.Empty));
-    } catch {
-      return Task.FromResult((false, string.Empty));
-    }
-  }
-
   public async Task<bool> RefundPayment(Payment payment, CancellationToken ct = default) {
     var options = new RefundCreateOptions {
       PaymentIntent = payment.TransactionId
@@ -116,6 +66,62 @@ public class StripeGateway : IPaymentGateway {
   public WebhookPayload ToWebhookPayload(JsonElement payload) {
     var props = payload.ExtractProperties("raw_body", "stripe_signature");
     return new StripeWebhookPayload(props["raw_body"], props["stripe_signature"]);
+  }
+
+  public async Task<(bool isSucceed, string transactionId)> VerifyClientPayment(
+    ClientPayload payload,
+    CancellationToken ct = default
+  ) {
+    if (payload is not StripeClientPayload stripePayload) {
+      return (false, string.Empty);
+    }
+
+    try {
+      var service = new SessionService();
+      var session = await service.GetAsync(stripePayload.SessionId, cancellationToken: ct);
+
+      if (session.PaymentStatus == "paid") {
+        return (true, session.PaymentIntentId);
+      }
+    } catch {
+      return (false, string.Empty);
+    }
+
+    return (false, string.Empty);
+  }
+
+  public Task<(bool isSucceed, Guid paymentId, string transactionId)> VerifyWebhookPayment(
+    WebhookPayload payload,
+    CancellationToken ct = default
+  ) {
+    if (payload is not StripeWebhookPayload stripePayload) {
+      return Task.FromResult((false, Guid.Empty, string.Empty));
+    }
+
+    try {
+      var stripeEvent = EventUtility.ConstructEvent(
+        stripePayload.RawBody,
+        stripePayload.StripeSignature,
+        _settings.EndpointSecret
+      );
+
+      if (stripeEvent.Type != EventTypes.CheckoutSessionCompleted) {
+        return Task.FromResult((false, Guid.Empty, string.Empty));
+      }
+
+      var session = stripeEvent.Data.Object as Session;
+
+      var paymentId = Guid.Parse(session?.ClientReferenceId ?? string.Empty);
+      if (session?.PaymentStatus == "paid" && !string.IsNullOrEmpty(session.PaymentIntentId)) {
+        return Task.FromResult((true, paymentId, session.PaymentIntentId));
+      }
+
+      return Task.FromResult((false, Guid.Empty, string.Empty));
+    } catch (StripeException) {
+      return Task.FromResult((false, Guid.Empty, string.Empty));
+    } catch {
+      return Task.FromResult((false, Guid.Empty, string.Empty));
+    }
   }
 }
 

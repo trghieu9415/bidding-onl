@@ -39,6 +39,7 @@ public class PaypalGateway : IPaymentGateway {
       purchase_units = new[] {
         new {
           reference_id = payment.Id.ToString(),
+          custom_id = payment.Id.ToString(),
           amount = new {
             currency_code = _options.Currency,
             value = amount
@@ -110,16 +111,18 @@ public class PaypalGateway : IPaymentGateway {
     }
   }
 
-  public async Task<(bool isSucceed, string transactionId)> VerifyWebhookPayment(WebhookPayload payload,
-    CancellationToken ct = default) {
+  public async Task<(bool isSucceed, Guid paymentId, string transactionId)> VerifyWebhookPayment(
+    WebhookPayload payload,
+    CancellationToken ct = default
+  ) {
     if (payload is not PaypalWebhookPayload paypalPayload) {
-      return (false, string.Empty);
+      return (false, Guid.Empty, string.Empty);
     }
 
     try {
       var token = await GetAccessTokenAsync(ct);
       if (string.IsNullOrEmpty(token)) {
-        return (false, string.Empty);
+        return (false, Guid.Empty, string.Empty);
       }
 
       _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -143,7 +146,7 @@ public class PaypalGateway : IPaymentGateway {
       var response = await _client.PostAsync("/v1/notifications/verify-webhook-signature", content, ct);
 
       if (!response.IsSuccessStatusCode) {
-        return (false, string.Empty);
+        return (false, Guid.Empty, string.Empty);
       }
 
       var jsonBody = await response.Content.ReadAsStringAsync(ct);
@@ -151,21 +154,27 @@ public class PaypalGateway : IPaymentGateway {
       var verificationStatus = json?["verification_status"]?.ToString();
 
       if (verificationStatus != "SUCCESS") {
-        return (false, string.Empty);
+        return (false, Guid.Empty, string.Empty);
       }
 
       var webhookEvent = JsonNode.Parse(paypalPayload.RawBody);
       var eventType = webhookEvent?["event_type"]?.ToString();
 
       if (eventType != "PAYMENT.CAPTURE.COMPLETED") {
-        return (false, string.Empty);
+        return (false, Guid.Empty, string.Empty);
       }
 
-      var captureId = webhookEvent?["resource"]?["id"]?.ToString();
+      var resource = webhookEvent?["resource"];
+      var captureId = resource?["id"]?.ToString();
+      var customId = resource?["custom_id"]?.ToString();
 
-      return !string.IsNullOrEmpty(captureId) ? (true, captureId) : (false, string.Empty);
+      if (string.IsNullOrEmpty(captureId) || !Guid.TryParse(customId, out var paymentId)) {
+        return (false, Guid.Empty, string.Empty);
+      }
+
+      return (true, paymentId, captureId);
     } catch {
-      return (false, string.Empty);
+      return (false, Guid.Empty, string.Empty);
     }
   }
 
