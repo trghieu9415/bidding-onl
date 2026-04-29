@@ -44,12 +44,13 @@ Kiến trúc được thiết kế để loại bỏ các điểm nghẽn phổ 
 Hệ thống tuân thủ chặt chẽ nguyên tắc tách biệt trách nhiệm nhằm đảm bảo khả năng kiểm thử và tính module hóa.
 
 * **Clean Architecture:** Phân tách thành các layer:
-  - `L0.API` (Presentation)
   - `L1.Core` (Domain)
   - `L2.Application` (Use Case)
   - `L3.Infrastructure` (Persistence / External)
   - `L3.Worker` (Background Processing)
- Tuân thủ nghiêm ngặt nguyên lý Dependency Inversion.
+  - `L4.Presentation` (API / WebSocket)
+
+* **Tuân thủ nghiêm ngặt nguyên lý Dependency Inversion:** Toàn bộ hệ thống được tách lớp thông qua abstraction và dependency injection nhằm giảm coupling giữa các thành phần.
 
 * **Domain-Driven Design (DDD):** Logic nghiệp vụ được đóng gói trong các `AggregateRoot`. Giao tiếp giữa các aggregate thông qua `DomainEvent`. Sử dụng mạnh `ValueObject` để đảm bảo tính bất biến.
 
