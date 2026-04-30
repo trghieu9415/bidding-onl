@@ -28,7 +28,10 @@ public class AddAuctionHandlerTests {
     var auctionRepo = new StubRepository<Auction> { CreateResult = Guid.NewGuid() };
     var handler = new AddAuctionHandler(auctionRepo, itemRepo);
 
-    var result = await handler.Handle(new AddAuctionCommand(catalogItemId, sessionId, 10m, 200m), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new AddAuctionCommand(catalogItemId, sessionId, 10m, 200m),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal(auctionRepo.CreateResult, result);
     var createdAuction = Assert.IsType<Auction>(auctionRepo.CreatedEntity);

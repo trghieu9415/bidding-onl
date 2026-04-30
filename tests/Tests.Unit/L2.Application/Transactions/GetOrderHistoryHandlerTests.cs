@@ -26,7 +26,10 @@ public class GetOrderHistoryHandlerTests {
     var readRepo = new StubReadRepository<Order, OrderDto> { GetAsyncResult = (2, orders) };
     var handler = new GetOrderHistoryHandler(readRepo);
 
-    var result = await handler.Handle(new GetOrderHistoryQuery(userId, filter), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new GetOrderHistoryQuery(userId, filter),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal(orders, result.Orders);
     Assert.Equal(Meta.Create(1, 10, 2), result.Meta);

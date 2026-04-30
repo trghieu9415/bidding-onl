@@ -1,9 +1,9 @@
 using L1.Core.Domain.Transaction.Entities;
 using L1.Core.Domain.Transaction.Enums;
-using SystemRefundPaymentCommand = L2.Application.UseCases.System.RefundPayment.RefundPaymentCommand;
-using SystemRefundPaymentHandler = L2.Application.UseCases.System.RefundPayment.RefundPaymentHandler;
 using Tests.Unit.L2.Application.TestDoubles;
 using Xunit;
+using SystemRefundPaymentCommand = L2.Application.UseCases.System.RefundPayment.RefundPaymentCommand;
+using SystemRefundPaymentHandler = L2.Application.UseCases.System.RefundPayment.RefundPaymentHandler;
 
 namespace Tests.Unit.L2.Application.System;
 
@@ -12,7 +12,10 @@ public class RefundPaymentHandlerTests {
   public async Task Handle_WhenPaymentMissing_ReturnsFalse() {
     var handler = new SystemRefundPaymentHandler(new StubRepository<Payment>(), new StubGatewayFactory());
 
-    var result = await handler.Handle(new SystemRefundPaymentCommand(Guid.NewGuid()), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new SystemRefundPaymentCommand(Guid.NewGuid()),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.False(result);
   }
@@ -27,7 +30,10 @@ public class RefundPaymentHandlerTests {
     gatewayFactory.Gateways[PaymentMethod.Stripe] = gateway;
     var handler = new SystemRefundPaymentHandler(paymentRepo, gatewayFactory);
 
-    var result = await handler.Handle(new SystemRefundPaymentCommand(payment.Id), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new SystemRefundPaymentCommand(payment.Id),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Same(payment, paymentRepo.UpdatedEntity);

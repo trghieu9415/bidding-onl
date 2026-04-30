@@ -20,7 +20,10 @@ public class RefundPaymentHandlerTests {
     var handler = new RefundPaymentHandler(paymentRepo, orderReadRepo);
 
     var exception = await Assert.ThrowsAsync<WorkflowException>(async () =>
-      await handler.Handle(new RefundPaymentCommand(payment.Id, Guid.NewGuid()), TestContext.Current.CancellationToken));
+      await handler.Handle(
+        new RefundPaymentCommand(payment.Id, Guid.NewGuid()),
+        TestContext.Current.CancellationToken
+      ));
 
     Assert.Equal(403, exception.StatusCode);
     Assert.Equal("Bạn không có quyền hoàn trả đơn hàng này", exception.Message);

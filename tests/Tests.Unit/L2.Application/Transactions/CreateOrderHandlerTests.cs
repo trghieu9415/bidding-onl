@@ -28,7 +28,9 @@ public class CreateOrderHandlerTests {
       new CreateOrderRequest(Guid.NewGuid(), new Address("John Doe", "0123456789", "123 Street"))
     );
 
-    var exception = await Assert.ThrowsAsync<WorkflowException>(async () => await handler.Handle(request, TestContext.Current.CancellationToken));
+    var exception = await Assert.ThrowsAsync<WorkflowException>(async () => await handler.Handle(request,
+      TestContext.Current.CancellationToken
+    ));
 
     Assert.Equal("Đấu giá chưa kết thúc hoặc không có người chiến thắng", exception.Message);
   }

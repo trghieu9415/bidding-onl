@@ -15,7 +15,11 @@ public class UpdateRegisteredItemHandlerTests {
     var handler = new UpdateRegisteredItemHandler(repo);
 
     var exception = await Assert.ThrowsAsync<WorkflowException>(async () =>
-      await handler.Handle(new UpdateRegisteredItemCommand(item.Id, Guid.NewGuid(), new UpdateRegisteredItemRequest("Phone", null, null, null, null, null, null)), TestContext.Current.CancellationToken));
+      await handler.Handle(
+        new UpdateRegisteredItemCommand(item.Id, Guid.NewGuid(),
+          new UpdateRegisteredItemRequest("Phone", null, null, null, null, null, null)),
+        TestContext.Current.CancellationToken
+      ));
 
     Assert.Equal(403, exception.StatusCode);
     Assert.Equal("Bạn không có quyền chỉnh sửa sản phẩm này", exception.Message);

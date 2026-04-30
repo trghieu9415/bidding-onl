@@ -19,7 +19,10 @@ public class GetRegisteredItemsHandlerTests {
     var readRepo = new StubReadRepository<CatalogItem, CatalogItemDto> { GetAsyncResult = (4, items) };
     var handler = new GetRegisteredItemsHandler(readRepo);
 
-    var result = await handler.Handle(new GetRegisteredItemsQuery(ownerId, filter), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new GetRegisteredItemsQuery(ownerId, filter),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal(items, result.Items);
     Assert.Equal(Meta.Create(1, 10, 4), result.Meta);

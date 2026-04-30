@@ -13,7 +13,10 @@ public class ApproveItemHandlerTests {
     var repo = new StubRepository<CatalogItem> { EntityByIdResult = item };
     var handler = new ApproveItemHandler(repo);
 
-    var result = await handler.Handle(new ApproveItemCommand(item.Id), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new ApproveItemCommand(item.Id),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Same(item, repo.UpdatedEntity);

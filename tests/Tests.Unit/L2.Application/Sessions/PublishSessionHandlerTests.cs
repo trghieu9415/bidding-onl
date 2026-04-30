@@ -13,7 +13,10 @@ public class PublishSessionHandlerTests {
     var repo = new StubRepository<AuctionSession> { EntityByIdResult = session };
     var handler = new PublishSessionHandler(repo);
 
-    var result = await handler.Handle(new PublishSessionCommand(session.Id), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new PublishSessionCommand(session.Id),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Same(session, repo.UpdatedEntity);

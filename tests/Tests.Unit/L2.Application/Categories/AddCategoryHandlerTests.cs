@@ -11,7 +11,10 @@ public class AddCategoryHandlerTests {
     var repo = new StubRepository<Category> { CreateResult = Guid.NewGuid() };
     var handler = new AddCategoryHandler(repo);
 
-    var result = await handler.Handle(new AddCategoryCommand("Electronics", null), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new AddCategoryCommand("Electronics", null),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal(repo.CreateResult, result);
     var createdCategory = Assert.IsType<Category>(repo.CreatedEntity);

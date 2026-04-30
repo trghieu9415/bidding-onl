@@ -13,7 +13,10 @@ public class GetBidHistoryHandlerTests {
     var readRepo = new StubAuctionReadRepository { GetBidsResult = (5, bids) };
     var handler = new GetBidHistoryHandler(readRepo);
 
-    var result = await handler.Handle(new GetBidHistoryQuery(Guid.NewGuid(), 2, 3), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new GetBidHistoryQuery(Guid.NewGuid(), 2, 3),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal(bids, result.Bids);
     Assert.Equal(Meta.Create(2, 3, 5), result.Meta);

@@ -17,7 +17,10 @@ public class GetWonAuctionsHandlerTests {
     var userId = Guid.NewGuid();
     var handler = new GetWonAuctionsHandler(readRepo);
 
-    var result = await handler.Handle(new GetWonAuctionsQuery(userId, filter), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new GetWonAuctionsQuery(userId, filter),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal([dto], result.Auctions);
     Assert.Equal(Meta.Create(1, 10, 1), result.Meta);

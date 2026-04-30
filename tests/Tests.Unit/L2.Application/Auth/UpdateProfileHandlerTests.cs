@@ -37,7 +37,10 @@ public class UpdateProfileHandlerTests {
       new UpdateProfileRequest("New Name", "0999", "new-url")
     );
 
-    var result = await handler.Handle(request, default);
+    var result = await handler.Handle(
+      request,
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     var updatedUser = Assert.IsType<User>(userService.UpdatedUser);

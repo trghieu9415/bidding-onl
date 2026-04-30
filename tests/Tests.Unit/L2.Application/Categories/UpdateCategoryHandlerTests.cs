@@ -12,7 +12,10 @@ public class UpdateCategoryHandlerTests {
     var handler = new UpdateCategoryHandler(new StubRepository<Category>());
 
     var exception = await Assert.ThrowsAsync<WorkflowException>(async () =>
-      await handler.Handle(new UpdateCategoryCommand(Guid.NewGuid(), new UpdateCategoryRequest("Phones", null)), TestContext.Current.CancellationToken));
+      await handler.Handle(
+        new UpdateCategoryCommand(Guid.NewGuid(), new UpdateCategoryRequest("Phones", null)),
+        TestContext.Current.CancellationToken
+      ));
 
     Assert.Equal(404, exception.StatusCode);
     Assert.Equal("Không tìm thấy danh mục", exception.Message);
@@ -25,7 +28,10 @@ public class UpdateCategoryHandlerTests {
     var parentId = Guid.NewGuid();
     var handler = new UpdateCategoryHandler(repo);
 
-    var result = await handler.Handle(new UpdateCategoryCommand(category.Id, new UpdateCategoryRequest("Phones", parentId)), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new UpdateCategoryCommand(category.Id, new UpdateCategoryRequest("Phones", parentId)),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Same(category, repo.UpdatedEntity);

@@ -13,7 +13,10 @@ public class GetAuctionHandlerTests {
     var handler = new GetAuctionHandler(new StubReadRepository<Auction, AuctionDto>());
 
     var exception = await Assert.ThrowsAsync<WorkflowException>(async () =>
-      await handler.Handle(new GetAuctionQuery(Guid.NewGuid()), TestContext.Current.CancellationToken));
+      await handler.Handle(
+        new GetAuctionQuery(Guid.NewGuid()),
+        TestContext.Current.CancellationToken
+      ));
 
     Assert.Equal(404, exception.StatusCode);
     Assert.Equal("Không tìm thấy thông tin đấu giá", exception.Message);

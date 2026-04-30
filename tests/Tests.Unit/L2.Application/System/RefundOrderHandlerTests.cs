@@ -14,7 +14,10 @@ public class RefundOrderHandlerTests {
     var repo = new StubRepository<Order> { EntityByIdResult = order };
     var handler = new RefundOrderHandler(repo);
 
-    var result = await handler.Handle(new RefundOrderCommand(order.Id), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new RefundOrderCommand(order.Id),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Same(order, repo.UpdatedEntity);

@@ -13,7 +13,10 @@ public class AssignWinnerHandlerTests {
     var repo = new StubRepository<CatalogItem> { EntityByIdResult = item };
     var handler = new AssignWinnerHandler(repo);
 
-    var result = await handler.Handle(new AssignWinnerCommand(item.Id, true), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new AssignWinnerCommand(item.Id, true),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Same(item, repo.UpdatedEntity);

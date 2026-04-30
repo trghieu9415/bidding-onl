@@ -16,7 +16,10 @@ public class GetCategoriesHandlerTests {
     var readRepo = new StubReadRepository<Category, CategoryDto> { GetAsyncResult = (8, categories) };
     var handler = new GetCategoriesHandler(readRepo);
 
-    var result = await handler.Handle(new GetCategoriesQuery(filter), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new GetCategoriesQuery(filter),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal(categories, result.Categories);
     Assert.Equal(Meta.Create(2, 5, 8), result.Meta);

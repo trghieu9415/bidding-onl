@@ -1,7 +1,7 @@
 using L1.Core.Domain.Transaction.Entities;
 using L1.Core.Domain.Transaction.Enums;
-using Tests.Unit.L2.Application.TestDoubles;
 using L2.Application.UseCases.Transactions.Commands.CreatePayment;
+using Tests.Unit.L2.Application.TestDoubles;
 using Xunit;
 
 namespace Tests.Unit.L2.Application.Transactions;
@@ -17,7 +17,10 @@ public class CreatePaymentHandlerTests {
     var paymentRepo = new StubRepository<Payment> { FirstEntityResult = existingPayment };
     var handler = new CreatePaymentHandler(orderRepo, paymentRepo, new StubGatewayFactory());
 
-    var result = await handler.Handle(new CreatePaymentCommand(order.Id, order.BidderId, PaymentMethod.Stripe), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new CreatePaymentCommand(order.Id, order.BidderId, PaymentMethod.Stripe),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal("https://existing-payment", result.PaymentUrl);
     Assert.Null(paymentRepo.CreatedEntity);
@@ -34,7 +37,10 @@ public class CreatePaymentHandlerTests {
     gatewayFactory.Gateways[PaymentMethod.Paypal] = gateway;
     var handler = new CreatePaymentHandler(orderRepo, paymentRepo, gatewayFactory);
 
-    var result = await handler.Handle(new CreatePaymentCommand(order.Id, order.BidderId, PaymentMethod.Paypal), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new CreatePaymentCommand(order.Id, order.BidderId, PaymentMethod.Paypal),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal("https://new-payment", result.PaymentUrl);
     var createdPayment = Assert.IsType<Payment>(paymentRepo.CreatedEntity);

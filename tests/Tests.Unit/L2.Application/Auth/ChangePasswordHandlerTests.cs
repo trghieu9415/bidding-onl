@@ -11,7 +11,10 @@ public class ChangePasswordHandlerTests {
     var handler = new ChangePasswordHandler(authService);
     var userId = Guid.NewGuid();
 
-    var result = await handler.Handle(new ChangePasswordCommand(userId, new ChangePasswordRequest("OldPass1", "NewPass1")), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new ChangePasswordCommand(userId, new ChangePasswordRequest("OldPass1", "NewPass1")),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Equal((userId, "OldPass1", "NewPass1"), authService.ChangePasswordInput);

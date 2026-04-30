@@ -14,7 +14,10 @@ public class SearchItemHandlerTests {
     var searchService = new StubSearchService { SearchResult = (7, items) };
     var handler = new SearchItemHandler(searchService);
 
-    var result = await handler.Handle(new SearchItemQuery(filter), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new SearchItemQuery(filter),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Same(filter, searchService.LastRequest);
     Assert.Equal(items, result.Items);

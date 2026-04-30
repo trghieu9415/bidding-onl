@@ -12,8 +12,10 @@ public class RegisterHandlerTests {
     var handler = new RegisterHandler(authService);
 
     var result =
-      await handler.Handle(new RegisterCommand("bidder@example.com", "Bidder Name", "Password1", "0123456789"),
-        TestContext.Current.CancellationToken);
+      await handler.Handle(
+        new RegisterCommand("bidder@example.com", "Bidder Name", "Password1", "0123456789"),
+        TestContext.Current.CancellationToken
+      );
 
     Assert.Equal(authService.RegisterResult, result.Tokens);
     var user = Assert.IsType<User>(authService.RegisteredUser);

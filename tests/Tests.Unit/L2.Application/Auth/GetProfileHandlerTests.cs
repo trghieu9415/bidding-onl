@@ -12,7 +12,10 @@ public class GetProfileHandlerTests {
     var handler = new GetProfileHandler(new StubUserService());
 
     var exception = await Assert.ThrowsAsync<WorkflowException>(async () =>
-      await handler.Handle(new GetProfileQuery(Guid.NewGuid(), UserRole.Bidder), TestContext.Current.CancellationToken));
+      await handler.Handle(
+        new GetProfileQuery(Guid.NewGuid(), UserRole.Bidder),
+        TestContext.Current.CancellationToken
+      ));
 
     Assert.Equal(404, exception.StatusCode);
     Assert.Equal("Người dùng không tồn tại", exception.Message);

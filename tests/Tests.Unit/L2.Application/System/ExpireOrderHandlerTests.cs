@@ -13,7 +13,10 @@ public class ExpireOrderHandlerTests {
     var repo = new StubRepository<Order> { EntityByIdResult = order };
     var handler = new ExpireOrderHandler(repo);
 
-    var result = await handler.Handle(new ExpireOrderCommand(order.Id), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new ExpireOrderCommand(order.Id),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.False(result);
     Assert.Null(repo.UpdatedEntity);

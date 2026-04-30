@@ -12,8 +12,10 @@ public class UpdateAuctionHandlerTests {
     var repo = new StubRepository<Auction> { EntityByIdResult = auction };
     var handler = new UpdateAuctionHandler(repo);
 
-    var result = await handler.Handle(new UpdateAuctionCommand(auction.Id, new UpdateAuctionRequest(25m, 300m)),
-      TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new UpdateAuctionCommand(auction.Id, new UpdateAuctionRequest(25m, 300m)),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Same(auction, repo.UpdatedEntity);

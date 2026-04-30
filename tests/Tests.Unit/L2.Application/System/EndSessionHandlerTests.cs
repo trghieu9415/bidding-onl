@@ -19,7 +19,10 @@ public class EndSessionHandlerTests {
     var auctionRepo = new StubRepository<Auction> { ByKeysResult = [auction1, auction2] };
     var handler = new EndSessionHandler(sessionRepo, auctionRepo);
 
-    var result = await handler.Handle(new EndSessionCommand(session.Id), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new EndSessionCommand(session.Id),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Equal(SessionStatus.Closed, session.Status);

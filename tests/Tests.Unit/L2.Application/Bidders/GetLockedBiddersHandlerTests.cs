@@ -17,7 +17,10 @@ public class GetLockedBiddersHandlerTests {
     var filter = new UserFilter { Page = 1, PerPage = 10 };
     var handler = new GetLockedBiddersHandler(userService);
 
-    var result = await handler.Handle(new GetLockedBiddersQuery(filter), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new GetLockedBiddersQuery(filter),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal([lockedUser], result.Bidders);
     Assert.Equal(Meta.Create(1, 10, 2), result.Meta);

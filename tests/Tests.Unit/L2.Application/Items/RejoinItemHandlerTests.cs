@@ -14,7 +14,10 @@ public class RejoinItemHandlerTests {
     var handler = new RejoinItemHandler(repo);
 
     var exception = await Assert.ThrowsAsync<WorkflowException>(async () =>
-      await handler.Handle(new RejoinItemCommand(item.Id, Guid.NewGuid()), TestContext.Current.CancellationToken));
+      await handler.Handle(
+        new RejoinItemCommand(item.Id, Guid.NewGuid()),
+        TestContext.Current.CancellationToken
+      ));
 
     Assert.Equal("Không tìm thấy sản phẩm", exception.Message);
   }

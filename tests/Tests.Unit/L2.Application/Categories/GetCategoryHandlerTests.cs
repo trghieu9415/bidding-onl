@@ -13,7 +13,10 @@ public class GetCategoryHandlerTests {
     var readRepo = new StubReadRepository<Category, CategoryDto> { EntityByIdResult = dto };
     var handler = new GetCategoryHandler(readRepo);
 
-    var result = await handler.Handle(new GetCategoryQuery(dto.Id), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new GetCategoryQuery(dto.Id),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Same(dto, result.Category);
   }

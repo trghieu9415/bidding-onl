@@ -16,7 +16,11 @@ public class VerifyClientPaymentHandlerTests {
     gatewayFactory.Gateways[PaymentMethod.Stripe] = gateway;
     var handler = new VerifyClientPaymentHandler(paymentRepo, gatewayFactory);
 
-    var result = await handler.Handle(new VerifyClientPaymentCommand(Guid.NewGuid(), new VerifyClientPaymentRequest(payment.Id, TestJson.CreateObject())), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new VerifyClientPaymentCommand(Guid.NewGuid(),
+        new VerifyClientPaymentRequest(payment.Id, TestJson.CreateObject())),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Equal(PaymentStatus.Succeeded, payment.Status);
@@ -32,7 +36,11 @@ public class VerifyClientPaymentHandlerTests {
     gatewayFactory.Gateways[PaymentMethod.Stripe] = gateway;
     var handler = new VerifyClientPaymentHandler(paymentRepo, gatewayFactory);
 
-    var result = await handler.Handle(new VerifyClientPaymentCommand(Guid.NewGuid(), new VerifyClientPaymentRequest(payment.Id, TestJson.CreateObject())), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new VerifyClientPaymentCommand(Guid.NewGuid(),
+        new VerifyClientPaymentRequest(payment.Id, TestJson.CreateObject())),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Equal(PaymentStatus.Failed, payment.Status);

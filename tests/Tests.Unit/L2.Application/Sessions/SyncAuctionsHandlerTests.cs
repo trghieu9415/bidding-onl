@@ -13,7 +13,10 @@ public class SyncAuctionsHandlerTests {
     var auctionIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
     var handler = new SyncAuctionsHandler(sessionRepo, new StubRepository<Auction>());
 
-    var result = await handler.Handle(new SyncAuctionsCommand(session.Id, auctionIds), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new SyncAuctionsCommand(session.Id, auctionIds),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Same(session, sessionRepo.UpdatedEntity);

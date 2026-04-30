@@ -12,7 +12,10 @@ public class GetCurrentSessionHandlerTests {
     var cache = new StubBusinessCache { CurrentSessionsResult = sessions };
     var handler = new GetCurrentSessionHandler(cache);
 
-    var result = await handler.Handle(new GetCurrentSessionQuery(), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new GetCurrentSessionQuery(),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal(sessions, result.Sessions);
   }

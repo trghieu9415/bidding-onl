@@ -17,7 +17,10 @@ public class StartSessionHandlerTests {
     var auctionRepo = new StubRepository<Auction> { ByKeysResult = [auction1, auction2] };
     var handler = new StartSessionHandler(sessionRepo, auctionRepo);
 
-    var result = await handler.Handle(new StartSessionCommand(session.Id), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new StartSessionCommand(session.Id),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Equal(SessionStatus.Live, session.Status);

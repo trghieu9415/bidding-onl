@@ -14,7 +14,10 @@ public class RevokeItemHandlerTests {
     var repo = new StubRepository<CatalogItem> { EntityByIdResult = item };
     var handler = new RevokeItemHandler(repo);
 
-    var result = await handler.Handle(new RevokeItemCommand(item.Id, ownerId), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new RevokeItemCommand(item.Id, ownerId),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Same(item, repo.UpdatedEntity);

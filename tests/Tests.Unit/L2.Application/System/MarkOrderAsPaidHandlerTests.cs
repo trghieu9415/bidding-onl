@@ -13,7 +13,10 @@ public class MarkOrderAsPaidHandlerTests {
     var repo = new StubRepository<Order> { EntityByIdResult = order };
     var handler = new MarkOrderAsPaidHandler(repo);
 
-    var result = await handler.Handle(new MarkOrderAsPaidCommand(order.Id), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new MarkOrderAsPaidCommand(order.Id),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Same(order, repo.UpdatedEntity);

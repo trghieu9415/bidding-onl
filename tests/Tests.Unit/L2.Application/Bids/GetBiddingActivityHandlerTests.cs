@@ -17,7 +17,10 @@ public class GetBiddingActivityHandlerTests {
     var readRepo = new StubReadRepository<Auction, AuctionDto> { GetAsyncResult = (2, auctions) };
     var handler = new GetBiddingActivityHandler(readRepo);
 
-    var result = await handler.Handle(new GetBiddingActivityQuery(userId, filter), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new GetBiddingActivityQuery(userId, filter),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal(auctions, result.Auctions);
     Assert.Equal(Meta.Create(1, 10, 2), result.Meta);

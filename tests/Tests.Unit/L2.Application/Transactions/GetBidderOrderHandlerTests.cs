@@ -14,7 +14,10 @@ public class GetBidderOrderHandlerTests {
     var handler = new GetBidderOrderHandler(orderReadRepo);
 
     var exception = await Assert.ThrowsAsync<WorkflowException>(async () =>
-      await handler.Handle(new GetBidderOrderQuery(order.Id, Guid.NewGuid()), TestContext.Current.CancellationToken));
+      await handler.Handle(
+        new GetBidderOrderQuery(order.Id, Guid.NewGuid()),
+        TestContext.Current.CancellationToken
+      ));
 
     Assert.Equal(404, exception.StatusCode);
     Assert.Equal("Không tìm thấy đơn hàng", exception.Message);

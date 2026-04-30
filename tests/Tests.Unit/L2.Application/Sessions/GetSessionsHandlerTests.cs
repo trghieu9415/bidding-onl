@@ -16,7 +16,10 @@ public class GetSessionsHandlerTests {
     var readRepo = new StubReadRepository<AuctionSession, AuctionSessionDto> { GetAsyncResult = (3, sessions) };
     var handler = new GetSessionsHandler(readRepo);
 
-    var result = await handler.Handle(new GetSessionsQuery(filter), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new GetSessionsQuery(filter),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal(sessions, result.Sessions);
     Assert.Equal(Meta.Create(1, 10, 3), result.Meta);

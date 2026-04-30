@@ -11,7 +11,10 @@ public class GetBidderHandlerTests {
     var handler = new GetBidderHandler(new StubUserService());
 
     var exception = await Assert.ThrowsAsync<WorkflowException>(async () =>
-      await handler.Handle(new GetBidderQuery(Guid.NewGuid()), TestContext.Current.CancellationToken));
+      await handler.Handle(
+        new GetBidderQuery(Guid.NewGuid()),
+        TestContext.Current.CancellationToken
+      ));
 
     Assert.Equal(404, exception.StatusCode);
     Assert.Equal("Không tìm thấy người dùng", exception.Message);

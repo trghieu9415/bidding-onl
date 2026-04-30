@@ -12,7 +12,10 @@ public class PlaceBidHandlerTests {
     var handler = new PlaceBidHandler(new StubRepository<Auction>());
 
     var exception = await Assert.ThrowsAsync<WorkflowException>(async () =>
-      await handler.Handle(new PlaceBidCommand(Guid.NewGuid(), Guid.NewGuid(), "Bidder", new PlaceBidRequest(100m)), TestContext.Current.CancellationToken));
+      await handler.Handle(
+        new PlaceBidCommand(Guid.NewGuid(), Guid.NewGuid(), "Bidder", new PlaceBidRequest(100m)),
+        TestContext.Current.CancellationToken
+      ));
 
     Assert.Equal(404, exception.StatusCode);
     Assert.Equal("Cuộc đấu giá không tồn tại", exception.Message);
@@ -26,7 +29,8 @@ public class PlaceBidHandlerTests {
     var bidderId = Guid.NewGuid();
     var handler = new PlaceBidHandler(repo);
 
-    var result = await handler.Handle(new PlaceBidCommand(auction.Id, bidderId, "Bidder", new PlaceBidRequest(100m)), default);
+    var result = await handler.Handle(new PlaceBidCommand(auction.Id, bidderId, "Bidder", new PlaceBidRequest(100m)),
+      default);
 
     Assert.Same(auction, repo.UpdatedEntity);
     Assert.Equal(auction.Bids.Last().Id, result);

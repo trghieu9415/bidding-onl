@@ -14,7 +14,10 @@ public class AddSessionHandlerTests {
     var handler = new AddSessionHandler(new StubRepository<AuctionSession>(), auctionRepo);
 
     var exception = await Assert.ThrowsAsync<WorkflowException>(async () =>
-      await handler.Handle(new AddSessionCommand("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2), []), TestContext.Current.CancellationToken));
+      await handler.Handle(
+        new AddSessionCommand("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2), []),
+        TestContext.Current.CancellationToken
+      ));
 
     Assert.Equal(404, exception.StatusCode);
     Assert.Contains(missingIds[0].ToString(), exception.Message);
@@ -26,7 +29,10 @@ public class AddSessionHandlerTests {
     var auctionIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
     var handler = new AddSessionHandler(sessionRepo, new StubRepository<Auction>());
 
-    var result = await handler.Handle(new AddSessionCommand("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2), auctionIds), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new AddSessionCommand("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2), auctionIds),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal(sessionRepo.CreateResult, result);
     var createdSession = Assert.IsType<AuctionSession>(sessionRepo.CreatedEntity);

@@ -21,7 +21,10 @@ public class RegisterItemHandlerTests {
     );
     var handler = new RegisterItemHandler(repo);
 
-    var result = await handler.Handle(new RegisterItemCommand(Guid.NewGuid(), request), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new RegisterItemCommand(Guid.NewGuid(), request),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal(repo.CreateResult, result);
     var createdItem = Assert.IsType<CatalogItem>(repo.CreatedEntity);

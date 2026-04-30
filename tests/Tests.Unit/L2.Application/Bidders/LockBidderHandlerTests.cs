@@ -11,7 +11,10 @@ public class LockBidderHandlerTests {
     var handler = new LockBidderHandler(userService);
     var userId = Guid.NewGuid();
 
-    var result = await handler.Handle(new LockBidderCommand(userId), TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      new LockBidderCommand(userId),
+      TestContext.Current.CancellationToken
+    );
 
     Assert.True(result);
     Assert.Equal(userId, userService.LockedId);

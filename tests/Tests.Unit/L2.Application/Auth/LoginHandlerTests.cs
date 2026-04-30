@@ -12,7 +12,10 @@ public class LoginHandlerTests {
     var handler = new LoginHandler(authService);
     var request = new LoginCommand(new LoginRequest("bidder@example.com", "Password1"), UserRole.Bidder);
 
-    var result = await handler.Handle(request, TestContext.Current.CancellationToken);
+    var result = await handler.Handle(
+      request,
+      TestContext.Current.CancellationToken
+    );
 
     Assert.Equal(authService.LoginResult, result.Tokens);
     Assert.Equal(("bidder@example.com", "Password1", UserRole.Bidder), authService.LoginInput);

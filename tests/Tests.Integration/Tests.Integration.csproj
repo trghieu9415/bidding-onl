@@ -15,4 +15,24 @@
     <Folder Include="L4.Presentation\Hubs\"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\L3.Infrastructure\L3.Infrastructure.csproj"/>
+    <ProjectReference Include="..\..\src\L3.Worker\L3.Worker.csproj"/>
+    <ProjectReference Include="..\..\src\L4.Presentation\L4.Presentation.csproj"/>
+    <ProjectReference Include="..\Tests.Unit\Tests.Unit.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="9.0.12"/>
+    <PackageReference Include="more.xunit.runner.visualstudio" Version="2.3.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.v3" Version="3.2.2"/>
+  </ItemGroup>
+
 </Project>
