@@ -1,4 +1,4 @@
-﻿using L2.Application.Ports.Configs;
+﻿using L2.Application.Abstractions;
 using L3.Infrastructure.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

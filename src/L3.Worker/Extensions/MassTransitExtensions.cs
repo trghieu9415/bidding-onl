@@ -1,7 +1,7 @@
 ﻿using L2.Application.Ports.Messaging;
 using L3.Infrastructure.Options;
 using L3.Infrastructure.Persistence;
-using L3.Worker.Adapters.Notification;
+using L3.Worker.Adapters.Messaging;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

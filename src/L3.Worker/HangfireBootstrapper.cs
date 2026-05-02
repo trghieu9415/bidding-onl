@@ -38,15 +38,6 @@ public class HangfireBootstrapper(
     );
   }
 
-  private void AddRecurringJob<T>(Expression<Action<T>> methodCall, string cronExpression) {
-    recurringJobs.AddOrUpdate(
-      typeof(T).Name,
-      methodCall,
-      cronExpression,
-      new RecurringJobOptions { TimeZone = _vnTimeZone }
-    );
-  }
-
   private static TimeZoneInfo GetVnTimeZone() {
     var timeZoneId = Environment.OSVersion.Platform == PlatformID.Win32NT
       ? "SE Asia Standard Time"

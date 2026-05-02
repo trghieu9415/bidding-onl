@@ -2,18 +2,16 @@
 using L2.Application.Ports.Cache;
 using L2.Application.Repositories.Read;
 using L3.Infrastructure.Services.Abstractions;
-using Medallion.Threading;
 
 namespace L3.Infrastructure.Adapters.Cache;
 
 public class BusinessCache(
-  ICacheService cache,
   ISessionReadRepository auctionSessionRepository,
-  IDistributedLockProvider lockProvider
+  ICacheManager cacheManager
 ) : IBusinessCache {
   public async Task<List<AuctionSessionDto>> GetCurrentSessionsAsync(CancellationToken ct) {
-    var sessions = await GetOrSetAsync(
-      BusinessKeys.CurrentSession,
+    var sessions = await cacheManager.GetOrSetAsync(
+      "current-session",
       async () => await auctionSessionRepository.GetCurrentSessionsAsync(ct),
       TimeSpan.FromDays(7), ct
     );
@@ -21,38 +19,7 @@ public class BusinessCache(
     return sessions ?? [];
   }
 
-  // NOTE: ========== [Helper] ==========
-  private async Task<T?> GetOrSetAsync<T>(
-    string key,
-    Func<Task<T?>> fetchLogic,
-    TimeSpan expiration,
-    CancellationToken ct
-  ) {
-    var cachedData = await cache.GetAsync<T>(key, ct);
-    if (cachedData != null) {
-      return cachedData;
-    }
-
-    var lockKey = $"lock:{key}";
-
-    await using var handle = await lockProvider.TryAcquireLockAsync(lockKey, TimeSpan.FromSeconds(5), ct);
-
-    if (handle == null) {
-      throw new TimeoutException($"Không thể lấy được khóa phân tán để làm mới cache cho key: {key}");
-    }
-
-    cachedData = await cache.GetAsync<T>(key, ct);
-    if (cachedData != null) {
-      return cachedData;
-    }
-
-    var data = await fetchLogic();
-    if (data == null) {
-      return data;
-    }
-
-    var jitter = TimeSpan.FromSeconds(Random.Shared.Next(0, 60));
-    await cache.SetAsync(key, data, expiration.Add(jitter), ct);
-    return data;
+  public async Task RemoveCurrentSessionsAsync(CancellationToken ct) {
+    await cacheManager.RemoveAsync("current-session", ct);
   }
 }

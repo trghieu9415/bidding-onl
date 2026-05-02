@@ -1,4 +1,4 @@
-﻿using L2.Application.Ports.Configs;
+﻿using L2.Application.Abstractions;
 
 namespace L3.Infrastructure.Options;
 

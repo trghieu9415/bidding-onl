@@ -7,7 +7,6 @@ using L3.Infrastructure.Services;
 using L3.Infrastructure.Services.Abstractions;
 using Medallion.Threading;
 using Medallion.Threading.Redis;
-using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
@@ -27,16 +26,8 @@ public static class DistributedExtensions {
       .AddConnectionMultiplexer(RedisSettings.MutexKeys.Backplane, settings.BackplaneConnection);
 
     // NOTE: ========== [REDIS_CACHE] ==========
-    services.AddOptions<RedisCacheOptions>()
-      .Configure<IServiceProvider>((opt, sp) => {
-        opt.InstanceName = settings.Keys.Cache;
-        opt.ConnectionMultiplexerFactory = () => {
-          var mux = sp.GetRequiredKeyedService<IConnectionMultiplexer>(RedisSettings.MutexKeys.Cache);
-          return Task.FromResult(mux);
-        };
-      });
-    services.AddStackExchangeRedisCache(_ => {});
     services.AddSingleton<ICacheService, RedisCacheService>();
+    services.AddSingleton<ICacheManager, CacheManager>();
     services.AddScoped<IBusinessCache, BusinessCache>();
 
     // NOTE: ========== [REDIS_LOCK] ==========
