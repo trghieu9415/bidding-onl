@@ -8,12 +8,25 @@ public class AuctionConfiguration : BaseConfiguration<Auction> {
   public override void Configure(EntityTypeBuilder<Auction> builder) {
     base.Configure(builder);
 
+    builder.Navigation(x => x.Bids)
+      .UsePropertyAccessMode(PropertyAccessMode.Field);
+
     builder.Property(x => x.CatalogItemId).IsRequired();
     builder.Property(x => x.SessionId).IsRequired();
+
     builder.Property(x => x.CurrentPrice).HasPrecision(18, 2);
+
+    builder.Property(x => x.TotalBids).IsRequired().HasDefaultValue(0);
+    builder.Property(x => x.LastBidId).IsRequired(false);
+    builder.Property(x => x.LastBidderId).IsRequired(false);
+    builder.Property(x => x.LastBidderName).HasMaxLength(200).IsRequired(false);
+
     builder.Property(x => x.WinningBidId).IsRequired(false);
     builder.Property(x => x.WinningAt).IsRequired(false);
-    builder.Property(x => x.Status).HasConversion<string>().HasMaxLength(50);
+
+    builder.Property(x => x.Status)
+      .HasConversion<string>()
+      .HasMaxLength(50);
 
     builder.OwnsOne(x => x.Rules, nav => {
       nav.Property(r => r.StepPrice).HasPrecision(18, 2).HasColumnName("StepPrice");

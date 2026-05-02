@@ -13,6 +13,10 @@ public class Auction : AggregateRoot {
   public Guid CatalogItemId { get; private set; }
   public AuctionStatus Status { get; private set; } = AuctionStatus.Scheduled;
   public decimal CurrentPrice { get; private set; }
+  public int TotalBids { get; private set; }
+  public Guid? LastBidId { get; private set; }
+  public Guid? LastBidderId { get; private set; }
+  public string? LastBidderName { get; private set; }
   public Guid OwnerId { get; private set; }
   public Guid? WinningBidId { get; private set; }
   public DateTime? WinningAt { get; private set; }
@@ -44,26 +48,32 @@ public class Auction : AggregateRoot {
     Rules = new AuctionRules(stepPrice, reservePrice);
   }
 
-  public void PlaceBid(Guid bidderId, string bidderName, decimal amount) {
+  public Bid PlaceBid(Guid bidderId, string bidderName, decimal amount) {
     if (Status != AuctionStatus.Active) {
       throw new DomainException("Chỉ có thể đặt giá khi đấu giá đang diễn ra.");
     }
 
-    var minimumNextBid = _bids.Count == 0 ? CurrentPrice : CurrentPrice + Rules.StepPrice;
+    var minimumNextBid = TotalBids == 0 ? CurrentPrice : CurrentPrice + Rules.StepPrice;
     if (amount < minimumNextBid) {
       throw new DomainException($"Giá đặt phải tối thiểu là {minimumNextBid}");
     }
 
-    var previousBidderId = _bids.OrderByDescending(x => x.Amount).FirstOrDefault()?.BidderId;
+    var previousBidderId = LastBidderId;
 
     var bid = Bid.Create(this, bidderId, amount);
     _bids.Add(bid);
     CurrentPrice = amount;
+    LastBidId = bid.Id;
+    LastBidderId = bidderId;
+    LastBidderName = bidderName;
+    TotalBids++;
 
     AddDomainEvent(new BidPlacedEvent(Id, bidderId, bidderName, amount));
     if (previousBidderId.HasValue && previousBidderId != bidderId) {
       AddDomainEvent(new OutbidEvent(Id, previousBidderId.Value, amount));
     }
+
+    return bid;
   }
 
   public void End() {
@@ -71,16 +81,13 @@ public class Auction : AggregateRoot {
       throw new DomainException("Không thể kết thúc phiên đấu giá đang diễn ra.");
     }
 
-    var isSold = _bids.Count > 0 && CurrentPrice >= Rules.ReservePrice;
+    var isSold = TotalBids > 0 && CurrentPrice >= Rules.ReservePrice;
     if (isSold) {
-      var topBid = _bids.OrderByDescending(x => x.Amount).First();
-      WinningBidId = topBid.Id;
+      WinningBidId = LastBidId;
       WinningAt = DateTime.UtcNow;
       Status = AuctionStatus.EndedSold;
     } else {
       Status = AuctionStatus.EndedUnsold;
-      WinningBidId = null;
-      WinningAt = null;
     }
 
     AddDomainEvent(new AuctionEndedEvent(Id, WinningBidId, CurrentPrice, OwnerId, isSold));

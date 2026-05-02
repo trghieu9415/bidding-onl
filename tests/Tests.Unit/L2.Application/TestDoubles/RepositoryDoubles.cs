@@ -9,28 +9,23 @@ namespace Tests.Unit.L2.Application.TestDoubles;
 public class StubRepository<T> : IRepository<T> where T : AggregateRoot {
   public T? EntityByIdResult { get; set; }
   public T? FirstEntityResult { get; set; }
-  public List<T> GetAsyncResult { get; set; } = [];
   public List<T> ByKeysResult { get; set; } = [];
   public IReadOnlyCollection<Guid> MissingIdsResult { get; set; } = [];
   public Guid CreateResult { get; set; } = Guid.NewGuid();
   public T? CreatedEntity { get; private set; }
   public T? UpdatedEntity { get; private set; }
   public Guid? DeletedId { get; private set; }
-  public bool? DeletedSoftDelete { get; private set; }
   public Guid? RestoredId { get; private set; }
   public Expression<Func<T, bool>>? LastCriteria { get; private set; }
   public ICollection<Expression<Func<T, object>>>? LastIncludes { get; private set; }
 
-  public Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default) => Task.FromResult(EntityByIdResult);
+  public Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default) {
+    return Task.FromResult(EntityByIdResult);
+  }
 
-  public Task<List<T>> GetAsync(
-    Expression<Func<T, bool>>? criteria = null,
-    ICollection<Expression<Func<T, object>>>? includes = null,
-    CancellationToken ct = default
-  ) {
-    LastCriteria = criteria;
-    LastIncludes = includes;
-    return Task.FromResult(GetAsyncResult);
+  public Task<T?> GetByIdAsync(Guid id, ICollection<Expression<Func<T, object>>>? includes = null,
+    CancellationToken ct = default) {
+    throw new NotImplementedException();
   }
 
   public Task<T?> GetFirstAsync(
@@ -69,9 +64,13 @@ public class StubRepository<T> : IRepository<T> where T : AggregateRoot {
     return Task.CompletedTask;
   }
 
-  public Task DeleteAsync(Guid id, bool softDelete = true, CancellationToken ct = default) {
+  public Task DeleteAsync(Guid id, CancellationToken ct = default) {
     DeletedId = id;
-    DeletedSoftDelete = softDelete;
+    return Task.CompletedTask;
+  }
+
+  public Task ForceDeleteAsync(Guid id, CancellationToken ct = default) {
+    DeletedId = id;
     return Task.CompletedTask;
   }
 
@@ -79,11 +78,19 @@ public class StubRepository<T> : IRepository<T> where T : AggregateRoot {
     RestoredId = id;
     return Task.CompletedTask;
   }
+
+  public Task DeleteRangeAsync(ICollection<Guid> ids, CancellationToken ct = default) {
+    throw new NotImplementedException();
+  }
+
+  public Task RestoreRangeAsync(ICollection<Guid> ids, CancellationToken ct = default) {
+    throw new NotImplementedException();
+  }
 }
 
 public class StubReadRepository<TEntity, TDto> : IReadRepository<TEntity, TDto>
   where TEntity : AggregateRoot
-  where TDto : IdDto {
+  where TDto : IdDto<TEntity> {
   public TDto? EntityByIdResult { get; set; }
   public TDto? FirstEntityResult { get; set; }
   public (int total, List<TDto> entities) GetAsyncResult { get; set; } = (0, []);
@@ -92,29 +99,27 @@ public class StubReadRepository<TEntity, TDto> : IReadRepository<TEntity, TDto>
   public IFilter? LastFilter { get; private set; }
   public List<Expression<Func<TEntity, object>>>? LastIncludes { get; private set; }
 
-  public Task<TDto?> GetByIdAsync(Guid id, CancellationToken ct = default) => Task.FromResult(EntityByIdResult);
+  public Task<TDto?> GetByIdAsync(Guid id, CancellationToken ct = default) {
+    return Task.FromResult(EntityByIdResult);
+  }
 
   public Task<(int total, List<TDto> entities)> GetAsync(
     Expression<Func<TEntity, bool>>? criteria = null,
     IFilter? filter = null,
-    List<Expression<Func<TEntity, object>>>? includes = null,
     CancellationToken ct = default
   ) {
     LastCriteria = criteria;
     LastFilter = filter;
-    LastIncludes = includes;
     return Task.FromResult(GetAsyncResult);
   }
 
   public Task<(int total, List<TDto> entities)> GetDeletedAsync(
     Expression<Func<TEntity, bool>>? criteria = null,
     IFilter? filter = null,
-    List<Expression<Func<TEntity, object>>>? includes = null,
     CancellationToken ct = default
   ) {
     LastCriteria = criteria;
     LastFilter = filter;
-    LastIncludes = includes;
     return Task.FromResult(GetDeletedAsyncResult);
   }
 

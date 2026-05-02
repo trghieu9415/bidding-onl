@@ -16,7 +16,7 @@ public class PaymentReadRepository(
   public async Task<PaymentDto?> GetByTransactionIdAsync(string transactionId, CancellationToken ct = default) {
     return await DbSet
       .AsNoTracking()
-      .Where(x => x.TransactionId == transactionId && !x.IsDeleted)
+      .Where(x => x.TransactionId == transactionId)
       .ProjectTo<PaymentDto>(_mapper.ConfigurationProvider)
       .FirstOrDefaultAsync(ct);
   }
@@ -24,7 +24,7 @@ public class PaymentReadRepository(
   public async Task<PaymentDto?> GetByOrderIdAsync(Guid orderId, CancellationToken ct = default) {
     return await DbSet
       .AsNoTracking()
-      .Where(x => x.OrderId == orderId && !x.IsDeleted)
+      .Where(x => x.OrderId == orderId)
       .ProjectTo<PaymentDto>(_mapper.ConfigurationProvider)
       .FirstOrDefaultAsync(ct);
   }

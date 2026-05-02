@@ -11,6 +11,7 @@ public abstract class BaseConfiguration<T> : IEntityTypeConfiguration<T> where T
     builder.Property(x => x.CreatedAt).IsRequired();
     builder.Property(x => x.DeletedAt).IsRequired(false);
     builder.Property(x => x.IsDeleted).HasDefaultValue(false);
+    builder.HasQueryFilter(x => !x.IsDeleted);
 
     builder.Property(x => x.RowVersion).IsRowVersion();
   }

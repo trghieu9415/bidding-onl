@@ -1,9 +1,11 @@
 ﻿using L2.Application.Abstractions;
 using L2.Application.Repositories;
 using L2.Application.Repositories.Read;
+using L2.Application.Repositories.Write;
 using L3.Infrastructure.Persistence;
 using L3.Infrastructure.Persistence.Repositories;
 using L3.Infrastructure.Persistence.Repositories.Read;
+using L3.Infrastructure.Persistence.Repositories.Write;
 using L3.Infrastructure.Seeding;
 using L3.Infrastructure.Seeding.Seeders;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +30,7 @@ public static class PersistenceExtensions {
 
     // Repositories
     services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+    services.AddScoped<IAuctionRepository, AuctionRepository>();
     // Read Repositories
     services.AddScoped(typeof(IReadRepository<,>), typeof(EfReadRepository<,>));
     services.AddScoped<IAuctionReadRepository, AuctionReadRepository>();

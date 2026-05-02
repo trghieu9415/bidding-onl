@@ -17,7 +17,7 @@ public class OrderReadRepository(
   public virtual async Task<OrderDto?> GetByAuctionIdAsync(Guid auctionId, CancellationToken ct = default) {
     return await DbSet
       .AsNoTracking()
-      .Where(x => x.AuctionId == auctionId && !x.IsDeleted)
+      .Where(x => x.AuctionId == auctionId)
       .ProjectTo<OrderDto>(_mapper.ConfigurationProvider)
       .FirstOrDefaultAsync(ct);
   }
@@ -26,7 +26,7 @@ public class OrderReadRepository(
     CancellationToken ct = default) {
     var orderDto = await DbSet
       .AsNoTracking()
-      .Where(x => x.Id == orderId && !x.IsDeleted)
+      .Where(x => x.Id == orderId)
       .ProjectTo<OrderDto>(_mapper.ConfigurationProvider)
       .FirstOrDefaultAsync(ct);
 
@@ -36,7 +36,7 @@ public class OrderReadRepository(
 
     var paymentDtos = await _dbContext.Set<Payment>()
       .AsNoTracking()
-      .Where(x => x.OrderId == orderId && !x.IsDeleted)
+      .Where(x => x.OrderId == orderId)
       .ProjectTo<PaymentDto>(_mapper.ConfigurationProvider)
       .ToListAsync(ct);
 

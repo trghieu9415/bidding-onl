@@ -23,9 +23,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\L1.Core\L1.Core.csproj"/>
     <ProjectReference Include="..\..\src\L2.Application\L2.Application.csproj"/>
-    <ProjectReference Include="..\..\src\L3.Infrastructure\L3.Infrastructure.csproj"/>
-    <ProjectReference Include="..\..\src\L3.Worker\L3.Worker.csproj"/>
-    <ProjectReference Include="..\..\src\L4.Presentation\L4.Presentation.csproj"/>
   </ItemGroup>
 
   <ItemGroup>

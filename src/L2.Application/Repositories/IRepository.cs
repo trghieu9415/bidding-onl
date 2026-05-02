@@ -6,11 +6,8 @@ namespace L2.Application.Repositories;
 public interface IRepository<T> where T : AggregateRoot {
   Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default);
 
-  Task<List<T>> GetAsync(
-    Expression<Func<T, bool>>? criteria = null,
-    ICollection<Expression<Func<T, object>>>? includes = null,
-    CancellationToken ct = default
-  );
+  Task<T?> GetByIdAsync(Guid id, ICollection<Expression<Func<T, object>>>? includes = null,
+    CancellationToken ct = default);
 
   Task<T?> GetFirstAsync(
     Expression<Func<T, bool>>? criteria = null,
@@ -31,6 +28,9 @@ public interface IRepository<T> where T : AggregateRoot {
 
   Task<Guid> CreateAsync(T entity, CancellationToken ct = default);
   Task UpdateAsync(T entity, CancellationToken ct = default);
-  Task DeleteAsync(Guid id, bool softDelete = true, CancellationToken ct = default);
+  Task DeleteAsync(Guid id, CancellationToken ct = default);
+  Task ForceDeleteAsync(Guid id, CancellationToken ct = default);
   Task RestoreAsync(Guid id, CancellationToken ct = default);
+  Task DeleteRangeAsync(ICollection<Guid> ids, CancellationToken ct = default);
+  Task RestoreRangeAsync(ICollection<Guid> ids, CancellationToken ct = default);
 }

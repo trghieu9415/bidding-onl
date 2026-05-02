@@ -1,10 +1,11 @@
-﻿using L1.Core.Domain.Transaction.Enums;
+﻿using L1.Core.Domain.Transaction.Entities;
+using L1.Core.Domain.Transaction.Enums;
 using L1.Core.Domain.Transaction.ValueObjects;
 using L2.Application.DTOs.Base;
 
 namespace L2.Application.DTOs;
 
-public record OrderDto : IdDto {
+public record OrderDto : IdDto<Order> {
   public Guid BidderId { get; init; }
   public string BidderName { get; init; } = null!;
   public Guid AuctionId { get; init; }

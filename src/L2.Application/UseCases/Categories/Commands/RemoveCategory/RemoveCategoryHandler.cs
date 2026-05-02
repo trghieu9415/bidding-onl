@@ -6,7 +6,7 @@ namespace L2.Application.UseCases.Categories.Commands.RemoveCategory;
 
 public class RemoveCategoryHandler(IRepository<Category> repository) : IRequestHandler<RemoveCategoryCommand, bool> {
   public async Task<bool> Handle(RemoveCategoryCommand request, CancellationToken ct) {
-    await repository.DeleteAsync(request.Id, true, ct);
+    await repository.DeleteAsync(request.Id, ct);
     return true;
   }
 }

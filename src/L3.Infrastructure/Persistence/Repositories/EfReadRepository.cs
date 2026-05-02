@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using AutoFilterer.Abstractions;
 using AutoFilterer.Extensions;
 using AutoMapper;
@@ -16,36 +15,28 @@ public class EfReadRepository<TEntity, TDto>(
   IMapper mapper
 ) : IReadRepository<TEntity, TDto>
   where TEntity : AggregateRoot
-  where TDto : IdDto {
-  private static readonly string[] AllExpandableProperties = typeof(TDto).GetProperties()
-    .Where(p => (
-        p.PropertyType.IsClass &&
-        p.PropertyType != typeof(string)
-      ) || typeof(IEnumerable).IsAssignableFrom(p.PropertyType)
-    )
-    .Select(p => p.Name)
-    .ToArray();
-
+  where TDto : IdDto<TEntity> {
   protected readonly DbSet<TEntity> DbSet = dbContext.Set<TEntity>();
 
   public virtual async Task<TDto?> GetByIdAsync(Guid id, CancellationToken ct = default) {
     return await DbSet
       .AsNoTracking()
-      .Where(x => x.Id == id && !x.IsDeleted)
-      .ProjectTo<TDto>(mapper.ConfigurationProvider, null, AllExpandableProperties)
+      .Where(x => x.Id == id)
+      .ProjectTo<TDto>(mapper.ConfigurationProvider)
+      .AsSplitQuery()
       .FirstOrDefaultAsync(ct);
   }
 
   public virtual async Task<(int total, List<TDto> entities)> GetAsync(
     Expression<Func<TEntity, bool>>? criteria = null,
     IFilter? filter = null,
-    List<Expression<Func<TEntity, object>>>? includes = null,
     CancellationToken ct = default
   ) {
-    var (total, query) = await GetBaseQueryAsync(false, criteria, filter, includes, ct);
+    var (total, pagedQuery) = await GetBaseQueryAsync(false, criteria, filter, ct);
 
-    var entities = await query
+    var entities = await pagedQuery
       .ProjectTo<TDto>(mapper.ConfigurationProvider)
+      .AsSplitQuery()
       .ToListAsync(ct);
 
     return (total, entities);
@@ -54,13 +45,13 @@ public class EfReadRepository<TEntity, TDto>(
   public virtual async Task<(int total, List<TDto> entities)> GetDeletedAsync(
     Expression<Func<TEntity, bool>>? criteria = null,
     IFilter? filter = null,
-    List<Expression<Func<TEntity, object>>>? includes = null,
     CancellationToken ct = default
   ) {
-    var (total, query) = await GetBaseQueryAsync(true, criteria, filter, includes, ct);
+    var (total, pagedQuery) = await GetBaseQueryAsync(true, criteria, filter, ct);
 
-    var entities = await query
+    var entities = await pagedQuery
       .ProjectTo<TDto>(mapper.ConfigurationProvider)
+      .AsSplitQuery()
       .ToListAsync(ct);
 
     return (total, entities);
@@ -70,7 +61,7 @@ public class EfReadRepository<TEntity, TDto>(
     Expression<Func<TEntity, bool>>? criteria = null,
     CancellationToken ct = default
   ) {
-    var query = DbSet.AsNoTracking().Where(x => !x.IsDeleted);
+    var query = DbSet.AsNoTracking();
 
     if (criteria != null) {
       query = query.Where(criteria);
@@ -78,25 +69,25 @@ public class EfReadRepository<TEntity, TDto>(
 
     return await query
       .ProjectTo<TDto>(mapper.ConfigurationProvider)
+      .AsSplitQuery()
       .FirstOrDefaultAsync(ct);
   }
 
   // NOTE: ========== [Helper Methods] ==========
-  private async Task<(int total, IQueryable<TEntity> query)> GetBaseQueryAsync(
+  private async Task<(int total, IQueryable<TEntity> pagedQuery)> GetBaseQueryAsync(
     bool isDeleted,
     Expression<Func<TEntity, bool>>? criteria = null,
     IFilter? filter = null,
-    List<Expression<Func<TEntity, object>>>? includes = null,
     CancellationToken ct = default
   ) {
-    var query = DbSet.AsNoTracking().Where(x => x.IsDeleted == isDeleted);
+    var query = DbSet.AsNoTracking();
+
+    if (isDeleted) {
+      query = query.IgnoreQueryFilters().Where(x => x.IsDeleted);
+    }
 
     if (criteria != null) {
       query = query.Where(criteria);
-    }
-
-    if (includes != null) {
-      query = includes.Aggregate(query, (current, include) => current.Include(include));
     }
 
     if (filter != null) {
@@ -104,6 +95,16 @@ public class EfReadRepository<TEntity, TDto>(
     }
 
     var total = await query.CountAsync(ct);
+
+    if (filter is not IPaginationFilter paginationFilter) {
+      return (total, query);
+    }
+
+    var page = paginationFilter.Page > 0 ? paginationFilter.Page : 1;
+    var perPage = paginationFilter.PerPage > 0 ? paginationFilter.PerPage : 10;
+
+    query = query.Skip((page - 1) * perPage).Take(perPage);
+
     return (total, query);
   }
 }

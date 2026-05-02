@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using L2.Application.Abstractions;
-using L2.Application.Exceptions;
 using L3.Infrastructure.Persistence.Identity;
 using MassTransit;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -27,15 +26,12 @@ public class AppDbContext(
       if (_currentTransaction != null) {
         await _currentTransaction.CommitAsync(ct);
       }
-    } catch (DbUpdateConcurrencyException) {
-      await RollbackTransactionAsync(ct);
-      throw new WorkflowException("Dữ liệu đã bị thay đổi. Vui lòng thử lại.", 409);
     } catch {
       await RollbackTransactionAsync(ct);
       throw;
     } finally {
       if (_currentTransaction != null) {
-        _currentTransaction.Dispose();
+        await _currentTransaction.DisposeAsync();
         _currentTransaction = null;
       }
     }
@@ -48,7 +44,7 @@ public class AppDbContext(
       }
     } finally {
       if (_currentTransaction != null) {
-        _currentTransaction.Dispose();
+        await _currentTransaction.DisposeAsync();
         _currentTransaction = null;
       }
     }

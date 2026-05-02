@@ -1,9 +1,10 @@
-﻿using L1.Core.Domain.Transaction.Enums;
+﻿using L1.Core.Domain.Transaction.Entities;
+using L1.Core.Domain.Transaction.Enums;
 using L2.Application.DTOs.Base;
 
 namespace L2.Application.DTOs;
 
-public record PaymentDto : IdDto {
+public record PaymentDto : IdDto<Payment> {
   public Guid OrderId { get; init; }
   public decimal Amount { get; init; }
   public string? PaymentUrl { get; init; }

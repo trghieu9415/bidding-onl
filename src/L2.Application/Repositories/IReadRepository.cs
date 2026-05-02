@@ -7,22 +7,23 @@ namespace L2.Application.Repositories;
 
 public interface IReadRepository<TEntity, TDto>
   where TEntity : AggregateRoot
-  where TDto : IdDto {
+  where TDto : IdDto<TEntity> {
   Task<TDto?> GetByIdAsync(Guid id, CancellationToken ct = default);
 
   Task<(int total, List<TDto> entities)> GetAsync(
     Expression<Func<TEntity, bool>>? criteria = null,
     IFilter? filter = null,
-    List<Expression<Func<TEntity, object>>>? includes = null,
-    CancellationToken ct = default);
+    CancellationToken ct = default
+  );
 
   Task<(int total, List<TDto> entities)> GetDeletedAsync(
     Expression<Func<TEntity, bool>>? criteria = null,
     IFilter? filter = null,
-    List<Expression<Func<TEntity, object>>>? includes = null,
-    CancellationToken ct = default);
+    CancellationToken ct = default
+  );
 
   Task<TDto?> GetFirstAsync(
     Expression<Func<TEntity, bool>>? criteria = null,
-    CancellationToken ct = default);
+    CancellationToken ct = default
+  );
 }

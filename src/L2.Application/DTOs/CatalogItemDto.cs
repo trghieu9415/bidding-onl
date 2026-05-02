@@ -1,9 +1,10 @@
-﻿using L1.Core.Domain.Catalog.Enums;
+﻿using L1.Core.Domain.Catalog.Entities;
+using L1.Core.Domain.Catalog.Enums;
 using L2.Application.DTOs.Base;
 
 namespace L2.Application.DTOs;
 
-public record CatalogItemDto : IdDto {
+public record CatalogItemDto : IdDto<CatalogItem> {
   public Guid OwnerId { get; init; }
   public string Name { get; init; } = null!;
   public string Description { get; init; } = null!;

@@ -4,6 +4,7 @@ using L2.Application.Ports.Logging;
 using L3.Infrastructure.Exceptions;
 using L4.Presentation.Response;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 namespace L4.Presentation.ExceptionHandler;
 
@@ -49,6 +50,7 @@ public class GlobalExceptionHandler(
       DomainException dEx => (400, ApiResponse.Fail(dEx.Message, 400).Value!),
       InfrastructureException iEx => (500, ApiResponse.Fail(iEx.Message, 500).Value!),
       WorkflowException wfEx => (wfEx.StatusCode, ApiResponse.Fail(wfEx.Message, wfEx.StatusCode).Value!),
+      DbUpdateConcurrencyException _ => (409, ApiResponse.Fail("Dữ liệu đã bị thay đổi. Vui lòng thử lại.", 409)),
       _ => (500, ApiResponse.Fail("Lỗi hệ thống không xác định", 500).Value!)
     };
   }

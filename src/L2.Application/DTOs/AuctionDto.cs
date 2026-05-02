@@ -1,9 +1,10 @@
-﻿using L1.Core.Domain.Bidding.Enums;
+﻿using L1.Core.Domain.Bidding.Entities;
+using L1.Core.Domain.Bidding.Enums;
 using L2.Application.DTOs.Base;
 
 namespace L2.Application.DTOs;
 
-public record AuctionDto : IdDto {
+public record AuctionDto : IdDto<Auction> {
   public Guid CatalogItemId { get; init; }
   public AuctionStatus Status { get; init; }
   public decimal CurrentPrice { get; init; }
