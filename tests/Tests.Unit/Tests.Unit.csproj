@@ -8,6 +8,15 @@
 
   <ItemGroup>
     <Folder Include="L2.Application\UseCases\"/>
+    <Folder Include="L2.Application\UseCases\Auctions\" />
+    <Folder Include="L2.Application\UseCases\Auth\" />
+    <Folder Include="L2.Application\UseCases\Bidders\" />
+    <Folder Include="L2.Application\UseCases\Bids\" />
+    <Folder Include="L2.Application\UseCases\Categories\" />
+    <Folder Include="L2.Application\UseCases\Items\" />
+    <Folder Include="L2.Application\UseCases\Sessions\" />
+    <Folder Include="L2.Application\UseCases\System\" />
+    <Folder Include="L2.Application\UseCases\Transactions\" />
   </ItemGroup>
 
   <ItemGroup>

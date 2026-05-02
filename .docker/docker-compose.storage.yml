@@ -10,7 +10,7 @@
     ports:
       - "5432:5432"
     volumes:
-      - ./.volumes/pg_data:/var/lib/postgresql/data # Chú ý thêm ../ vì file yml đang nằm trong thư mục con
+      - ./.volumes/pg_data:/var/lib/postgresql/data 
 
   minio:
     image: minio/minio:RELEASE.2025-02-28T09-55-16Z
