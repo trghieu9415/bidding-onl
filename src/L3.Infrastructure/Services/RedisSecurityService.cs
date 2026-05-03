@@ -1,13 +1,18 @@
-﻿using L3.Infrastructure.Services.Abstractions;
+﻿using L3.Infrastructure.Options;
+using L3.Infrastructure.Services.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
 namespace L3.Infrastructure.Services;
 
-public class SecurityService(IConnectionMultiplexer redis) : ISecurityService {
+public class SecurityService(
+  [FromKeyedServices(RedisSettings.MutexKeys.Critical)]
+  IConnectionMultiplexer redis
+) : ISecurityService {
   private readonly IDatabase _db = redis.GetDatabase();
 
   public async Task BlacklistAsync(string jti, TimeSpan duration, CancellationToken ct = default) {
-    await _db.StringSetAsync(SecurityKeys.BlackList(jti), "true", duration);
+    await _db.StringSetAsync(SecurityKeys.BlackList(jti), RedisValue.EmptyString, duration);
   }
 
   public async Task<bool> IsBlacklistedAsync(string jti, CancellationToken ct = default) {
@@ -15,6 +20,10 @@ public class SecurityService(IConnectionMultiplexer redis) : ISecurityService {
   }
 
   public async Task SyncSecurityStampAsync(Guid userId, string securityStamp, CancellationToken ct = default) {
+    if (string.IsNullOrEmpty(securityStamp)) {
+      return;
+    }
+
     await _db.StringSetAsync(SecurityKeys.UserStamp(userId), securityStamp, TimeSpan.FromDays(1));
   }
 

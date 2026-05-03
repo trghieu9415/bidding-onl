@@ -1,3 +1,4 @@
+using FluentAssertions;
 using L1.Core.Base.Entity;
 using Xunit;
 
@@ -5,40 +6,57 @@ namespace Tests.Unit.L1.Core.Base.Entity;
 
 public class BaseEntityTests {
   [Fact]
-  public void NewEntity_InitializesIdentityAndCreatedAt() {
-    var before = DateTime.UtcNow;
-    var entity = new TestEntity();
-    var after = DateTime.UtcNow;
+  public void Constructor_ShouldInitializeDefaultValues() {
+    // Arrange
+    var entity = new FakeBaseEntity();
 
-    Assert.NotEqual(Guid.Empty, entity.Id);
-    Assert.InRange(entity.CreatedAt, before, after);
-    Assert.False(entity.IsDeleted);
-    Assert.Null(entity.DeletedAt);
+    // Assert
+    entity.Id.Should().NotBeEmpty();
+    entity.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+    entity.IsDeleted.Should().BeFalse();
+    entity.DeletedAt.Should().BeNull();
   }
 
   [Fact]
-  public void Delete_MarksEntityAsDeletedAndSetsDeletedAt() {
-    var entity = new TestEntity();
-    var before = DateTime.UtcNow;
+  public void Delete_ShouldSetIsDeletedToTrueAndSetDeletedAt() {
+    // Arrange
+    var entity = new FakeBaseEntity();
 
+    // Act
     entity.Delete();
 
-    var after = DateTime.UtcNow;
-    Assert.True(entity.IsDeleted);
-    Assert.NotNull(entity.DeletedAt);
-    Assert.InRange(entity.DeletedAt!.Value, before, after);
+    // Assert
+    entity.IsDeleted.Should().BeTrue();
+    entity.DeletedAt.Should().NotBeNull();
+    entity.DeletedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
   }
 
   [Fact]
-  public void Restore_ClearsDeletedFlags() {
-    var entity = new TestEntity();
+  public void Restore_ShouldSetIsDeletedToFalseAndNullifyDeletedAt() {
+    // Arrange
+    var entity = new FakeBaseEntity();
     entity.Delete();
 
+    // Act
     entity.Restore();
 
-    Assert.False(entity.IsDeleted);
-    Assert.Null(entity.DeletedAt);
+    // Assert
+    entity.IsDeleted.Should().BeFalse();
+    entity.DeletedAt.Should().BeNull();
   }
 
-  private sealed class TestEntity : BaseEntity;
+  [Fact]
+  public void RowVersion_ShouldBeSettableAndGettable() {
+    // Arrange
+    var entity = new FakeBaseEntity();
+    const uint expectedVersion = 1;
+
+    // Act
+    entity.RowVersion = expectedVersion;
+
+    // Assert
+    entity.RowVersion.Should().Be(expectedVersion);
+  }
+
+  private sealed class FakeBaseEntity : BaseEntity;
 }

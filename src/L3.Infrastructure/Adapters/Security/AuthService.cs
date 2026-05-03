@@ -170,28 +170,30 @@ public class AuthService(
   }
 
   public async Task LogoutAsync(string refreshToken, bool revokeAll, CancellationToken ct) {
-    if (string.IsNullOrEmpty(refreshToken)) {
+    if (string.IsNullOrWhiteSpace(refreshToken)) {
       return;
     }
 
-    try {
-      var tokenHandler = new JwtSecurityTokenHandler();
-      var jwtToken = tokenHandler.ReadJwtToken(refreshToken);
+    var tokenHandler = new JwtSecurityTokenHandler();
+    if (!tokenHandler.CanReadToken(refreshToken)) {
+      return;
+    }
 
-      if (revokeAll) {
-        var userId = jwtToken.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-        var user = await userManager.FindByIdAsync(userId);
+    var jwtToken = tokenHandler.ReadJwtToken(refreshToken);
+
+    if (revokeAll) {
+      var userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+      if (userIdClaim != null) {
+        var user = await userManager.FindByIdAsync(userIdClaim.Value);
         if (user != null) {
           await UpdateSecurityStampInternal(user, ct);
         }
-      } else {
-        var remainingTime = jwtToken.ValidTo - DateTime.UtcNow;
-        if (remainingTime.TotalSeconds > 0) {
-          await securityService.BlacklistAsync(jwtToken.Id, remainingTime, ct);
-        }
       }
-    } catch {
-      /* ignored */
+    } else {
+      var remainingTime = jwtToken.ValidTo - DateTime.UtcNow;
+      if (remainingTime.TotalSeconds > 0) {
+        await securityService.BlacklistAsync(jwtToken.Id, remainingTime, ct);
+      }
     }
   }
 

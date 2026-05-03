@@ -6,8 +6,8 @@ namespace L2.Application.DTOs;
 
 public record CatalogItemDto : IdDto<CatalogItem> {
   public Guid OwnerId { get; init; }
-  public string Name { get; init; } = null!;
-  public string Description { get; init; } = null!;
+  public required string Name { get; init; }
+  public required string Description { get; init; }
   public ItemStatus Status { get; init; }
   public ItemCondition? Condition { get; init; }
   public decimal StartingPrice { get; init; }

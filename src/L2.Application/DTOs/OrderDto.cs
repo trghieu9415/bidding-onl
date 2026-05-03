@@ -7,12 +7,12 @@ namespace L2.Application.DTOs;
 
 public record OrderDto : IdDto<Order> {
   public Guid BidderId { get; init; }
-  public string BidderName { get; init; } = null!;
+  public required string BidderName { get; init; }
   public Guid AuctionId { get; init; }
   public Guid CatalogId { get; init; }
-  public string CatalogName { get; init; } = null!;
-  public string CatalogImage { get; init; } = null!;
+  public required string CatalogName { get; init; }
+  public required string CatalogImage { get; init; }
   public OrderStatus Status { get; init; }
   public decimal Price { get; init; }
-  public Address Address { get; init; } = null!;
+  public required Address Address { get; init; }
 }

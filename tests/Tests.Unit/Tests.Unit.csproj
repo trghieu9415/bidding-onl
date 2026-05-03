@@ -8,15 +8,24 @@
 
   <ItemGroup>
     <Folder Include="L2.Application\UseCases\"/>
-    <Folder Include="L2.Application\UseCases\Auctions\" />
-    <Folder Include="L2.Application\UseCases\Auth\" />
-    <Folder Include="L2.Application\UseCases\Bidders\" />
-    <Folder Include="L2.Application\UseCases\Bids\" />
-    <Folder Include="L2.Application\UseCases\Categories\" />
-    <Folder Include="L2.Application\UseCases\Items\" />
-    <Folder Include="L2.Application\UseCases\Sessions\" />
-    <Folder Include="L2.Application\UseCases\System\" />
-    <Folder Include="L2.Application\UseCases\Transactions\" />
+    <Folder Include="L2.Application\UseCases\Auctions\Commands\"/>
+    <Folder Include="L2.Application\UseCases\Auctions\Queries\"/>
+    <Folder Include="L2.Application\UseCases\Auth\Commands\"/>
+    <Folder Include="L2.Application\UseCases\Auth\Queries\"/>
+    <Folder Include="L2.Application\UseCases\Bidders\Commands\"/>
+    <Folder Include="L2.Application\UseCases\Bidders\Queries\"/>
+    <Folder Include="L2.Application\UseCases\Bids\Commands\"/>
+    <Folder Include="L2.Application\UseCases\Bids\Queries\"/>
+    <Folder Include="L2.Application\UseCases\Categories\Commands\"/>
+    <Folder Include="L2.Application\UseCases\Categories\Queries\"/>
+    <Folder Include="L2.Application\UseCases\Items\Commands\"/>
+    <Folder Include="L2.Application\UseCases\Items\Queries\"/>
+    <Folder Include="L2.Application\UseCases\Sessions\Commands\"/>
+    <Folder Include="L2.Application\UseCases\Sessions\Queries\"/>
+    <Folder Include="L2.Application\UseCases\System\Commands\"/>
+    <Folder Include="L2.Application\UseCases\System\Queries\"/>
+    <Folder Include="L2.Application\UseCases\Transactions\Commands\"/>
+    <Folder Include="L2.Application\UseCases\Transactions\Queries\"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -29,10 +38,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="FluentAssertions" Version="8.9.0"/>
     <PackageReference Include="more.xunit.runner.visualstudio" Version="2.3.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="NSubstitute" Version="5.3.0"/>
     <PackageReference Include="xunit.v3" Version="3.2.2"/>
   </ItemGroup>
 
