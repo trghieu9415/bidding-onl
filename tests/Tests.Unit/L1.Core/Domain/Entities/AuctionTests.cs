@@ -1,302 +1,369 @@
-using L1.Core.Domain.Bidding.Entities;
+using FluentAssertions;
 using L1.Core.Domain.Bidding.Enums;
 using L1.Core.Domain.Bidding.Events;
 using L1.Core.Exceptions;
+using Tests.Common.Builders;
 using Xunit;
 
 namespace Tests.Unit.L1.Core.Domain.Entities;
 
 public class AuctionTests {
-  private static Auction CreateStandardAuction() {
-    return Auction.Create(
-      Guid.NewGuid(),
-      Guid.NewGuid(),
-      100m,
-      10m,
-      500m
-    ).SetOwnerId(Guid.NewGuid());
-  }
-
   [Fact]
   public void Create_ValidParameters_InitializesScheduledAuction() {
+    // Arrange
     var catalogItemId = Guid.NewGuid();
     var sessionId = Guid.NewGuid();
+    var builder = new AuctionBuilder()
+      .WithCatalogItemId(catalogItemId)
+      .WithSessionId(sessionId)
+      .WithPrices(100m, 10m, 500m)
+      .WithOwnerId(null);
 
-    var auction = Auction.Create(catalogItemId, sessionId, 100m, 10m, 500m);
+    // Act
+    var auction = builder.Build();
 
-    Assert.Equal(catalogItemId, auction.CatalogItemId);
-    Assert.Equal(sessionId, auction.SessionId);
-    Assert.Equal(100m, auction.CurrentPrice);
-    Assert.Equal(10m, auction.Rules.StepPrice);
-    Assert.Equal(500m, auction.Rules.ReservePrice);
-    Assert.Equal(AuctionStatus.Scheduled, auction.Status);
-    Assert.Empty(auction.Bids);
-    Assert.Empty(auction.DomainEvents);
+    // Assert
+    auction.CatalogItemId.Should().Be(catalogItemId);
+    auction.SessionId.Should().Be(sessionId);
+    auction.CurrentPrice.Should().Be(100m);
+    auction.Rules.StepPrice.Should().Be(10m);
+    auction.Rules.ReservePrice.Should().Be(500m);
+    auction.Status.Should().Be(AuctionStatus.Scheduled);
+    auction.Bids.Should().BeEmpty();
+    auction.DomainEvents.Should().BeEmpty();
   }
 
   [Fact]
   public void SetOwnerId_AssignsOwnerAndReturnsSameAuction() {
-    var auction = Auction.Create(Guid.NewGuid(), Guid.NewGuid(), 100m, 10m, 500m);
+    // Arrange
+    var auction = new AuctionBuilder().WithOwnerId(null).Build();
     var ownerId = Guid.NewGuid();
 
+    // Act
     var returnedAuction = auction.SetOwnerId(ownerId);
 
-    Assert.Same(auction, returnedAuction);
-    Assert.Equal(ownerId, auction.OwnerId);
+    // Assert
+    returnedAuction.Should().BeSameAs(auction);
+    auction.OwnerId.Should().Be(ownerId);
   }
 
   [Fact]
   public void UpdateRules_WhenScheduled_UpdatesRules() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().Build();
 
+    // Act
     auction.UpdateRules(20m, 600m);
 
-    Assert.Equal(20m, auction.Rules.StepPrice);
-    Assert.Equal(600m, auction.Rules.ReservePrice);
+    // Assert
+    auction.Rules.StepPrice.Should().Be(20m);
+    auction.Rules.ReservePrice.Should().Be(600m);
   }
 
   [Fact]
   public void UpdateRules_WhenNotScheduled_ThrowsDomainException() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().Build();
     auction.Start();
 
-    var exception = Assert.Throws<DomainException>(() => auction.UpdateRules(20m, 600m));
+    // Act
+    var act = () => auction.UpdateRules(20m, 600m);
 
-    Assert.Equal("Chỉ được sửa quy tắc khi đấu giá chưa bắt đầu.", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Chỉ được sửa quy tắc khi đấu giá chưa bắt đầu.");
   }
 
   [Fact]
   public void Start_WhenScheduled_ChangesStatusAndRaisesEvent() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().Build();
 
+    // Act
     auction.Start();
 
-    Assert.Equal(AuctionStatus.Active, auction.Status);
-    var startedEvent = Assert.IsType<AuctionStartedEvent>(Assert.Single(auction.DomainEvents));
-    Assert.Equal(auction.Id, startedEvent.AggregateId);
-    Assert.Equal(auction.CatalogItemId, startedEvent.ItemId);
-    Assert.Equal(auction.OwnerId, startedEvent.OwnerId);
+    // Assert
+    auction.Status.Should().Be(AuctionStatus.Active);
+    var startedEvent = auction.DomainEvents.Should().ContainSingle().Subject.As<AuctionStartedEvent>();
+    startedEvent.AggregateId.Should().Be(auction.Id);
+    startedEvent.ItemId.Should().Be(auction.CatalogItemId);
+    startedEvent.OwnerId.Should().Be(auction.OwnerId);
   }
 
   [Fact]
   public void Start_WhenNotScheduled_ThrowsDomainException() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().Build();
     auction.Start();
 
-    var exception = Assert.Throws<DomainException>(() => auction.Start());
+    // Act
+    var act = () => auction.Start();
 
-    Assert.Equal("Phiên đấu giá không ở trạng thái được lên lịch", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Phiên đấu giá không ở trạng thái được lên lịch");
   }
 
   [Fact]
   public void Cancel_WhenScheduled_ChangesStatusToCanceled() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().Build();
 
+    // Act
     auction.Cancel();
 
-    Assert.Equal(AuctionStatus.Canceled, auction.Status);
+    // Assert
+    auction.Status.Should().Be(AuctionStatus.Canceled);
   }
 
   [Fact]
   public void Cancel_WhenNotScheduled_ThrowsDomainException() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().Build();
     auction.Start();
 
-    var exception = Assert.Throws<DomainException>(() => auction.Cancel());
+    // Act
+    var act = () => auction.Cancel();
 
-    Assert.Equal("Không thể hủy phiên đấu giá đang diễn ra", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Không thể hủy phiên đấu giá đang diễn ra");
   }
 
   [Fact]
   public void PlaceBid_WhenNotActive_ThrowsDomainException() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().Build();
 
-    var exception = Assert.Throws<DomainException>(() => auction.PlaceBid(Guid.NewGuid(), "Bidder", 100m));
+    // Act
+    Action act = () => auction.PlaceBid(Guid.NewGuid(), "Bidder", 100m);
 
-    Assert.Equal("Chỉ có thể đặt giá khi đấu giá đang diễn ra.", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Chỉ có thể đặt giá khi đấu giá đang diễn ra.");
   }
 
   [Fact]
   public void PlaceBid_WhenFirstBidIsBelowCurrentPrice_ThrowsDomainException() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().WithPrices(100m, 10m, 500m).Build();
     auction.Start();
 
-    var exception = Assert.Throws<DomainException>(() => auction.PlaceBid(Guid.NewGuid(), "Bidder", 99m));
+    // Act
+    Action act = () => auction.PlaceBid(Guid.NewGuid(), "Bidder", 99m);
 
-    Assert.Equal("Giá đặt phải tối thiểu là 100", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Giá đặt phải tối thiểu là 100");
   }
 
   [Fact]
   public void PlaceBid_WhenFirstBidIsValid_AddsBidAndRaisesBidPlacedEvent() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().WithPrices(100m, 10m, 500m).Build();
     auction.Start();
     auction.ClearEvents();
     var bidderId = Guid.NewGuid();
 
+    // Act
     auction.PlaceBid(bidderId, "Bidder A", 100m);
 
-    var bid = Assert.Single(auction.Bids);
-    Assert.Equal(100m, auction.CurrentPrice);
-    Assert.Equal(bidderId, bid.BidderId);
+    // Assert
+    var bid = auction.Bids.Should().ContainSingle().Subject;
+    auction.CurrentPrice.Should().Be(100m);
+    bid.BidderId.Should().Be(bidderId);
 
-    var bidPlacedEvent = Assert.IsType<BidPlacedEvent>(Assert.Single(auction.DomainEvents));
-    Assert.Equal(auction.Id, bidPlacedEvent.AggregateId);
-    Assert.Equal(bidderId, bidPlacedEvent.BidderId);
-    Assert.Equal("Bidder A", bidPlacedEvent.BidderName);
-    Assert.Equal(100m, bidPlacedEvent.Amount);
+    var bidPlacedEvent = auction.DomainEvents.Should().ContainSingle().Subject.As<BidPlacedEvent>();
+    bidPlacedEvent.AggregateId.Should().Be(auction.Id);
+    bidPlacedEvent.BidderId.Should().Be(bidderId);
+    bidPlacedEvent.BidderName.Should().Be("Bidder A");
+    bidPlacedEvent.Amount.Should().Be(100m);
   }
 
   [Fact]
   public void PlaceBid_WhenAmountDoesNotMeetStepPrice_ThrowsDomainException() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().WithPrices(100m, 10m, 500m).Build();
     auction.Start();
     auction.PlaceBid(Guid.NewGuid(), "Bidder A", 100m);
 
-    var exception = Assert.Throws<DomainException>(() => auction.PlaceBid(Guid.NewGuid(), "Bidder B", 109m));
+    // Act
+    Action act = () => auction.PlaceBid(Guid.NewGuid(), "Bidder B", 109m);
 
-    Assert.Equal("Giá đặt phải tối thiểu là 110", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Giá đặt phải tối thiểu là 110");
   }
 
   [Fact]
   public void PlaceBid_WhenDifferentBidderOutbids_RaisesBidPlacedAndOutbidEvents() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().WithPrices(100m, 10m, 500m).Build();
     auction.Start();
     var firstBidderId = Guid.NewGuid();
     var secondBidderId = Guid.NewGuid();
     auction.PlaceBid(firstBidderId, "Bidder A", 100m);
     auction.ClearEvents();
 
+    // Act
     auction.PlaceBid(secondBidderId, "Bidder B", 120m);
 
-    Assert.Equal(120m, auction.CurrentPrice);
-    Assert.Equal(2, auction.Bids.Count);
-    Assert.Equal(2, auction.DomainEvents.Count);
+    // Assert
+    auction.CurrentPrice.Should().Be(120m);
+    auction.Bids.Should().HaveCount(2);
+    auction.DomainEvents.Should().HaveCount(2);
 
-    Assert.Contains(auction.DomainEvents, domainEvent => domainEvent is BidPlacedEvent {
-      BidderId: var bidderId,
-      Amount: 120m,
-      BidderName: "Bidder B"
-    } && bidderId == secondBidderId);
+    auction.DomainEvents.OfType<BidPlacedEvent>().Should().ContainSingle(e =>
+      e.BidderId == secondBidderId &&
+      e.Amount == 120m &&
+      e.BidderName == "Bidder B"
+    );
 
-    Assert.Contains(auction.DomainEvents, domainEvent => domainEvent is OutbidEvent {
-      PreviousBidderId: var previousBidderId,
-      NewPrice: 120m
-    } && previousBidderId == firstBidderId);
+    auction.DomainEvents.OfType<OutbidEvent>().Should().ContainSingle(e =>
+      e.PreviousBidderId == firstBidderId &&
+      e.NewPrice == 120m
+    );
   }
 
   [Fact]
   public void PlaceBid_WhenSameBidderIncreasesOwnBid_DoesNotRaiseOutbidEvent() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().WithPrices(100m, 10m, 500m).Build();
     auction.Start();
     var bidderId = Guid.NewGuid();
     auction.PlaceBid(bidderId, "Bidder A", 100m);
     auction.ClearEvents();
 
+    // Act
     auction.PlaceBid(bidderId, "Bidder A", 120m);
 
-    Assert.Single(auction.DomainEvents);
-    Assert.IsType<BidPlacedEvent>(auction.DomainEvents.Single());
+    // Assert
+    var bidEvent = auction.DomainEvents.Should().ContainSingle().Subject;
+    bidEvent.Should().BeOfType<BidPlacedEvent>();
   }
 
   [Fact]
   public void End_WhenNotActive_ThrowsDomainException() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().Build();
 
-    var exception = Assert.Throws<DomainException>(() => auction.End());
+    // Act
+    var act = () => auction.End();
 
-    Assert.Equal("Không thể kết thúc phiên đấu giá đang diễn ra.", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Không thể kết thúc phiên đấu giá đang diễn ra.");
   }
 
   [Fact]
   public void End_WhenNoBids_MarksAuctionAsUnsoldAndRaisesEvent() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().WithPrices(100m, 10m, 500m).Build();
     auction.Start();
     auction.ClearEvents();
 
+    // Act
     auction.End();
 
-    Assert.Equal(AuctionStatus.EndedUnsold, auction.Status);
-    Assert.Null(auction.WinningBidId);
-    Assert.Null(auction.WinningAt);
+    // Assert
+    auction.Status.Should().Be(AuctionStatus.EndedUnsold);
+    auction.WinningBidId.Should().BeNull();
+    auction.WinningAt.Should().BeNull();
 
-    var endedEvent = Assert.IsType<AuctionEndedEvent>(Assert.Single(auction.DomainEvents));
-    Assert.Equal(auction.Id, endedEvent.AggregateId);
-    Assert.False(endedEvent.IsSold);
-    Assert.Equal(auction.OwnerId, endedEvent.OwnerId);
-    Assert.Null(endedEvent.WinnerId);
-    Assert.Equal(100m, endedEvent.FinalPrice);
+    var endedEvent = auction.DomainEvents.Should().ContainSingle().Subject.As<AuctionEndedEvent>();
+    endedEvent.AggregateId.Should().Be(auction.Id);
+    endedEvent.IsSold.Should().BeFalse();
+    endedEvent.OwnerId.Should().Be(auction.OwnerId);
+    endedEvent.WinnerId.Should().BeNull();
+    endedEvent.FinalPrice.Should().Be(100m);
   }
 
   [Fact]
   public void End_WhenHighestBidDoesNotMeetReserve_MarksAuctionAsUnsold() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().WithPrices(100m, 10m, 500m).Build();
     auction.Start();
     auction.PlaceBid(Guid.NewGuid(), "Bidder A", 300m);
     auction.ClearEvents();
 
+    // Act
     auction.End();
 
-    Assert.Equal(AuctionStatus.EndedUnsold, auction.Status);
-    Assert.Null(auction.WinningBidId);
-    Assert.Null(auction.WinningAt);
-    Assert.False(Assert.IsType<AuctionEndedEvent>(Assert.Single(auction.DomainEvents)).IsSold);
+    // Assert
+    auction.Status.Should().Be(AuctionStatus.EndedUnsold);
+    auction.WinningBidId.Should().BeNull();
+    auction.WinningAt.Should().BeNull();
+    auction.DomainEvents.Should().ContainSingle().Subject.As<AuctionEndedEvent>().IsSold.Should().BeFalse();
   }
 
   [Fact]
   public void End_WhenHighestBidMeetsReserve_MarksAuctionAsSoldAndStoresWinner() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().WithPrices(100m, 10m, 500m).Build();
     auction.Start();
     auction.PlaceBid(Guid.NewGuid(), "Bidder A", 600m);
     auction.ClearEvents();
     var before = DateTime.UtcNow;
 
+    // Act
     auction.End();
 
+    // Assert
     var after = DateTime.UtcNow;
-    Assert.Equal(AuctionStatus.EndedSold, auction.Status);
-    Assert.NotNull(auction.WinningBidId);
-    Assert.NotNull(auction.WinningAt);
-    Assert.InRange(auction.WinningAt!.Value, before, after);
+    auction.Status.Should().Be(AuctionStatus.EndedSold);
+    auction.WinningBidId.Should().NotBeNull();
+    auction.WinningAt.Should().NotBeNull();
+    auction.WinningAt!.Value.Should().BeOnOrAfter(before).And.BeOnOrBefore(after);
 
-    var topBid = auction.Bids.Single();
-    Assert.Equal(topBid.Id, auction.WinningBidId);
+    var topBid = auction.Bids.Should().ContainSingle().Subject;
+    topBid.Id.Should().Be(auction.WinningBidId.Value);
 
-    var endedEvent = Assert.IsType<AuctionEndedEvent>(Assert.Single(auction.DomainEvents));
-    Assert.True(endedEvent.IsSold);
-    Assert.Equal(auction.WinningBidId, endedEvent.WinnerId);
-    Assert.Equal(600m, endedEvent.FinalPrice);
+    var endedEvent = auction.DomainEvents.Should().ContainSingle().Subject.As<AuctionEndedEvent>();
+    endedEvent.IsSold.Should().BeTrue();
+    endedEvent.WinnerId.Should().Be(auction.WinningBidId);
+    endedEvent.FinalPrice.Should().Be(600m);
   }
 
   [Fact]
   public void Paid_WhenAuctionIsNotEndedSold_ThrowsDomainException() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().Build();
 
-    var exception = Assert.Throws<DomainException>(() => auction.Paid(true));
+    // Act
+    var act = () => auction.Paid(true);
 
-    Assert.Equal("Cuộc đấu giá chưa ở trạng thái chờ thanh toán", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Cuộc đấu giá chưa ở trạng thái chờ thanh toán");
   }
 
   [Fact]
   public void Paid_WhenMarkedPaid_ChangesStatusToCompleted() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().WithPrices(100m, 10m, 500m).Build();
     auction.Start();
     auction.PlaceBid(Guid.NewGuid(), "Bidder A", 600m);
     auction.End();
 
+    // Act
     auction.Paid(true);
 
-    Assert.Equal(AuctionStatus.Completed, auction.Status);
+    // Assert
+    auction.Status.Should().Be(AuctionStatus.Completed);
   }
 
   [Fact]
   public void Paid_WhenMarkedUnpaid_ChangesStatusToCanceled() {
-    var auction = CreateStandardAuction();
+    // Arrange
+    var auction = new AuctionBuilder().WithPrices(100m, 10m, 500m).Build();
     auction.Start();
     auction.PlaceBid(Guid.NewGuid(), "Bidder A", 600m);
     auction.End();
 
+    // Act
     auction.Paid(false);
 
-    Assert.Equal(AuctionStatus.Canceled, auction.Status);
+    // Assert
+    auction.Status.Should().Be(AuctionStatus.Canceled);
   }
 }

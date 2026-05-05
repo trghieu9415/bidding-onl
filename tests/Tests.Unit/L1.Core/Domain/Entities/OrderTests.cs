@@ -1,8 +1,9 @@
-using L1.Core.Domain.Transaction.Entities;
+using FluentAssertions;
 using L1.Core.Domain.Transaction.Enums;
 using L1.Core.Domain.Transaction.Events;
 using L1.Core.Domain.Transaction.ValueObjects;
 using L1.Core.Exceptions;
+using Tests.Common.Builders;
 using Xunit;
 
 namespace Tests.Unit.L1.Core.Domain.Entities;
@@ -12,117 +13,124 @@ public class OrderTests {
 
   [Fact]
   public void Create_ValidParameters_InitializesPendingOrderAndRaisesCreatedEvent() {
+    // Arrange
     var bidderId = Guid.NewGuid();
     var auctionId = Guid.NewGuid();
     var catalogId = Guid.NewGuid();
+    var builder = new OrderBuilder()
+      .WithBidderId(bidderId)
+      .WithAuctionId(auctionId)
+      .WithCatalogId(catalogId)
+      .WithAddress(ShippingAddress);
 
-    var order = Order.Create(
-      bidderId,
-      "John Doe",
-      "john@example.com",
-      auctionId,
-      catalogId,
-      "Laptop",
-      "main.png",
-      ShippingAddress
-    );
+    // Act
+    var order = builder.Build();
 
-    Assert.Equal(bidderId, order.BidderId);
-    Assert.Equal("John Doe", order.BidderName);
-    Assert.Equal("john@example.com", order.BidderEmail);
-    Assert.Equal(auctionId, order.AuctionId);
-    Assert.Equal(catalogId, order.CatalogId);
-    Assert.Equal("Laptop", order.CatalogName);
-    Assert.Equal("main.png", order.CatalogImage);
-    Assert.Equal(ShippingAddress, order.Address);
-    Assert.Equal(OrderStatus.Pending, order.Status);
-    Assert.Equal(0m, order.Price);
+    // Assert
+    order.BidderId.Should().Be(bidderId);
+    order.BidderName.Should().Be("John Doe");
+    order.BidderEmail.Should().Be("john@example.com");
+    order.AuctionId.Should().Be(auctionId);
+    order.CatalogId.Should().Be(catalogId);
+    order.CatalogName.Should().Be("Laptop");
+    order.CatalogImage.Should().Be("main.png");
+    order.Address.Should().Be(ShippingAddress);
+    order.Status.Should().Be(OrderStatus.Pending);
+    order.Price.Should().Be(0m);
 
-    var createdEvent = Assert.IsType<OrderCreatedEvent>(Assert.Single(order.DomainEvents));
-    Assert.Equal(order.Id, createdEvent.AggregateId);
-    Assert.Equal(bidderId, createdEvent.BidderId);
-    Assert.Equal(auctionId, createdEvent.AuctionId);
+    var createdEvent = order.DomainEvents.Should().ContainSingle().Subject.As<OrderCreatedEvent>();
+    createdEvent.AggregateId.Should().Be(order.Id);
+    createdEvent.BidderId.Should().Be(bidderId);
+    createdEvent.AuctionId.Should().Be(auctionId);
   }
 
   [Fact]
   public void MarkAsPaid_WhenPending_ChangesStatusAndRaisesCompletedEvent() {
-    var order = CreateOrder();
+    // Arrange
+    var order = new OrderBuilder().Build();
     order.ClearEvents();
 
+    // Act
     order.MarkAsPaid("billing@example.com");
 
-    Assert.Equal(OrderStatus.Confirmed, order.Status);
-    var completedEvent = Assert.IsType<OrderCompletedEvent>(Assert.Single(order.DomainEvents));
-    Assert.Equal(order.Id, completedEvent.AggregateId);
-    Assert.Equal(order.BidderId, completedEvent.BidderId);
-    Assert.Equal(order.AuctionId, completedEvent.AuctionId);
-    Assert.Equal(order.BidderName, completedEvent.BidderName);
-    Assert.Equal("billing@example.com", completedEvent.BidderEmail);
+    // Assert
+    order.Status.Should().Be(OrderStatus.Confirmed);
+    var completedEvent = order.DomainEvents.Should().ContainSingle().Subject.As<OrderCompletedEvent>();
+    completedEvent.AggregateId.Should().Be(order.Id);
+    completedEvent.BidderId.Should().Be(order.BidderId);
+    completedEvent.AuctionId.Should().Be(order.AuctionId);
+    completedEvent.BidderName.Should().Be(order.BidderName);
+    completedEvent.BidderEmail.Should().Be("billing@example.com");
   }
 
   [Fact]
   public void MarkAsPaid_WhenNotPending_ThrowsDomainException() {
-    var order = CreateOrder();
+    // Arrange
+    var order = new OrderBuilder().Build();
     order.Cancel();
 
-    var exception = Assert.Throws<DomainException>(() => order.MarkAsPaid("billing@example.com"));
+    // Act
+    var act = () => order.MarkAsPaid("billing@example.com");
 
-    Assert.Equal("Chỉ có thể thanh toán đơn khi đơn ở trạng thái Chờ", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Chỉ có thể thanh toán đơn khi đơn ở trạng thái Chờ");
   }
 
   [Fact]
   public void Cancel_WhenPending_ChangesStatusAndRaisesCanceledEvent() {
-    var order = CreateOrder();
+    // Arrange
+    var order = new OrderBuilder().Build();
     order.ClearEvents();
 
+    // Act
     order.Cancel();
 
-    Assert.Equal(OrderStatus.Canceled, order.Status);
-    var canceledEvent = Assert.IsType<OrderCanceledEvent>(Assert.Single(order.DomainEvents));
-    Assert.Equal(order.Id, canceledEvent.AggregateId);
-    Assert.Equal(order.BidderId, canceledEvent.CustomerId);
-    Assert.Equal(order.AuctionId, canceledEvent.AuctionId);
+    // Assert
+    order.Status.Should().Be(OrderStatus.Canceled);
+    var canceledEvent = order.DomainEvents.Should().ContainSingle().Subject.As<OrderCanceledEvent>();
+    canceledEvent.AggregateId.Should().Be(order.Id);
+    canceledEvent.CustomerId.Should().Be(order.BidderId);
+    canceledEvent.AuctionId.Should().Be(order.AuctionId);
   }
 
   [Fact]
   public void Cancel_WhenNotPending_ThrowsDomainException() {
-    var order = CreateOrder();
+    // Arrange
+    var order = new OrderBuilder().Build();
     order.MarkAsPaid("billing@example.com");
 
-    var exception = Assert.Throws<DomainException>(() => order.Cancel());
+    // Act
+    var act = () => order.Cancel();
 
-    Assert.Equal("Chỉ có thể hủy đơn khi đơn ở trạng thái Chờ", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Chỉ có thể hủy đơn khi đơn ở trạng thái Chờ");
   }
 
   [Fact]
   public void Refund_WhenConfirmed_ChangesStatusToRefunded() {
-    var order = CreateOrder();
+    // Arrange
+    var order = new OrderBuilder().Build();
     order.MarkAsPaid("billing@example.com");
 
+    // Act
     order.Refund();
 
-    Assert.Equal(OrderStatus.Refunded, order.Status);
+    // Assert
+    order.Status.Should().Be(OrderStatus.Refunded);
   }
 
   [Fact]
   public void Refund_WhenNotConfirmed_ThrowsDomainException() {
-    var order = CreateOrder();
+    // Arrange
+    var order = new OrderBuilder().Build();
 
-    var exception = Assert.Throws<DomainException>(() => order.Refund());
+    // Act
+    var act = () => order.Refund();
 
-    Assert.Equal("Chỉ có thể hoàn đơn khi đơn ở trạng thái Đã xác nhận", exception.Message);
-  }
-
-  private static Order CreateOrder() {
-    return Order.Create(
-      Guid.NewGuid(),
-      "John Doe",
-      "john@example.com",
-      Guid.NewGuid(),
-      Guid.NewGuid(),
-      "Laptop",
-      "main.png",
-      ShippingAddress
-    );
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Chỉ có thể hoàn đơn khi đơn ở trạng thái Đã xác nhận");
   }
 }

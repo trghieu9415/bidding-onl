@@ -1,7 +1,8 @@
-using L1.Core.Domain.Bidding.Entities;
+using FluentAssertions;
 using L1.Core.Domain.Bidding.Enums;
 using L1.Core.Domain.Bidding.Events;
 using L1.Core.Exceptions;
+using Tests.Common.Builders;
 using Xunit;
 
 namespace Tests.Unit.L1.Core.Domain.Entities;
@@ -9,149 +10,188 @@ namespace Tests.Unit.L1.Core.Domain.Entities;
 public class AuctionSessionTests {
   [Fact]
   public void Create_ValidParameters_InitializesDraftSession() {
-    var startTime = DateTime.UtcNow.AddHours(1);
-    var endTime = DateTime.UtcNow.AddHours(2);
+    // Arrange
+    var builder = new AuctionSessionBuilder().WithTitle("Morning Session");
 
-    var session = AuctionSession.Create("Morning Session", startTime, endTime);
+    // Act
+    var session = builder.Build();
 
-    Assert.Equal("Morning Session", session.Title);
-    Assert.Equal(SessionStatus.Draft, session.Status);
-    Assert.Equal(startTime, session.TimeFrame.StartTime);
-    Assert.Equal(endTime, session.TimeFrame.EndTime);
-    Assert.Empty(session.AuctionIds);
+    // Assert
+    session.Title.Should().Be("Morning Session");
+    session.Status.Should().Be(SessionStatus.Draft);
+    session.TimeFrame.StartTime.Should().BeCloseTo(DateTime.UtcNow.AddHours(1), TimeSpan.FromSeconds(5));
+    session.TimeFrame.EndTime.Should().BeCloseTo(DateTime.UtcNow.AddHours(2), TimeSpan.FromSeconds(5));
+    session.AuctionIds.Should().BeEmpty();
   }
 
   [Fact]
   public void Update_ChangesTitleAndReturnsSameSession() {
-    var session = AuctionSession.Create("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2));
+    // Arrange
+    var session = new AuctionSessionBuilder().WithTitle("Morning Session").Build();
 
+    // Act
     var returnedSession = session.Update("Evening Session");
 
-    Assert.Same(session, returnedSession);
-    Assert.Equal("Evening Session", session.Title);
+    // Assert
+    returnedSession.Should().BeSameAs(session);
+    session.Title.Should().Be("Evening Session");
   }
 
   [Fact]
   public void SetTimeFrame_WhenDraft_UpdatesTimeFrame() {
-    var session = AuctionSession.Create("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2));
+    // Arrange
+    var session = new AuctionSessionBuilder().Build();
     var newStart = DateTime.UtcNow.AddHours(3);
     var newEnd = DateTime.UtcNow.AddHours(4);
 
+    // Act
     var returnedSession = session.SetTimeFrame(newStart, newEnd);
 
-    Assert.Same(session, returnedSession);
-    Assert.Equal(newStart, session.TimeFrame.StartTime);
-    Assert.Equal(newEnd, session.TimeFrame.EndTime);
+    // Assert
+    returnedSession.Should().BeSameAs(session);
+    session.TimeFrame.StartTime.Should().Be(newStart);
+    session.TimeFrame.EndTime.Should().Be(newEnd);
   }
 
   [Fact]
   public void SetTimeFrame_WhenPublished_UpdatesTimeFrame() {
-    var session = AuctionSession.Create("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2));
+    // Arrange
+    var session = new AuctionSessionBuilder().Build();
     session.Publish();
     session.ClearEvents();
     var newStart = DateTime.UtcNow.AddHours(5);
     var newEnd = DateTime.UtcNow.AddHours(6);
 
+    // Act
     session.SetTimeFrame(newStart, newEnd);
 
-    Assert.Equal(newStart, session.TimeFrame.StartTime);
-    Assert.Equal(newEnd, session.TimeFrame.EndTime);
+    // Assert
+    session.TimeFrame.StartTime.Should().Be(newStart);
+    session.TimeFrame.EndTime.Should().Be(newEnd);
   }
 
   [Fact]
   public void SetTimeFrame_WhenSessionIsLive_ThrowsDomainException() {
-    var session = AuctionSession.Create("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2));
+    // Arrange
+    var session = new AuctionSessionBuilder().Build();
     session.Start();
 
-    var exception = Assert.Throws<DomainException>(() =>
-      session.SetTimeFrame(DateTime.UtcNow.AddHours(3), DateTime.UtcNow.AddHours(4)));
+    // Act
+    Action act = () => session.SetTimeFrame(DateTime.UtcNow.AddHours(3), DateTime.UtcNow.AddHours(4));
 
-    Assert.Equal("Không thể thay đổi thời gian khi phiên đã diễn ra.", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Không thể thay đổi thời gian khi phiên đã diễn ra.");
   }
 
   [Fact]
   public void SetTimeFrame_WhenEndTimeIsNotAfterStartTime_ThrowsDomainException() {
-    var session = AuctionSession.Create("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2));
+    // Arrange
+    var session = new AuctionSessionBuilder().Build();
     var startTime = DateTime.UtcNow.AddHours(3);
 
-    var exception = Assert.Throws<DomainException>(() => session.SetTimeFrame(startTime, startTime));
+    // Act
+    Action act = () => session.SetTimeFrame(startTime, startTime);
 
-    Assert.Equal("Thời gian bắt đầu phải trước thời gian kết thúc.", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Thời gian bắt đầu phải trước thời gian kết thúc.");
   }
 
   [Fact]
   public void SetTimeFrame_WhenEndTimeIsInPast_ThrowsDomainException() {
-    var session = AuctionSession.Create("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2));
+    // Arrange
+    var session = new AuctionSessionBuilder().Build();
 
-    var exception = Assert.Throws<DomainException>(() =>
-      session.SetTimeFrame(DateTime.UtcNow.AddHours(-2), DateTime.UtcNow.AddHours(-1)));
+    // Act
+    Action act = () => session.SetTimeFrame(DateTime.UtcNow.AddHours(-2), DateTime.UtcNow.AddHours(-1));
 
-    Assert.Equal("Thời gian kết thúc không được ở trong quá khứ.", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Thời gian kết thúc không được ở trong quá khứ.");
   }
 
   [Fact]
   public void SyncAuctions_ReplacesAuctionIdsAndReturnsSameSession() {
-    var session = AuctionSession.Create("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2));
+    // Arrange
+    var session = new AuctionSessionBuilder().Build();
     session.SyncAuctions([Guid.NewGuid()]);
     var auctionIds = new[] { Guid.NewGuid(), Guid.NewGuid() };
 
+    // Act
     var returnedSession = session.SyncAuctions(auctionIds);
 
-    Assert.Same(session, returnedSession);
-    Assert.Equal(auctionIds, session.AuctionIds);
+    // Assert
+    returnedSession.Should().BeSameAs(session);
+    session.AuctionIds.Should().BeEquivalentTo(auctionIds);
   }
 
   [Fact]
   public void SyncAuctions_WhenClosed_ThrowsDomainException() {
-    var session = AuctionSession.Create("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2));
+    // Arrange
+    var session = new AuctionSessionBuilder().Build();
     session.Close();
 
-    var exception = Assert.Throws<DomainException>(() => session.SyncAuctions([Guid.NewGuid()]));
+    // Act
+    Action act = () => session.SyncAuctions([Guid.NewGuid()]);
 
-    Assert.Equal("Phiên đấu giá đã đóng.", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Phiên đấu giá đã đóng.");
   }
 
   [Fact]
   public void Publish_WhenDraft_ChangesStatusAndRaisesEvent() {
-    var startTime = DateTime.UtcNow.AddHours(1);
-    var endTime = DateTime.UtcNow.AddHours(2);
-    var session = AuctionSession.Create("Morning Session", startTime, endTime);
+    // Arrange
+    var session = new AuctionSessionBuilder().WithTitle("Morning Session").Build();
 
+    // Act
     session.Publish();
 
-    Assert.Equal(SessionStatus.Published, session.Status);
-    var publishedEvent = Assert.IsType<SessionPublishedEvent>(Assert.Single(session.DomainEvents));
-    Assert.Equal(session.Id, publishedEvent.AggregateId);
-    Assert.Equal("Morning Session", publishedEvent.Title);
-    Assert.Equal(startTime, publishedEvent.StartTime);
-    Assert.Equal(endTime, publishedEvent.EndTime);
+    // Assert
+    session.Status.Should().Be(SessionStatus.Published);
+    var publishedEvent = session.DomainEvents.Should().ContainSingle().Subject.As<SessionPublishedEvent>();
+    publishedEvent.AggregateId.Should().Be(session.Id);
+    publishedEvent.Title.Should().Be("Morning Session");
+    publishedEvent.StartTime.Should().Be(session.TimeFrame.StartTime);
+    publishedEvent.EndTime.Should().Be(session.TimeFrame.EndTime);
   }
 
   [Fact]
   public void Publish_WhenNotDraft_ThrowsDomainException() {
-    var session = AuctionSession.Create("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2));
+    // Arrange
+    var session = new AuctionSessionBuilder().Build();
     session.Publish();
 
-    var exception = Assert.Throws<DomainException>(() => session.Publish());
+    // Act
+    var act = () => session.Publish();
 
-    Assert.Equal("Trạng thái không phù hợp để công khai phiên đấu giá", exception.Message);
+    // Assert
+    act.Should().Throw<DomainException>()
+      .WithMessage("Trạng thái không phù hợp để công khai phiên đấu giá");
   }
 
   [Fact]
   public void Start_ChangesStatusToLive() {
-    var session = AuctionSession.Create("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2));
+    // Arrange
+    var session = new AuctionSessionBuilder().Build();
 
+    // Act
     session.Start();
 
-    Assert.Equal(SessionStatus.Live, session.Status);
+    // Assert
+    session.Status.Should().Be(SessionStatus.Live);
   }
 
   [Fact]
   public void Close_ChangesStatusToClosed() {
-    var session = AuctionSession.Create("Morning Session", DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2));
+    // Arrange
+    var session = new AuctionSessionBuilder().Build();
 
+    // Act
     session.Close();
 
-    Assert.Equal(SessionStatus.Closed, session.Status);
+    // Assert
+    session.Status.Should().Be(SessionStatus.Closed);
   }
 }
