@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using L1.Core.Domain.Catalog.Entities;
 
 namespace Tests.Common.Builders;
 
+[ExcludeFromCodeCoverage]
 public class CategoryBuilder {
   private string _name = "Electronics";
   private Guid? _parentId;

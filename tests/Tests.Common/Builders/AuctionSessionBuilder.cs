@@ -1,7 +1,9 @@
-﻿using L1.Core.Domain.Bidding.Entities;
+﻿using System.Diagnostics.CodeAnalysis;
+using L1.Core.Domain.Bidding.Entities;
 
 namespace Tests.Common.Builders;
 
+[ExcludeFromCodeCoverage]
 public class AuctionSessionBuilder {
   private readonly List<Guid> _auctionIds = [];
   private DateTime _endTime = DateTime.UtcNow.AddHours(2);

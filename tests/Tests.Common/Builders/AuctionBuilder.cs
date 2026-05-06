@@ -1,8 +1,9 @@
-﻿using L1.Core.Domain.Bidding.Entities;
+﻿using System.Diagnostics.CodeAnalysis;
+using L1.Core.Domain.Bidding.Entities;
 
 namespace Tests.Common.Builders;
 
-
+[ExcludeFromCodeCoverage]
 public class AuctionBuilder {
   private Guid _catalogItemId = Guid.NewGuid();
   private decimal _currentPrice = 100m;

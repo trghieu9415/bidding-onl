@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using L1.Core.Domain.Transaction.Entities;
 using L1.Core.Domain.Transaction.Enums;
 
 namespace Tests.Common.Builders;
 
+[ExcludeFromCodeCoverage]
 public class PaymentBuilder {
   private decimal _amount = 150m;
   private PaymentMethod _method = PaymentMethod.Stripe;

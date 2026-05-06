@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using L1.Core.Domain.Bidding.Entities;
 
 namespace Tests.Common.Builders;
 
+[ExcludeFromCodeCoverage]
 public class BidBuilder {
   private decimal _amount = 120m;
   private Auction _auction = new AuctionBuilder().Build();

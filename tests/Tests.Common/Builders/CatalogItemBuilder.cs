@@ -1,9 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using L1.Core.Domain.Catalog.Entities;
 using L1.Core.Domain.Catalog.Enums;
 
 namespace Tests.Common.Builders;
 
-[]
+[ExcludeFromCodeCoverage]
 public class CatalogItemBuilder {
   private Guid[]? _categoryIds;
   private ItemCondition? _condition;

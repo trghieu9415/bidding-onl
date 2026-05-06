@@ -1,17 +1,19 @@
+using System.Diagnostics.CodeAnalysis;
 using L1.Core.Domain.Transaction.Entities;
 using L1.Core.Domain.Transaction.ValueObjects;
 
 namespace Tests.Common.Builders;
 
+[ExcludeFromCodeCoverage]
 public class OrderBuilder {
-  private Address _address = new("John Doe", "0123456789", "123 Auction Street");
-  private Guid _auctionId = Guid.NewGuid();
   private readonly string _bidderEmail = "john@example.com";
-  private Guid _bidderId = Guid.NewGuid();
   private readonly string _bidderName = "John Doe";
-  private Guid _catalogId = Guid.NewGuid();
   private readonly string _catalogImage = "main.png";
   private readonly string _catalogName = "Laptop";
+  private Address _address = new("John Doe", "0123456789", "123 Auction Street");
+  private Guid _auctionId = Guid.NewGuid();
+  private Guid _bidderId = Guid.NewGuid();
+  private Guid _catalogId = Guid.NewGuid();
 
   public OrderBuilder WithBidderId(Guid bidderId) {
     _bidderId = bidderId;

@@ -1,3 +1,4 @@
+using FluentAssertions;
 using L1.Core.Domain.Bidding.Events;
 using Xunit;
 
@@ -6,9 +7,11 @@ namespace Tests.Unit.L1.Core.Domain.Events;
 public class BiddingEventTests {
   [Fact]
   public void Events_ExposeExpectedAggregateIds() {
+    // Arrange
     var auctionId = Guid.NewGuid();
     var sessionId = Guid.NewGuid();
 
+    // Act
     var auctionEndedEvent = new AuctionEndedEvent(auctionId, Guid.NewGuid(), 500m, Guid.NewGuid(), true);
     var auctionStartedEvent = new AuctionStartedEvent(auctionId, Guid.NewGuid(), Guid.NewGuid());
     var bidPlacedEvent = new BidPlacedEvent(auctionId, Guid.NewGuid(), "Bidder", 500m);
@@ -16,10 +19,11 @@ public class BiddingEventTests {
     var sessionPublishedEvent =
       new SessionPublishedEvent(sessionId, "Session", DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
 
-    Assert.Equal(auctionId, auctionEndedEvent.AggregateId);
-    Assert.Equal(auctionId, auctionStartedEvent.AggregateId);
-    Assert.Equal(auctionId, bidPlacedEvent.AggregateId);
-    Assert.Equal(auctionId, outbidEvent.AggregateId);
-    Assert.Equal(sessionId, sessionPublishedEvent.AggregateId);
+    // Assert
+    auctionEndedEvent.AggregateId.Should().Be(auctionId);
+    auctionStartedEvent.AggregateId.Should().Be(auctionId);
+    bidPlacedEvent.AggregateId.Should().Be(auctionId);
+    outbidEvent.AggregateId.Should().Be(auctionId);
+    sessionPublishedEvent.AggregateId.Should().Be(sessionId);
   }
 }
