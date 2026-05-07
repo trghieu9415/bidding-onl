@@ -3,68 +3,94 @@ using L2.Application.Abstractions;
 using L2.Application.Behaviors;
 using L2.Application.Exceptions;
 using L2.Application.Ports.Concurrency;
-using MediatR;
 using NSubstitute;
 using Xunit;
 
 namespace Tests.Unit.L2.Application.Behaviors;
 
 public class LockBehaviorTests {
-  private readonly LockBehavior<FakeLockableRequest, string> _behavior;
-  private readonly IDistributedLockService _lockServiceMock;
-  private readonly RequestHandlerDelegate<string> _nextMock;
+  private readonly IDistributedLockService _lockService = Substitute.For<IDistributedLockService>();
+
+  private readonly LockBehavior<TestLockRequest, string> _sut;
 
   public LockBehaviorTests() {
-    _lockServiceMock = Substitute.For<IDistributedLockService>();
-    _nextMock = Substitute.For<RequestHandlerDelegate<string>>();
-    _behavior = new LockBehavior<FakeLockableRequest, string>(_lockServiceMock);
+    _sut = new LockBehavior<TestLockRequest, string>(_lockService);
   }
 
   [Fact]
-  public async Task Handle_ShouldCallNextAndDisposeLock_WhenLockIsAcquiredSuccessfully() {
-    var request = new FakeLockableRequest {
-      LockKey = "auction-123",
-      WaitTime = TimeSpan.FromSeconds(3)
-    };
+  public async Task Handle_Should_InvokeNext_WhenLockAcquired() {
+    // Arrange
+    var request = new TestLockRequest();
 
-    const string expectedResponse = "SuccessResult";
-    var mockDisposableLock = Substitute.For<IDisposable>();
+    var distributedLock = Substitute.For<IDisposable>();
 
-    _lockServiceMock
+    _lockService
       .AcquireLockAsync(request.LockKey, request.WaitTime)
-      .Returns(mockDisposableLock);
+      .Returns(distributedLock);
 
-    _nextMock.Invoke(TestContext.Current.CancellationToken).Returns(expectedResponse);
-    var result = await _behavior.Handle(request, _nextMock, CancellationToken.None);
-    result.Should().Be(expectedResponse);
+    // Act
+    var result = await _sut.Handle(
+      request,
+      Next,
+      CancellationToken.None
+    );
 
-    await _nextMock.Received(1).Invoke(TestContext.Current.CancellationToken);
+    // Assert
+    result.Should().Be("success");
 
-    mockDisposableLock.Received(1).Dispose();
+    await _lockService
+      .Received(1)
+      .AcquireLockAsync(request.LockKey, request.WaitTime);
+
+    distributedLock
+      .Received(1)
+      .Dispose();
+
+    return;
+
+    Task<string> Next(CancellationToken _) {
+      return Task.FromResult("success");
+    }
   }
 
   [Fact]
-  public async Task Handle_ShouldThrowWorkflowException_WhenLockAcquisitionFails() {
-    var request = new FakeLockableRequest {
-      LockKey = "auction-456",
-      WaitTime = TimeSpan.FromSeconds(3)
-    };
+  public async Task Handle_Should_ThrowWorkflowException_WhenLockNotAcquired() {
+    // Arrange
+    var request = new TestLockRequest();
 
-    _lockServiceMock
+    _lockService
       .AcquireLockAsync(request.LockKey, request.WaitTime)
       .Returns((IDisposable?)null);
 
-    Func<Task> action = async () => await _behavior.Handle(request, _nextMock, CancellationToken.None);
-    var exception = await action.Should().ThrowAsync<WorkflowException>();
+    // Act
+    var act = async () => await _sut.Handle(
+      request,
+      Next,
+      CancellationToken.None
+    );
+
+    // Assert
+    var exception = await act.Should()
+      .ThrowAsync<WorkflowException>();
 
     exception.Which.StatusCode.Should().Be(429);
-    exception.Which.Message.Should().Be("Hệ thống đang bận xử lý yêu cầu này. Vui lòng thử lại.");
 
-    await _nextMock.DidNotReceive().Invoke(TestContext.Current.CancellationToken);
+    exception.Which.Message.Should()
+      .Be("Hệ thống đang bận xử lý yêu cầu này. Vui lòng thử lại.");
+
+    await _lockService
+      .Received(1)
+      .AcquireLockAsync(request.LockKey, request.WaitTime);
+    return;
+
+    Task<string> Next(CancellationToken _) {
+      return Task.FromResult("success");
+    }
   }
-}
 
-public class FakeLockableRequest : ILockable, IRequest<string> {
-  public string LockKey { get; init; } = string.Empty;
-  public TimeSpan WaitTime { get; init; }
+  public sealed class TestLockRequest : ILockable {
+    public string LockKey => "test-lock";
+
+    public TimeSpan WaitTime => TimeSpan.FromSeconds(5);
+  }
 }

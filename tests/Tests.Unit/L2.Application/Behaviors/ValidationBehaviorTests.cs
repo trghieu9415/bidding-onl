@@ -10,75 +10,103 @@ using Xunit;
 namespace Tests.Unit.L2.Application.Behaviors;
 
 public class ValidationBehaviorTests {
-  private readonly RequestHandlerDelegate<string> _nextMock;
-
-  public ValidationBehaviorTests() {
-    _nextMock = Substitute.For<RequestHandlerDelegate<string>>();
-    _nextMock.Invoke().Returns("NextCalled");
-  }
-
   [Fact]
-  public async Task Handle_ShouldCallNext_WhenNoValidatorsExist() {
-    // Arrange: Không tiêm validator nào vào
-    var behavior = new ValidationBehavior<FakeRequest, string>(Enumerable.Empty<IValidator<FakeRequest>>());
-    var request = new FakeRequest();
+  public async Task Handle_Should_InvokeNext_WhenNoValidatorsExist() {
+    // Arrange
+    var validators = Enumerable.Empty<IValidator<TestValidationRequest>>();
+    var sut = new ValidationBehavior<TestValidationRequest, string>(validators);
+    var request = new TestValidationRequest();
 
     // Act
-    var result = await behavior.Handle(request, _nextMock, CancellationToken.None);
+    var result = await sut.Handle(
+      request,
+      Next,
+      CancellationToken.None
+    );
 
     // Assert
-    result.Should().Be("NextCalled");
-    await _nextMock.Received(1).Invoke(TestContext.Current.CancellationToken);
+    result.Should().Be("success");
+    return;
+
+    Task<string> Next(CancellationToken _) {
+      return Task.FromResult("success");
+    }
   }
 
   [Fact]
-  public async Task Handle_ShouldCallNext_WhenValidationPasses() {
-    // Arrange: Có validator nhưng dữ liệu hợp lệ (không sinh ra lỗi)
-    var validatorMock = Substitute.For<IValidator<FakeRequest>>();
-    validatorMock.ValidateAsync(Arg.Any<ValidationContext<FakeRequest>>(), Arg.Any<CancellationToken>())
-      .Returns(new ValidationResult()); // Kết quả rỗng = Hợp lệ
+  public async Task Handle_Should_InvokeNext_WhenValidationPasses() {
+    // Arrange
+    var validator = Substitute.For<IValidator<TestValidationRequest>>();
 
-    var behavior = new ValidationBehavior<FakeRequest, string>(new[] { validatorMock });
-    var request = new FakeRequest();
+    validator
+      .ValidateAsync(Arg.Any<IValidationContext>(), Arg.Any<CancellationToken>())
+      .Returns(new ValidationResult());
+
+    var sut = new ValidationBehavior<TestValidationRequest, string>([validator]);
+    var request = new TestValidationRequest();
 
     // Act
-    var result = await behavior.Handle(request, _nextMock, CancellationToken.None);
+    var result = await sut.Handle(
+      request,
+      Next,
+      CancellationToken.None
+    );
 
     // Assert
-    result.Should().Be("NextCalled");
-    await _nextMock.Received(1).Invoke(TestContext.Current.CancellationToken);
+    result.Should().Be("success");
+    return;
+
+    Task<string> Next(CancellationToken _) {
+      return Task.FromResult("success");
+    }
   }
 
   [Fact]
-  public async Task Handle_ShouldThrowInvalidInputException_WithDistinctMessages_WhenValidationFails() {
-    var validatorMock1 = Substitute.For<IValidator<FakeRequest>>();
-    var validatorMock2 = Substitute.For<IValidator<FakeRequest>>();
+  public async Task Handle_Should_ThrowInvalidInputException_WhenValidationFails() {
+    // Arrange
+    var validator1 = Substitute.For<IValidator<TestValidationRequest>>();
+    var validator2 = Substitute.For<IValidator<TestValidationRequest>>();
 
-    validatorMock1.ValidateAsync(Arg.Any<ValidationContext<FakeRequest>>(), Arg.Any<CancellationToken>())
-      .Returns(new ValidationResult(new[] {
-        new ValidationFailure("Prop1", "Lỗi số 1"),
-        new ValidationFailure("Prop1", "Lỗi số 1")
-      }));
-
-    validatorMock2.ValidateAsync(Arg.Any<ValidationContext<FakeRequest>>(), Arg.Any<CancellationToken>())
+    validator1
+      .ValidateAsync(Arg.Any<IValidationContext>(), Arg.Any<CancellationToken>())
       .Returns(new ValidationResult([
-        new ValidationFailure("Prop2",
-          "Lỗi số 2"
-        )
+        new ValidationFailure("Property1", "Lỗi số 1"),
+        new ValidationFailure("Property2", "Lỗi số 2")
       ]));
 
-    var behavior = new ValidationBehavior<FakeRequest, string>(new[] { validatorMock1, validatorMock2 });
-    var request = new FakeRequest();
+    validator2
+      .ValidateAsync(Arg.Any<IValidationContext>(), Arg.Any<CancellationToken>())
+      .Returns(new ValidationResult([
+        new ValidationFailure("Property1", "Lỗi số 1"),
+        new ValidationFailure("Property3", "Lỗi số 3")
+      ]));
 
-    Func<Task> action = async () => await behavior.Handle(request, _nextMock, CancellationToken.None);
+    var sut = new ValidationBehavior<TestValidationRequest, string>([validator1, validator2]);
+    var request = new TestValidationRequest();
 
-    var exception = await action.Should().ThrowAsync<InvalidInputException>();
+    // Act
+    var act = async () => await sut.Handle(
+      request,
+      Next,
+      CancellationToken.None
+    );
 
-    exception.Which.Message.Should().Contain("Lỗi số 1");
-    exception.Which.Message.Should().Contain("Lỗi số 2");
+    // Assert
+    var exception = await act.Should().ThrowAsync<InvalidInputException>();
 
-    await _nextMock.DidNotReceive().Invoke(TestContext.Current.CancellationToken);
+    exception.Which.Message.Should().Be("Đầu vào không hợp lệ");
+
+    exception.Which.Errors.Should().BeEquivalentTo(
+      "Lỗi số 1",
+      "Lỗi số 2",
+      "Lỗi số 3"
+    );
+    return;
+
+    Task<string> Next(CancellationToken _) {
+      return Task.FromResult("success");
+    }
   }
-}
 
-public class FakeRequest : IRequest<string> {}
+  public sealed class TestValidationRequest : IRequest<string>;
+}

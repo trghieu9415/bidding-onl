@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="L2.Application\Filters\"/>
     <Folder Include="L2.Application\UseCases\"/>
     <Folder Include="L2.Application\UseCases\Auctions\Commands\"/>
     <Folder Include="L2.Application\UseCases\Auctions\Queries\"/>
