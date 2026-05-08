@@ -35,6 +35,12 @@
     <ProjectReference Include="..\Tests.Common\Tests.Common.csproj"/>
   </ItemGroup>
 
+  <PropertyGroup>
+    <ExcludeByAttribute>ExcludeFromCodeCoverage</ExcludeByAttribute>
+    <Exclude>[L2.Application]L2.Application.DTOs.*,[L2.Application]L2.Application.Models.*</Exclude>
+    <Include>[L2.Application]L2.Application.Models.Meta</Include>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="10.0.0">
       <PrivateAssets>all</PrivateAssets>

@@ -9,6 +9,7 @@ using Xunit;
 
 namespace Tests.Unit.L2.Application.Behaviors;
 
+#pragma warning disable xUnit1051
 public class ValidationBehaviorTests {
   [Fact]
   public async Task Handle_Should_InvokeNext_WhenNoValidatorsExist() {
@@ -17,20 +18,14 @@ public class ValidationBehaviorTests {
     var sut = new ValidationBehavior<TestValidationRequest, string>(validators);
     var request = new TestValidationRequest();
 
+    var next = Substitute.For<RequestHandlerDelegate<string>>();
+    next.Invoke().Returns("success");
+
     // Act
-    var result = await sut.Handle(
-      request,
-      Next,
-      CancellationToken.None
-    );
+    var result = await sut.Handle(request, next, CancellationToken.None);
 
     // Assert
     result.Should().Be("success");
-    return;
-
-    Task<string> Next(CancellationToken _) {
-      return Task.FromResult("success");
-    }
   }
 
   [Fact]
@@ -45,20 +40,14 @@ public class ValidationBehaviorTests {
     var sut = new ValidationBehavior<TestValidationRequest, string>([validator]);
     var request = new TestValidationRequest();
 
+    var next = Substitute.For<RequestHandlerDelegate<string>>();
+    next.Invoke().Returns("success");
+
     // Act
-    var result = await sut.Handle(
-      request,
-      Next,
-      CancellationToken.None
-    );
+    var result = await sut.Handle(request, next, CancellationToken.None);
 
     // Assert
     result.Should().Be("success");
-    return;
-
-    Task<string> Next(CancellationToken _) {
-      return Task.FromResult("success");
-    }
   }
 
   [Fact]
@@ -84,28 +73,18 @@ public class ValidationBehaviorTests {
     var sut = new ValidationBehavior<TestValidationRequest, string>([validator1, validator2]);
     var request = new TestValidationRequest();
 
+    var next = Substitute.For<RequestHandlerDelegate<string>>();
+    next.Invoke().Returns("success");
+
     // Act
-    var act = async () => await sut.Handle(
-      request,
-      Next,
-      CancellationToken.None
-    );
+    var act = async () => await sut.Handle(request, next, CancellationToken.None);
 
     // Assert
     var exception = await act.Should().ThrowAsync<InvalidInputException>();
-
     exception.Which.Message.Should().Be("Đầu vào không hợp lệ");
-
     exception.Which.Errors.Should().BeEquivalentTo(
-      "Lỗi số 1",
-      "Lỗi số 2",
-      "Lỗi số 3"
+      "Lỗi số 1", "Lỗi số 2", "Lỗi số 3"
     );
-    return;
-
-    Task<string> Next(CancellationToken _) {
-      return Task.FromResult("success");
-    }
   }
 
   public sealed class TestValidationRequest : IRequest<string>;

@@ -13,34 +13,19 @@ public class AppDbContext(
 ) : IdentityUserContext<AppUser, Guid>(options), IUnitOfWork {
   private IDbContextTransaction? _currentTransaction;
 
-  public async Task BeginTransactionAsync(CancellationToken ct = default) {
+  public async Task<IAsyncDisposable> BeginTransactionAsync(CancellationToken ct = default) {
     if (_currentTransaction != null) {
-      return;
+      return _currentTransaction;
     }
 
     _currentTransaction = await Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct);
+    return _currentTransaction;
   }
 
   public async Task CommitTransactionAsync(CancellationToken ct = default) {
     try {
       if (_currentTransaction != null) {
         await _currentTransaction.CommitAsync(ct);
-      }
-    } catch {
-      await RollbackTransactionAsync(ct);
-      throw;
-    } finally {
-      if (_currentTransaction != null) {
-        await _currentTransaction.DisposeAsync();
-        _currentTransaction = null;
-      }
-    }
-  }
-
-  public async Task RollbackTransactionAsync(CancellationToken ct = default) {
-    try {
-      if (_currentTransaction != null) {
-        await _currentTransaction.RollbackAsync(ct);
       }
     } finally {
       if (_currentTransaction != null) {

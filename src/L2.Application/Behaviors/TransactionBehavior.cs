@@ -14,18 +14,12 @@ public class TransactionBehavior<TRequest, TResponse>(
     RequestHandlerDelegate<TResponse> next,
     CancellationToken ct
   ) {
-    await unitOfWork.BeginTransactionAsync(ct);
+    await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
 
-    try {
-      var response = await next();
-
-      await eventDispatcher.DispatchEventsAsync(ct);
-      await unitOfWork.SaveChangesAsync(ct);
-      await unitOfWork.CommitTransactionAsync(ct);
-      return response;
-    } catch (Exception) {
-      await unitOfWork.RollbackTransactionAsync(ct);
-      throw;
-    }
+    var response = await next();
+    await eventDispatcher.DispatchEventsAsync(ct);
+    await unitOfWork.SaveChangesAsync(ct);
+    await unitOfWork.CommitTransactionAsync(ct);
+    return response;
   }
 }
