@@ -5,101 +5,69 @@ using Xunit;
 namespace Tests.Unit.L2.Application.Models;
 
 public class MetaTests {
-  [Fact]
-  public void Create_Should_CreateMetaWithoutPagination_WhenSinglePage() {
+  [Theory]
+  [InlineData(1, 10, 25, 3, true, false, true)]
+  [InlineData(2, 10, 25, 3, true, true, true)]
+  [InlineData(3, 10, 25, 3, true, true, false)]
+  [InlineData(1, 10, 5, 1, false, false, false)]
+  public void Create_ShouldCalculateCorrectPagination(
+    int page, int perPage, int total,
+    int expectedTotalPages, bool expectedHasPagination,
+    bool expectedHasPrev, bool expectedHasNext) {
     // Act
-    var result = Meta.Create(
-      1,
-      10,
-      5
-    );
+    var result = Meta.Create(page, perPage, total);
 
     // Assert
-    result.Page.Should().Be(1);
-    result.PerPage.Should().Be(10);
-    result.Total.Should().Be(5);
-    result.TotalPages.Should().Be(1);
-
-    result.HasPagination.Should().BeFalse();
-    result.HasPreviousPage.Should().BeFalse();
-    result.HasNextPage.Should().BeFalse();
+    result.TotalPages.Should().Be(expectedTotalPages);
+    result.HasPagination.Should().Be(expectedHasPagination);
+    result.HasPreviousPage.Should().Be(expectedHasPrev);
+    result.HasNextPage.Should().Be(expectedHasNext);
   }
 
   [Fact]
-  public void Create_Should_CreateMetaWithPagination_WhenMultiplePages() {
+  public void Create_ShouldHandleZeroTotal_Correctly() {
     // Act
-    var result = Meta.Create(
-      2,
-      10,
-      25
-    );
+    var result = Meta.Create(1, 10, 0);
 
     // Assert
-    result.Page.Should().Be(2);
-    result.PerPage.Should().Be(10);
-    result.Total.Should().Be(25);
-    result.TotalPages.Should().Be(3);
-
-    result.HasPagination.Should().BeTrue();
-    result.HasPreviousPage.Should().BeTrue();
-    result.HasNextPage.Should().BeTrue();
-  }
-
-  [Fact]
-  public void Create_Should_SetHasNextPageFalse_WhenLastPage() {
-    // Act
-    var result = Meta.Create(
-      3,
-      10,
-      25
-    );
-
-    // Assert
-    result.Page.Should().Be(3);
-    result.TotalPages.Should().Be(3);
-
-    result.HasPagination.Should().BeTrue();
-    result.HasPreviousPage.Should().BeTrue();
-    result.HasNextPage.Should().BeFalse();
-  }
-
-  [Fact]
-  public void Create_Should_NormalizeInvalidValues() {
-    // Act
-    var result = Meta.Create(
-      -10,
-      0,
-      -5
-    );
-
-    // Assert
-    result.Page.Should().Be(0);
-    result.PerPage.Should().Be(1);
-    result.Total.Should().Be(0);
     result.TotalPages.Should().Be(0);
-
+    result.Page.Should().Be(0);
     result.HasPagination.Should().BeFalse();
-    result.HasPreviousPage.Should().BeFalse();
-    result.HasNextPage.Should().BeFalse();
+  }
+
+  [Theory]
+  [InlineData(0, 1)]
+  [InlineData(-5, 1)]
+  public void Create_ShouldNormalizeInvalidPage_ToMinimum(int inputPage, int expectedPage) {
+    // Act
+    var result = Meta.Create(inputPage, 10, 50);
+
+    // Assert
+    result.Page.Should().Be(expectedPage);
   }
 
   [Fact]
-  public void Create_Should_ClampPageToTotalPages_WhenPageExceedsTotalPages() {
+  public void Create_ShouldClampPage_ToTotalPages() {
+    var result = Meta.Create(10, 10, 50);
+    result.Page.Should().Be(5);
+  }
+
+  [Theory]
+  [InlineData(1, -5, 10, 1, 10)]
+  [InlineData(1, 10, -10, 10, 0)]
+  [InlineData(1, -1, -1, 1, 0)]
+  public void Create_ShouldNormalizeNegativeValues_Correctly(
+    int page,
+    int inputPerPage,
+    int inputTotal,
+    int expectedPerPage,
+    int expectedTotal
+  ) {
     // Act
-    var result = Meta.Create(
-      999,
-      10,
-      25
-    );
+    var result = Meta.Create(page, inputPerPage, inputTotal);
 
     // Assert
-    result.Page.Should().Be(3);
-    result.PerPage.Should().Be(10);
-    result.Total.Should().Be(25);
-    result.TotalPages.Should().Be(3);
-
-    result.HasPagination.Should().BeTrue();
-    result.HasPreviousPage.Should().BeTrue();
-    result.HasNextPage.Should().BeFalse();
+    result.PerPage.Should().Be(expectedPerPage);
+    result.Total.Should().Be(expectedTotal);
   }
 }

@@ -49,4 +49,18 @@ public class CategoryTests {
     act.Should().Throw<DomainException>()
       .WithMessage("Danh mục cha không thể là chính nó.");
   }
+
+  [Fact]
+  public void Update_WithNullParentId_SetsParentIdToNull() {
+    // Arrange
+    var parentId = Guid.NewGuid();
+    var category = new CategoryBuilder().WithParentId(parentId).Build();
+
+    // Act
+    category.Update("New Name", null);
+
+    // Assert
+    category.ParentId.Should().BeNull();
+    category.Name.Should().Be("New Name");
+  }
 }

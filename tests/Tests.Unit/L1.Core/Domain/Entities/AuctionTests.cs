@@ -238,8 +238,8 @@ public class AuctionTests {
     auction.PlaceBid(bidderId, "Bidder A", 120m);
 
     // Assert
-    var bidEvent = auction.DomainEvents.Should().ContainSingle().Subject;
-    bidEvent.Should().BeOfType<BidPlacedEvent>();
+    auction.DomainEvents.Should().ContainSingle().Which.Should().BeOfType<BidPlacedEvent>();
+    auction.DomainEvents.OfType<OutbidEvent>().Should().BeEmpty();
   }
 
   [Fact]

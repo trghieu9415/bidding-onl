@@ -69,7 +69,7 @@ public class Auction : AggregateRoot {
     TotalBids++;
 
     AddDomainEvent(new BidPlacedEvent(Id, bidderId, bidderName, amount));
-    if (previousBidderId.HasValue && previousBidderId != bidderId) {
+    if (previousBidderId.HasValue && previousBidderId.Value != bidderId) {
       AddDomainEvent(new OutbidEvent(Id, previousBidderId.Value, amount));
     }
 

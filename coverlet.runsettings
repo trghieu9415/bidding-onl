@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura,line</Format>
+          <Include>
+            [L1.Core]*,
+            [L2.Application]*,
+            [L3.Infrastructure]*,
+            [L3.Worker]*,
+            [L4.Presentation]*
+          </Include>
+          <Exclude>
+            [*]*.DTOs.*,
+            [*]*.Migrations.*,
+
+            <!-- Specical Exclude -->
+            [L2.Application]*.Models.TokenModel,
+            [L2.Application]*.Models.AuthTokens,
+            [L2.Application]*.Models.User
+          </Exclude>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

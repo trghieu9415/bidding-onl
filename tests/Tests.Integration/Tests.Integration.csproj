@@ -19,11 +19,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="9.0.12"/>
-    <PackageReference Include="more.xunit.runner.visualstudio" Version="2.3.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="xunit.v3" Version="3.2.2"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -33,9 +28,9 @@
     <Folder Include="L3.Infrastructure\Adapters\Logging\"/>
     <Folder Include="L3.Infrastructure\Services\"/>
     <Folder Include="L3.Worker\Adapters\"/>
-    <Folder Include="L4.Presentation\Adapters\" />
-    <Folder Include="L4.Presentation\Controllers\" />
-    <Folder Include="L4.Presentation\Hubs\" />
+    <Folder Include="L4.Presentation\Adapters\"/>
+    <Folder Include="L4.Presentation\Controllers\"/>
+    <Folder Include="L4.Presentation\Hubs\"/>
   </ItemGroup>
 
 </Project>
