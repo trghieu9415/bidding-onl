@@ -15,6 +15,9 @@
           <Exclude>
             [*]*.DTOs.*,
             [*]*.Migrations.*,
+            [*]*.Filters.*Filter,
+            [*]*.Commands.*Command,[*]*.Commands.*Request,[*]*.Commands.*Result,
+            [*]*.Queries.*Query,[*]*.Queries.*Request,[*]*.Queries.*Result,
 
             <!-- Specical Exclude -->
             [L2.Application]*.Models.TokenModel,

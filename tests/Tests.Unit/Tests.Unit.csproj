@@ -6,9 +6,8 @@
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
- 
+
   <ItemGroup>
-    <Folder Include="L2.Application\Filters\"/>
     <Folder Include="L2.Application\UseCases\"/>
     <Folder Include="L2.Application\UseCases\Auctions\Commands\"/>
     <Folder Include="L2.Application\UseCases\Auctions\Queries\"/>
@@ -16,18 +15,25 @@
     <Folder Include="L2.Application\UseCases\Auth\Queries\"/>
     <Folder Include="L2.Application\UseCases\Bidders\Commands\"/>
     <Folder Include="L2.Application\UseCases\Bidders\Queries\"/>
+    <Folder Include="L2.Application\UseCases\Bidders\Validators\"/>
     <Folder Include="L2.Application\UseCases\Bids\Commands\"/>
     <Folder Include="L2.Application\UseCases\Bids\Queries\"/>
+    <Folder Include="L2.Application\UseCases\Bids\Validators\"/>
     <Folder Include="L2.Application\UseCases\Categories\Commands\"/>
     <Folder Include="L2.Application\UseCases\Categories\Queries\"/>
+    <Folder Include="L2.Application\UseCases\Categories\Validators\"/>
     <Folder Include="L2.Application\UseCases\Items\Commands\"/>
     <Folder Include="L2.Application\UseCases\Items\Queries\"/>
+    <Folder Include="L2.Application\UseCases\Items\Validators\"/>
     <Folder Include="L2.Application\UseCases\Sessions\Commands\"/>
     <Folder Include="L2.Application\UseCases\Sessions\Queries\"/>
+    <Folder Include="L2.Application\UseCases\Sessions\Validators\"/>
     <Folder Include="L2.Application\UseCases\System\Commands\"/>
     <Folder Include="L2.Application\UseCases\System\Queries\"/>
+    <Folder Include="L2.Application\UseCases\System\Validators\"/>
     <Folder Include="L2.Application\UseCases\Transactions\Commands\"/>
     <Folder Include="L2.Application\UseCases\Transactions\Queries\"/>
+    <Folder Include="L2.Application\UseCases\Transactions\Validators\"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -37,6 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.Validators.UnitTestExtension" Version="1.12.0.5"/>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1"/>
     <PackageReference Include="xunit.v3" Version="3.2.2"/>
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">

@@ -6,7 +6,6 @@ using L2.Application.UseCases.Auth.Commands.RefreshAccess;
 using L2.Application.UseCases.Auth.Commands.Register;
 using L2.Application.UseCases.Auth.Commands.RequestPassword;
 using L2.Application.UseCases.Auth.Commands.ResetPassword;
-using L2.Application.UseCases.Auth.Commands.Test;
 using L2.Application.UseCases.Auth.Commands.UpdateProfile;
 using L2.Application.UseCases.Auth.Queries.GetProfile;
 using L4.Presentation.Response;
@@ -119,13 +118,5 @@ public class AuthController : UserController {
       SameSite = SameSiteMode.None
     });
     return ApiResponse.Success(result, "Đăng xuất thành công");
-  }
-
-  [HttpPost("test")]
-  [AllowAnonymous]
-  [ProducesSuccess<bool>]
-  public async Task<IActionResult> Test([FromBody] TestCommand command, CancellationToken ct) {
-    var result = await Mediator.Send(command, ct);
-    return ApiResponse.Success(result);
   }
 }

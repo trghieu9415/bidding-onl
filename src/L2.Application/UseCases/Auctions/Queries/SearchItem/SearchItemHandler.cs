@@ -2,7 +2,7 @@
 using L2.Application.Ports.Search;
 using MediatR;
 
-namespace L2.Application.UseCases.Auctions.Commands.SearchItem;
+namespace L2.Application.UseCases.Auctions.Queries.SearchItem;
 
 public class SearchItemHandler(ISearchService searchService)
   : IRequestHandler<SearchItemQuery, SearchItemResult> {

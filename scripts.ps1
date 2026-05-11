@@ -27,6 +27,7 @@ function Ensure-ReportGenerator {
   }
 }
 
+cls
 switch ($Command) {
   "build" {
     Write-Host "=> Building project..." -ForegroundColor Green
@@ -89,7 +90,7 @@ switch ($Command) {
   }
   "dev" {
     Write-Host "=> Watching and running project..." -ForegroundColor Green
-    dotnet watch run --project $PresentationProj
+    dotnet watch run --project $PresentationProj --launch-profile "http"
   }
   default {
     Write-Host "Lệnh không hợp lệ: $Command" -ForegroundColor Red

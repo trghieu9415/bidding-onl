@@ -4,7 +4,7 @@ using L2.Application.DTOs;
 using L2.Application.Models;
 using MediatR;
 
-namespace L2.Application.UseCases.Auctions.Commands.SearchItem;
+namespace L2.Application.UseCases.Auctions.Queries.SearchItem;
 
 public record SearchItemQuery(AuctionSearchRequest SearchFilter) : IRequest<SearchItemResult>;
 

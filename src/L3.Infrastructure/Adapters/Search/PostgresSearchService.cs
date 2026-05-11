@@ -3,7 +3,7 @@ using L1.Core.Domain.Bidding.Entities;
 using L1.Core.Domain.Catalog.Entities;
 using L2.Application.DTOs;
 using L2.Application.Ports.Search;
-using L2.Application.UseCases.Auctions.Commands.SearchItem;
+using L2.Application.UseCases.Auctions.Queries.SearchItem;
 using L3.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 

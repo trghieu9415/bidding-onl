@@ -1,5 +1,5 @@
 ﻿using L2.Application.DTOs;
-using L2.Application.UseCases.Auctions.Commands.SearchItem;
+using L2.Application.UseCases.Auctions.Queries.SearchItem;
 
 namespace L2.Application.Ports.Search;
 

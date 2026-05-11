@@ -1,8 +1,8 @@
 ﻿using L2.Application.DTOs;
 using L2.Application.Filters;
-using L2.Application.UseCases.Auctions.Commands.SearchItem;
 using L2.Application.UseCases.Auctions.Queries.GetAuction;
 using L2.Application.UseCases.Auctions.Queries.GetWonAuctions;
+using L2.Application.UseCases.Auctions.Queries.SearchItem;
 using L2.Application.UseCases.Bids.Commands.PlaceBid;
 using L2.Application.UseCases.Bids.Queries.GetBiddingActivity;
 using L2.Application.UseCases.Bids.Queries.GetBidHistory;
