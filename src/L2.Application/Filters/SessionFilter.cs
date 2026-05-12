@@ -25,8 +25,9 @@ public sealed class SessionFilterValidator : BaseFilterValidator<SessionFilter> 
       .WithMessage("Tiêu đề phiên đấu giá không được vượt quá 200 ký tự.")
       .When(x => !string.IsNullOrWhiteSpace(x.Title));
 
-    RuleFor(x => x)
-      .Must(x => !x.StartTime.HasValue || !x.EndTime.HasValue || x.StartTime <= x.EndTime)
-      .WithMessage("Thời gian bắt đầu không được lớn hơn thời gian kết thúc.");
+    RuleFor(x => x.EndTime)
+      .GreaterThanOrEqualTo(x => x.StartTime!.Value)
+      .WithMessage("Thời gian bắt đầu không được lớn hơn thời gian kết thúc.")
+      .When(x => x.StartTime.HasValue && x.EndTime.HasValue);
   }
 }

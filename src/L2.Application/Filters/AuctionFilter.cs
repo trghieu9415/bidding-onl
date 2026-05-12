@@ -35,9 +35,10 @@ public sealed class AuctionFilterValidator : BaseFilterValidator<AuctionFilter> 
       .Must(x => !x.MinPrice.HasValue || !x.MaxPrice.HasValue || x.MinPrice <= x.MaxPrice)
       .WithMessage("Giá tối thiểu không được lớn hơn giá tối đa.");
 
-    RuleFor(x => x)
-      .Must(x => !x.MinWinningAt.HasValue || !x.MaxWinningAt.HasValue || x.MinWinningAt <= x.MaxWinningAt)
-      .WithMessage("Thời gian thắng tối thiểu không được lớn hơn thời gian thắng tối đa.");
+    RuleFor(x => x.MaxWinningAt)
+      .GreaterThanOrEqualTo(x => x.MinWinningAt!.Value)
+      .WithMessage("Thời gian thắng tối thiểu không được lớn hơn thời gian thắng tối đa.")
+      .When(x => x.MinWinningAt.HasValue && x.MaxWinningAt.HasValue);
 
     RuleFor(x => x.MinPrice)
       .GreaterThanOrEqualTo(0)

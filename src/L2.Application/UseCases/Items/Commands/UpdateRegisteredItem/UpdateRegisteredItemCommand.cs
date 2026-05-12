@@ -41,7 +41,8 @@ public class UpdateRegisteredItemValidator : AbstractValidator<UpdateRegisteredI
         .WithMessage("Tình trạng không hợp lệ.");
 
       data.RuleFor(x => x.CategoryIds)
-        .Must(ids => ids == null || ids.Count > 0)
+        .NotNull()
+        .NotEmpty()
         .WithMessage("Danh mục không được rỗng.");
 
       data.RuleForEach(x => x.CategoryIds)

@@ -37,12 +37,14 @@ public sealed class AuctionSearchValidator : AbstractValidator<AuctionSearchRequ
       .WithMessage("Giá tối đa không được nhỏ hơn 0.")
       .When(x => x.MaxPrice.HasValue);
 
-    RuleFor(x => x)
-      .Must(x => !x.MinPrice.HasValue || !x.MaxPrice.HasValue || x.MinPrice <= x.MaxPrice)
-      .WithMessage("Giá tối thiểu không được lớn hơn giá tối đa.");
+    RuleFor(x => x.MaxPrice)
+      .GreaterThanOrEqualTo(x => x.MinPrice!.Value)
+      .WithMessage("Giá tối thiểu không được lớn hơn giá tối đa.")
+      .When(x => x.MinPrice.HasValue && x.MaxPrice.HasValue);
 
-    RuleFor(x => x)
-      .Must(x => !x.FromDate.HasValue || !x.ToDate.HasValue || x.FromDate <= x.ToDate)
+    RuleFor(x => x.ToDate)
+      .GreaterThanOrEqualTo(x => x.FromDate)
+      .When(x => x.FromDate.HasValue && x.ToDate.HasValue)
       .WithMessage("Ngày bắt đầu không được lớn hơn ngày kết thúc.");
 
     RuleFor(x => x.Page)
